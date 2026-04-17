@@ -140,7 +140,7 @@
       '<div class="demo-banner-inner">' +
         '<span class="demo-banner-emoji">🦓</span>' +
         '<span class="demo-banner-text">' +
-          '<strong>Dit is een demo met voorbeeldklas</strong> — wijzigingen worden niet bewaard.' +
+          '<strong>Dit is een demo met een fictieve voorbeeldklas</strong> — wijzigingen worden niet bewaard.' +
         '</span>' +
         '<a href="https://www.jufzisa.be/spelgenerator-app" target="_blank" class="demo-banner-btn">' +
           'Ontdek de Spelgenerator →' +
