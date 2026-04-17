@@ -1,0 +1,4080 @@
+<!DOCTYPE html>
+
+<html lang="nl">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Takenbord per kind</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --bg:#f3f4f8;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --card-shadow:0 4px 14px rgba(0,0,0,.08);
+    --radius:20px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"Nunito", Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    visibility:hidden;
+  }
+  body.kb-ready{
+    visibility:visible;
+  }
+  .page{
+    max-width:1400px;
+    margin:0 auto;
+    padding:16px 20px 80px;
+  }
+  h1{
+    margin:6px 0 8px;
+    text-align:center;
+    font-size:clamp(26px, 4vw, 44px);
+    line-height:1.1;
+  }
+  .subtitle{
+    text-align:center;
+    color:var(--muted);
+    font-size:18px;
+    margin:0 0 22px;
+  }
+  .names-topbar{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .teacher-btn,.back-fab,.small-btn,.apply-btn,.close-btn,.add-task-btn{
+    border:none;
+    background:#ffffff;
+    color:#374151;
+    border-radius:16px;
+    padding:12px 16px;
+    font-size:17px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:var(--card-shadow);
+  }
+  .teacher-btn{
+    background:linear-gradient(135deg,#ede9fe,#dbeafe);
+    color:#3730a3;
+  }
+  .name-grid{
+    display:grid;
+    grid-template-columns:repeat(6, minmax(0, 1fr));
+    gap:18px;
+  }
+  .name-card{
+    border:none;
+    border-radius:var(--radius);
+    padding:20px 14px 14px;
+    min-height:136px;
+    cursor:pointer;
+    box-shadow:var(--card-shadow);
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease, border-color .15s ease;
+    text-align:center;
+    border:4px solid transparent;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .name-card:hover{
+    transform:translateY(-3px) scale(1.01);
+    box-shadow:0 8px 22px rgba(0,0,0,.12);
+    filter:saturate(1.05);
+  }
+  .name-card:active{ transform:translateY(0) scale(.99); }
+  .name{
+    font-size:30px;
+    font-weight:800;
+    line-height:1.1;
+    margin-bottom:10px;
+    word-break:break-word;
+  }
+  .task-info{
+    font-size:17px;
+    font-weight:700;
+    color:#374151;
+    background:rgba(255,255,255,.58);
+    border-radius:999px;
+    padding:8px 12px;
+    display:inline-block;
+  }
+  .assign-hint{
+    display:block;
+    margin-top:10px;
+    font-size:14px;
+    font-weight:800;
+    color:#b91c1c;
+  }
+  
+  .needs-assignment{
+    border-color:#fca5a5 !important;
+    background:#fee2e2 !important;
+  }
+  .p1{ background:#fde2e4; }
+  .p2{ background:#dff7f2; }
+  .p3{ background:#e3f0ff; }
+  .p4{ background:#fceccf; }
+  .p5{ background:#ebe4ff; }
+  .p6{ background:#def4d7; }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .pupil-title{
+    text-align:center;
+    font-size:clamp(28px, 3vw, 42px);
+    font-weight:800;
+    margin:0;
+  }
+  .back-fab{
+    position:fixed;
+    left:18px;
+    bottom:18px;
+    z-index:50;
+    padding:16px 22px;
+    font-size:24px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#ffffff,#eef2ff);
+  }
+
+  .task-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    max-width:900px;
+    margin:0 auto;
+  }
+  .task-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    background:#fff;
+    border-radius:22px;
+    padding:18px 18px;
+    box-shadow:var(--card-shadow);
+    flex-wrap:wrap;
+    border:4px solid transparent;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .task-row.status-0-row{ border-color:#edf2ff; }
+  .task-row.status-1-row{ border-color:#fde68a; background:#fffdf3; }
+  .task-row.status-2-row{ border-color:#bbf7d0; background:#f5fff8; }
+
+  .task-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:220px;
+    flex:1;
+  }
+  .task-icon{
+    width:56px;
+    height:56px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    background:#f3f4f6;
+    flex-shrink:0;
+  }
+  .task-label{ font-size:24px; font-weight:800; }
+  .task-sub{ font-size:15px; color:var(--muted); margin-top:4px; }
+
+  .task-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .status-btn{
+    min-width:62px;
+    height:62px;
+    border:none;
+    border-radius:18px;
+    font-size:28px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    transition:transform .12s ease, opacity .12s ease, filter .12s ease, background .12s ease;
+    opacity:.28;
+    filter:grayscale(.45);
+  }
+  .status-btn:hover{ transform:scale(1.05); }
+  .status-btn.active{
+    opacity:1;
+    filter:none;
+    transform:scale(1.08);
+    outline:4px solid rgba(31,41,55,.15);
+  }
+  .status-0{ background:#eef2ff; }
+  .status-1{ background:#fef3c7; }
+  .status-2{ background:#dcfce7; }
+  .status-0.active{ background:#c7d2fe; }
+  .status-1.active{ background:#fde68a; }
+  .status-2.active{ background:#86efac; }
+
+  .smiley-row{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  .smiley-chip{
+    min-width:48px;
+    height:48px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    font-size:24px;
+    background:#f3f4f6;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+    opacity:.65;
+  }
+  .smiley-chip.active{
+    outline:4px solid rgba(31,41,55,.12);
+    background:#fff7ed;
+    opacity:1;
+  }
+
+  .empty-box{
+    max-width:760px;
+    margin:60px auto 0;
+    background:#fff;
+    border-radius:24px;
+    padding:30px 24px;
+    text-align:center;
+    box-shadow:var(--card-shadow);
+  }
+  .empty-title{ font-size:28px; font-weight:800; margin-bottom:10px; }
+  .empty-text{ font-size:18px; color:var(--muted); line-height:1.5; }
+
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .overlay.show{ display:flex; }
+
+  .popup{
+    width:min(520px, 100%);
+    background:white;
+    border-radius:24px;
+    padding:28px 22px 20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.18);
+    text-align:center;
+  }
+  .popup h3{
+    margin:0 0 8px;
+    font-size:30px;
+  }
+  .popup p{
+    margin:0 0 18px;
+    color:var(--muted);
+    font-size:18px;
+  }
+  .popup-smileys{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .popup-smiley{
+    width:80px;
+    min-height:90px;
+    border:none;
+    border-radius:16px;
+    background:#f3f4f6;
+    cursor:pointer;
+    font-size:34px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    padding:8px 4px;
+    font-family:inherit;
+  }
+  .popup-smiley .sml{
+    font-size:11px;
+    font-weight:800;
+    color:#374151;
+    line-height:1.2;
+    text-align:center;
+  }
+  .popup-close{
+    border:none;
+    background:#e5e7eb;
+    border-radius:14px;
+    padding:12px 18px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  .teacher-modal{
+    width:min(1040px, 100%);
+    max-height:90vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:26px;
+    padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,.22);
+  }
+  .teacher-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .teacher-header h3{
+    margin:0;
+    font-size:30px;
+  }
+  .teacher-sub{
+    color:var(--muted);
+    font-size:17px;
+    margin-bottom:18px;
+    line-height:1.5;
+  }
+  .teacher-grid{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:18px;
+  }
+  .teacher-card{
+    background:#f8fafc;
+    border-radius:22px;
+    padding:18px;
+  }
+  .teacher-card h4{
+    margin:0 0 14px;
+    font-size:22px;
+  }
+  .select-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:10px;
+  }
+  .select-pill{
+    border:none;
+    border-radius:18px;
+    padding:12px 12px 10px;
+    font-size:17px;
+    font-weight:800;
+    cursor:pointer;
+    background:#e5e7eb;
+    color:#374151;
+    text-align:center;
+    border:3px solid transparent;
+  }
+  .select-pill.active{
+    background:#c7d2fe;
+    color:#312e81;
+    border-color:#818cf8;
+  }
+  .select-pill.needs-task.active{
+    background:#fca5a5;
+    color:#7f1d1d;
+    border-color:#dc2626;
+  }
+  .select-pill.has-own.active{
+    background:#86efac;
+    color:#14532d;
+    border-color:#16a34a;
+  }
+  .select-pill.needs-task{
+    background:#fee2e2;
+    color:#991b1b;
+    border-color:#fca5a5;
+  }
+  .select-pill.has-own{
+    background:#dcfce7;
+    color:#166534;
+    border-color:#86efac;
+  }
+  .select-pill-top{
+    display:block;
+    font-size:17px;
+    font-weight:800;
+    margin-bottom:4px;
+  }
+  .select-pill-sub{
+    display:block;
+    font-size:12px;
+    font-weight:800;
+    opacity:.85;
+  }
+  .task-chip-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .task-chip{
+    border:none;
+    border-radius:16px;
+    padding:12px 14px;
+    font-size:16px;
+    font-weight:800;
+    cursor:pointer;
+    background:#e5e7eb;
+    color:#374151;
+  }
+  .task-chip.active{
+    background:#fde68a;
+    color:#92400e;
+  }
+  .teacher-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .apply-btn{
+    background:linear-gradient(135deg,#dcfce7,#bbf7d0);
+    color:#166534;
+  }
+  .danger-btn{
+    background:linear-gradient(135deg,#fee2e2,#fecaca);
+    color:#991b1b;
+  }
+  .close-btn{
+    background:#e5e7eb;
+  }
+  .small-btn{
+    padding:10px 14px;
+    font-size:15px;
+    background:#ede9fe;
+    color:#4338ca;
+  }
+  .custom-task-box{
+    background:#eef2ff;
+    border-radius:18px;
+    padding:14px;
+    margin-top:16px;
+  }
+  .custom-task-title{
+    font-size:16px;
+    font-weight:800;
+    color:#3730a3;
+    margin-bottom:10px;
+  }
+  .emoji-picker{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .emoji-btn{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:22px;
+    background:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+  }
+  .emoji-btn.active{
+    outline:3px solid #818cf8;
+    background:#e0e7ff;
+  }
+  .custom-task-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .custom-task-input{
+    flex:1;
+    min-width:220px;
+    border:none;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:16px;
+    box-shadow:inset 0 0 0 2px #c7d2fe;
+  }
+  .add-task-btn{
+    background:linear-gradient(135deg,#ddd6fe,#bfdbfe);
+    color:#312e81;
+  }
+
+  @media (max-width: 1200px){
+    .name-grid{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
+  }
+  @media (max-width: 900px){
+    .teacher-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 760px){
+    .page{ padding:20px 16px 120px; }
+    .name-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px; }
+    .name{ font-size:24px; }
+    .task-info{ font-size:15px; }
+    .task-row{ padding:14px; }
+    .task-label{ font-size:20px; }
+    .status-btn{ min-width:56px; height:56px; font-size:24px; }
+    .select-grid{ grid-template-columns:1fr; }
+    .back-fab{
+      left:14px;
+      right:14px;
+      bottom:14px;
+      width:calc(100% - 28px);
+      text-align:center;
+      font-size:22px;
+    }
+  }
+
+.back-btn-orange{
+  background:linear-gradient(135deg,#fb923c,#f97316) !important;
+  color:#fff !important;
+  border:none !important;
+}
+.back-btn-orange:hover{
+  opacity:.92;
+}
+
+/* EIGEN AFBEELDINGEN – leerlingkaart */
+.name-card-photo-wrap { margin-bottom:8px; }
+.name-card-photo { width:64px; height:64px; border-radius:50%; object-fit:cover; border:3px solid rgba(255,255,255,.7); box-shadow:0 2px 8px rgba(0,0,0,.12); }
+
+/* EIGEN AFBEELDINGEN – taakrij */
+.task-icon-img { width:56px; height:56px; border-radius:16px; object-fit:contain; background:#f3f4f6; flex-shrink:0; }
+
+/* PILL met foto */
+.pill-photo { width:28px; height:28px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:4px; border:2px solid rgba(255,255,255,.6); }
+.pill-photo-btn { position:absolute; top:-6px; right:-6px; width:22px; height:22px; border-radius:50%; border:none; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:2; }
+
+/* Chip upload knop */
+.chip-task-img { width:20px; height:20px; object-fit:contain; border-radius:4px; vertical-align:middle; margin-right:3px; }
+.chip-upload-btn { border:none; background:rgba(255,255,255,.8); border-radius:8px; padding:4px 6px; font-size:13px; cursor:pointer; opacity:.7; transition:opacity .12s; }
+.chip-upload-btn:hover { opacity:1; }
+
+/* Smartboard-modus: teacher-only elementen verborgen */
+body.smartboard .teacher-only { display:none !important; }
+/* iPad-modus: ook timer verborgen */
+body.ipad-modus #timerToggleBtn { display:none !important; }
+body.ipad-modus #timer-popup { display:none !important; }
+
+/* Taaknaam-wrap in teacher modal */
+.kind-task-wrap { display:inline-flex; flex-direction:column; align-items:center; gap:2px; }
+.chip-task-img { width:18px; height:18px; object-fit:contain; border-radius:3px; vertical-align:middle; margin-right:3px; }
+.smiley-row-single { justify-content:flex-start; }
+.smiley-chip-chosen { min-width:56px !important; height:56px !important; font-size:28px !important; background:#f0fdf4 !important; outline:3px solid #86efac !important; opacity:1 !important; cursor:pointer !important; }
+
+/* Upload-rijen in teacher modal */
+.kind-upload-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:14px; border:1px solid #e5e7eb; background:#f9fafb; margin-bottom:8px; flex-wrap:wrap; }
+.kind-upload-row:last-child { margin-bottom:0; }
+.kind-upload-preview { width:48px; height:48px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:12px; background:#fff; border:2px solid #e0e7ff; overflow:hidden; }
+.kind-upload-thumb { width:44px; height:44px; object-fit:contain; border-radius:10px; }
+.kind-upload-thumb-round { border-radius:50%; object-fit:cover; }
+.kind-upload-emoji { font-size:26px; line-height:1; }
+.kind-upload-label { flex:1; font-size:17px; font-weight:800; color:#1f2937; min-width:100px; }
+.kind-upload-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.kind-upload-btn { padding:10px 14px !important; font-size:15px !important; border-radius:12px !important; }
+.setup-screen{
+  display:none;
+}
+.setup-card{
+  max-width:none;
+  margin:0;
+  background:transparent;
+  border-radius:24px;
+  padding:26px;
+  box-shadow:var(--card-shadow);
+}
+.setup-grid{
+  display:grid;
+  grid-template-columns:1.2fr .9fr;
+  gap:18px;
+  margin-top:18px;
+  align-items:start;
+}
+.setup-box{
+  background:#f8fafc;
+  border-radius:20px;
+  padding:18px;
+}
+.setup-label{
+  font-size:13px;
+  font-weight:800;
+  color:#6b7280;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:8px;
+}
+.setup-input{
+  width:100%;
+  border:none;
+  border-radius:14px;
+  padding:14px 16px;
+  font-size:16px;
+  box-shadow:inset 0 0 0 2px #c7d2fe;
+}
+.setup-textarea{
+  width:100%;
+  min-height:170px;
+  border:none;
+  border-radius:14px;
+  padding:14px 16px;
+  font-size:16px;
+  font-family:"Nunito", Arial, sans-serif;
+  resize:vertical;
+  box-shadow:inset 0 0 0 2px #c7d2fe;
+}
+.setup-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+  justify-content:center;
+}
+.primary-big-btn{
+  border:none;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;
+  border-radius:16px;
+  padding:14px 20px;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:var(--card-shadow);
+}
+.secondary-big-btn{
+  border:none;
+  background:#e5e7eb;
+  color:#374151;
+  border-radius:16px;
+  padding:14px 20px;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:var(--card-shadow);
+}
+.setup-help{
+  text-align:center;
+  color:var(--muted);
+  font-size:17px;
+  margin-top:10px;
+  line-height:1.5;
+}
+.sort-chip{
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+  border:2px solid #cbd5e1;
+  background:#f8fafc;
+  color:#475569;
+  cursor:pointer;
+}
+.sort-chip.active{
+  border-color:#60a5fa;
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+.toggle-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.toggle{
+  position:relative;
+  width:42px;
+  height:22px;
+  flex-shrink:0;
+}
+.toggle input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+.toggle-slider{
+  position:absolute;
+  inset:0;
+  background:#cbd5e1;
+  border-radius:999px;
+  cursor:pointer;
+  transition:.2s;
+}
+.toggle-slider::before{
+  content:'';
+  position:absolute;
+  width:16px;
+  height:16px;
+  left:3px;
+  top:3px;
+  background:#fff;
+  border-radius:50%;
+  transition:.2s;
+}
+.toggle input:checked + .toggle-slider{
+  background:#6366f1;
+}
+.toggle input:checked + .toggle-slider::before{
+  transform:translateX(20px);
+}
+.toggle-label{
+  font-size:15px;
+  font-weight:700;
+  color:#374151;
+}
+.setup-status{
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:700;
+  display:none;
+}
+.setup-status.show{
+  display:block;
+}
+.setup-status.success{
+  background:#dcfce7;
+  color:#166534;
+}
+.setup-list-wrap{
+  background:#f8fafc;
+  border-radius:20px;
+  padding:18px;
+}
+.setup-left{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.setup-right{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  position:sticky;
+  top:18px;
+}
+
+.setup-added-list{
+  max-height:420px;
+  overflow:auto;
+  padding-right:4px;
+}
+
+.setup-added-list::-webkit-scrollbar{
+  width:6px;
+}
+
+.setup-added-list::-webkit-scrollbar-thumb{
+  background:#cbd5e1;
+  border-radius:999px;
+}
+
+.setup-added-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:#fff;
+  border-radius:12px;
+  padding:8px 10px;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+}
+
+.setup-added-name{
+  font-size:13px;
+  font-weight:700;
+  color:#1f2937;
+  line-height:1.3;
+}
+
+.setup-right-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.setup-right-actions .back-btn-orange,
+.setup-right-actions .primary-big-btn{
+  width:100%;
+}
+.setup-list-title{
+  font-size:15px;
+  font-weight:800;
+  color:#374151;
+  margin-bottom:10px;
+}
+.setup-added-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.setup-added-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:#fff;
+  border-radius:14px;
+  padding:10px 12px;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+}
+.setup-added-name{
+  font-size:15px;
+  font-weight:700;
+  color:#1f2937;
+}
+.setup-empty{
+  font-size:15px;
+  color:var(--muted);
+  line-height:1.5;
+}
+.setup-remove-btn{
+  border:none;
+  background:#fee2e2;
+  color:#991b1b;
+  border-radius:8px;
+  padding:4px 8px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  flex-shrink:0;
+}
+/* Kleinere knoppen voor setup-scherm */
+.setup-btn-small { border:none; border-radius:10px; padding:8px 14px; font-size:13px; font-weight:800; cursor:pointer; font-family:"Nunito",Arial,sans-serif; background:#e5e7eb; color:#374151; box-shadow:0 2px 6px rgba(0,0,0,.06); }
+.setup-btn-small:hover { opacity:.88; }
+.setup-btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; }
+.setup-btn-danger { background:#fee2e2; color:#991b1b; }
+.setup-btn-nav { border:none; border-radius:12px; padding:10px 18px; font-size:15px; font-weight:800; cursor:pointer; font-family:"Nunito",Arial,sans-serif; width:100%; }
+.setup-btn-go { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; margin-top:4px; }
+.setup-btn-go:hover { opacity:.9; }
+@media (max-width: 900px){
+  .setup-grid{ grid-template-columns:1fr; }
+  .setup-right{ position:static; }
+  .setup-added-list{ max-height:none; }
+}
+</style>
+  <!-- DEMO: Firebase vervangen door dummy + voorbeeldklas -->
+  <script src="demo-config-kind.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="pro-header">
+  <div class="pro-header-left">
+    <a href="../../" class="pro-back-btn">← Terug naar overzicht</a>
+    <span class="pro-header-title">👤 Takenbord per kind</span>
+  </div>
+  <span class="pro-badge" style="background:#8b5cf6;">DEMO</span>
+</div>
+<div class="page">
+
+<section id="setup-screen" class="setup-screen">
+<div class="kb-setup-layout">
+
+  <!-- ── ZIJBALK ── -->
+  <nav class="kb-sb-nav">
+    <button class="kb-sb-back" onclick="goBackToWelcome()">← Welkomstscherm</button>
+    <div class="kb-sb-bord-naam" id="kb-sb-bord-naam"></div>
+    <div class="kb-sb-label">Instellen</div>
+
+    <button class="kb-sb-stap" id="kb-stap-namen" onclick="kbToon('namen')">
+      <div class="kb-sb-badge" id="kb-badge-namen">1</div>
+      <div class="kb-sb-info">
+        <div class="kb-sb-titel">Namen</div>
+        <div class="kb-sb-sub" id="kb-sub-namen">Leerlingen toevoegen</div>
+      </div>
+    </button>
+
+    <button class="kb-sb-stap" id="kb-stap-taken" onclick="kbToon('taken')">
+      <div class="kb-sb-badge kb-badge-2" id="kb-badge-taken">2</div>
+      <div class="kb-sb-info">
+        <div class="kb-sb-titel">Taken</div>
+        <div class="kb-sb-sub" id="kb-sub-taken">Taken toewijzen</div>
+      </div>
+    </button>
+
+    <button class="kb-sb-go" onclick="goToNamesScreen()">👤 Naar het kindbord →</button>
+
+    <div style="height:16px;"></div>
+    <div class="kb-sb-label">Meer</div>
+    <button class="kb-sb-extra" onclick="openBackupKind()">💾 Backup &amp; herstel</button>
+    <button class="kb-sb-extra" onclick="document.getElementById('setup-help-overlay').classList.add('show')">❓ Uitleg</button>
+  </nav>
+
+  <!-- ── CONTENT ── -->
+  <div class="kb-sb-content">
+
+    <!-- PANEEL 1: NAMEN -->
+    <div class="kb-paneel" id="kb-paneel-namen">
+      <div class="kb-paneel-titel">Namen toevoegen</div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:#ecfdf5;border-radius:12px;border:1.5px solid #a7f3d0;margin-bottom:20px;flex-wrap:wrap;font-size:14px;font-weight:800;color:#065f46;">
+        <span>📚 Namen overnemen uit een ander bord?</span>
+        <button onclick="openLaadUitBibliotheekKind()" style="border:1.5px solid #059669;background:#fff;color:#059669;border-radius:9px;padding:8px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;">📥 Bibliotheek</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start;width:100%;">
+
+        <!-- LINKER KOLOM -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <div style="background:#fff;border:1.5px solid #e0e7ff;border-radius:14px;padding:18px 20px;">
+            <div style="font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:6px;">📋 Klaslijst in één keer plakken</div>
+            <div style="font-size:13px;color:#94a3b8;margin-bottom:14px;line-height:1.5;">Kopieer namen uit Smartschool, Excel of Word — één naam per regel.</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:800;color:#6b7280;">Volgorde:</span>
+              <button type="button" class="sort-chip active" id="setup-order-voor" onclick="setSetupOrder('voornaam')">Voornaam Achternaam</button>
+              <button type="button" class="sort-chip" id="setup-order-ach" onclick="setSetupOrder('achternaam')">Achternaam Voornaam</button>
+            </div>
+            <div class="toggle-row" style="margin-bottom:14px;">
+              <label class="toggle"><input id="setup-show-lastname" type="checkbox" onchange="toggleSetupLastname()"/><span class="toggle-slider"></span></label>
+              <span style="font-size:14px;font-weight:700;color:#374151;margin-left:10px;">Achternaam tonen op het bord</span>
+            </div>
+            <textarea id="setupBulkInput" style="width:100%;min-height:100px;font-size:15px;padding:12px 14px;border:1.5px solid #e0e7ff;border-radius:10px;resize:vertical;font-family:inherit;color:#1a202c;background:#f7fafc;line-height:1.6;margin-bottom:12px;box-sizing:border-box;" placeholder="Jana De Smedt&#10;Thomas Peeters&#10;Lena&#10;..."></textarea>
+            <div style="display:flex;gap:10px;">
+              <button type="button" onclick="addBulkPupilsFromSetup()" style="flex:1;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none;background:#3b82f6;color:#fff;">➕ Toevoegen</button>
+              <button type="button" onclick="clearAllPupilsFromSetup()" style="flex:1;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none;background:#e2e8f0;color:#4a5568;">🗑 Lijst leeg</button>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1.5px solid #e0e7ff;border-radius:14px;padding:18px 20px;">
+            <div style="font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:12px;">✏️ Of één naam toevoegen</div>
+            <input id="setupNameInput" type="text" placeholder="Jana De Smedt" onkeydown="if(event.key==='Enter')addSinglePupilFromSetup()" style="width:100%;padding:12px 14px;font-size:15px;font-family:inherit;border:1.5px solid #e0e7ff;border-radius:10px;background:#f7fafc;color:#1a202c;box-sizing:border-box;margin-bottom:10px;"/>
+            <button type="button" onclick="addSinglePupilFromSetup()" style="width:100%;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none;background:#3b82f6;color:#fff;">+ Toevoegen</button>
+          </div>
+
+        </div>
+
+        <!-- RECHTER KOLOM: leerlingenlijst -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-weight:800;font-size:15px;color:#1e1b4b;">Leerlingen (<span id="setup-count">0</span>)</span>
+          </div>
+          <div id="setupStatus" style="margin-bottom:8px;"></div>
+          <div id="autosave-kind" style="display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#166534;">
+            ✅ <strong>Automatisch opgeslagen</strong>
+          </div>
+          <div id="setupAddedList" class="setup-added-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PANEEL 2: TAKEN TOEWIJZEN -->
+    <div class="kb-paneel kb-paneel-hidden" id="kb-paneel-taken">
+      <div class="kb-paneel-titel">Taken toewijzen</div>
+      <div style="font-size:14px;color:#6b7280;margin-bottom:20px;line-height:1.7;">
+        Vink leerlingen aan (links) en taken (rechts), dan klik je onderaan op <strong>Toewijzen</strong>. Klik steeds eerst op toewijzen voor je een andere groep kinderen taken geeft. Je kan ook per leerling een andere set taken geven.
+      </div>
+      <div class="kb-taken-layout">
+        <!-- Leerlingen -->
+        <div class="kb-taken-col">
+          <div class="kb-taken-col-titel">👦 Leerlingen</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <button type="button" onclick="kbSelectAllPupils()" style="flex:1;padding:8px;border-radius:9px;border:none;background:#e2e8f0;color:#4a5568;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Alles selecteren</button>
+            <button type="button" onclick="kbDeselectAllPupils()" style="flex:1;padding:8px;border-radius:9px;border:none;background:#e2e8f0;color:#4a5568;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Deselecteren</button>
+          </div>
+          <div id="teacherPupilGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
+        </div>
+        <!-- Taken -->
+        <div class="kb-taken-col">
+          <div class="kb-taken-col-titel">📋 Taken</div>
+          <div style="font-size:13px;color:#6b7280;margin-bottom:10px;line-height:1.6;">Klik op een taak om ze te selecteren. Klik ⚙ voor naam wijzigen of eigen afbeelding.</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <button type="button" onclick="kbSelectAllTasks()" style="flex:1;padding:8px;border-radius:9px;border:none;background:#e2e8f0;color:#4a5568;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Alles selecteren</button>
+            <button type="button" onclick="kbDeselectAllTasks()" style="flex:1;padding:8px;border-radius:9px;border:none;background:#e2e8f0;color:#4a5568;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Deselecteren</button>
+          </div>
+          <div id="teacherTaskGrid" class="kb-task-grid"></div>
+          <!-- Eigen taak toevoegen -->
+          <div class="eigen-taak-wrap" style="margin-top:16px;">
+            <div class="eigen-taak-titel">➕ Eigen taak toevoegen</div>
+            <div class="eigen-taak-hint">Klik op ⭐ voor een pictogram, typ een naam en klik +</div>
+            <div class="eigen-taak-rij" style="position:relative;">
+              <button type="button" class="eigen-taak-emoji-btn" id="kb-emoji-btn" onclick="toggleKbEmojiPicker()" title="Kies pictogram">⭐</button>
+              <div class="emoji-picker-popup" id="kb-emoji-popup">
+                <div style="font-size:12px;font-weight:800;color:#6b7280;margin-bottom:8px;">Kies een pictogram</div>
+                <div id="emojiPicker" class="emoji-picker"></div>
+              </div>
+              <input id="newTaskInput" type="text" class="naam-input" style="flex:1;" placeholder="Naam van de taak…" onkeydown="if(event.key==='Enter')addCustomTask()"/>
+              <button type="button" class="invoer-btn invoer-btn-primary" onclick="addCustomTask()" style="flex:none;padding:0 20px;height:46px;font-size:16px;">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Toewijzen knop -->
+      <div style="margin-top:20px;padding:16px;background:#ecfdf5;border-radius:14px;border:1.5px solid #a7f3d0;">
+        <div style="font-size:13px;color:#065f46;margin-bottom:10px;font-weight:700;" id="kb-assign-hint">Selecteer leerlingen en taken hierboven, dan klik Toewijzen.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" onclick="assignTasksToSelected()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#059669;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">✓ Toewijzen aan geselecteerde leerlingen</button>
+          <button type="button" onclick="clearAssignmentsSelected()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#e2e8f0;color:#4a5568;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">✕ Taken wissen bij geselecteerde</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Instellingen verplaatst naar Namen en Taken panelen -->
+    <div id="kb-paneel-inst" class="kb-paneel-hidden"></div>
+
+  </div><!-- /kb-sb-content -->
+</div><!-- /kb-setup-layout -->
+</section>
+
+<!-- ── BIBLIOTHEEK MODAL ─────────────────────────────────────────────── -->
+<div id="kind-bib-overlay" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;padding:28px;max-width:600px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div style="font-size:20px;font-weight:800;color:#1e1b4b;">📚 Overnemen uit ander bord</div>
+      <button onclick="closeKindBib()" style="border:none;background:none;font-size:20px;cursor:pointer;color:#9ca3af;">✕</button>
+    </div>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:20px;">Kies een bord om namen, taken of pictogrammen van over te nemen.</p>
+
+    <div id="kind-bib-lijst" style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;"></div>
+
+    <div id="kind-bib-opties" style="display:none;background:#f8fafc;border:1.5px solid #e0e7ff;border-radius:14px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:800;color:#1e1b4b;margin-bottom:12px;">Wat wil je overnemen van <strong id="kind-bib-bronnaam"></strong>?</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;color:#374151;">
+          <input type="checkbox" id="bib-opt-namen" checked style="width:18px;height:18px;accent-color:#059669;"> Namen overnemen
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;color:#374151;">
+          <input type="checkbox" id="bib-opt-taken" checked style="width:18px;height:18px;accent-color:#059669;"> Taken &amp; pictogrammen overnemen
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;color:#374151;">
+          <input type="checkbox" id="bib-opt-toewijzing" style="width:18px;height:18px;accent-color:#059669;"> Taak-toewijzingen per leerling overnemen
+        </label>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="uitvoerenKindBib()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#059669;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">✓ Overnemen</button>
+        <button onclick="document.getElementById('kind-bib-opties').style.display='none'" style="flex:1;padding:12px;border-radius:10px;border:none;background:#e2e8f0;color:#4a5568;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">Annuleren</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="names-screen" style="display:none;">
+<h1>Kies je naam</h1>
+<p class="subtitle" id="kind-bord-naam" style="font-size:13px;font-weight:800;color:#6366f1;margin-bottom:4px;"></p>
+<p class="subtitle">Klik op jouw naam en kijk welke taken je nog moet maken.</p>
+<div class="names-topbar">
+  <button class="teacher-only" onclick="goBackToSetup()" type="button" style="border:none;background:#f97316;color:#fff;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">← Terug naar beheer</button>
+  <button class="teacher-btn teacher-only" onclick="openSmartboardTakenbord()" type="button" style="background:#3b82f6;color:#fff;border:none;">📺 Smartboard</button>
+  <button class="teacher-btn teacher-only" onclick="openQrTakenbord()" type="button" style="background:#8b5cf6;color:#fff;border:none;">📱 QR-code</button>
+  <div class="meer-opties-wrap teacher-only" style="position:relative;display:inline-block;">
+    <button onclick="toggleTakenbordMeer()" style="background:#f1f5f9;color:#374151;border:2px solid #e2e8f0;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Meer ▾</button>
+    <div id="takenbord-meer-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:2px solid #e0e7ff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:160px;z-index:200;padding:6px;">
+      <button onclick="openPdfModalKind();closeTakenbordMeer()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:7px 10px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">📄 PDF rapport</button>
+      <button onclick="toggleTimer();closeTakenbordMeer()" id="timerToggleBtn" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:7px 10px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">⏱️ Timer</button>
+      <button onclick="goBackToWelcome();closeTakenbordMeer()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:7px 10px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">🏠 Welkomstscherm</button>
+      <div style="border-top:1px solid #e0e7ff;margin:4px 0;"></div>
+      <button onclick="exportTakenbord();closeTakenbordMeer()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:7px 10px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">💾 Backup opslaan</button>
+      <button onclick="document.getElementById('takenbord-import-input').click();closeTakenbordMeer()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:7px 10px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">📂 Backup terugzetten</button>
+      <input type="file" id="takenbord-import-input" accept=".json" style="display:none;" onchange="importTakenbord(event)">
+    </div>
+  </div>
+</div>
+
+<!-- Leerkracht-banner -->
+<div id="kind-teacher-banner" class="kind-teacher-banner teacher-only">
+  <span>👩‍🏫 <strong>Leerkrachtweergave</strong> — kinderen zien dit scherm niet. Gebruik <strong>📺 Smartboard</strong> of <strong>📱 QR-code</strong> om het bord te tonen.</span>
+  <button onclick="document.getElementById('kind-teacher-banner').style.display='none'" style="border:none;background:none;color:#a16207;font-size:14px;font-weight:800;cursor:pointer;padding:0 4px;">✕</button>
+</div>
+
+<!-- ⚙️ Menu knop voor smartboard modus -->
+<div id="smartboard-top-btns" style="display:none;position:fixed;top:12px;right:12px;z-index:7000;display:none;gap:8px;align-items:center;">
+  <button onclick="toggleTimer()" style="border:2px solid #e0e7ff;background:#f0f4ff;color:#6366f1;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">⏱️ Timer</button>
+  <button onclick="document.getElementById('kind-exit-overlay').classList.add('show')" style="border:none;background:rgba(99,102,241,.15);color:#6366f1;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">⚙️ Menu</button>
+</div>
+<button id="smartboard-exit-btn" style="display:none;"></button>
+
+
+<!-- Foto-hint: inline boven het namenraster, verdwijnt na sluiten -->
+<div id="kind-hint-photos" style="display:none;background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:10px 16px;margin:0 0 14px;font-size:13px;color:#92400e;align-items:center;gap:10px;flex-wrap:wrap;">
+  <span>💡 <strong>Tip:</strong> Je kan foto's bij namen en afbeeldingen bij taken toevoegen via <strong>← Terug naar beheer</strong>.</span>
+  <button onclick="localStorage.setItem('kind_hint_photos','1');document.getElementById('kind-hint-photos').style.display='none'" style="border:none;background:none;color:#a16207;font-size:13px;font-weight:800;cursor:pointer;padding:0;flex-shrink:0;margin-left:auto;">✕ Sluiten</button>
+</div>
+
+<div class="name-grid" id="nameGrid"></div>
+<div class="empty-box" id="emptyNames" style="display:none;">
+<div class="empty-title">Geen leerlingen gevonden</div>
+<div class="empty-text">
+        Voeg eerst leerlingen toe via het vorige scherm.<br/>
+        Daarna verschijnen de namen hier.
+      </div>
+</div>
+</section>
+<section id="tasks-screen" style="display:none;">
+<div class="topbar">
+<h2 class="pupil-title" id="pupilTitle"></h2>
+<button id="kind-undo-btn" onclick="undoKindAction()" style="display:none;border:none;background:#fef3c7;color:#92400e;border:1.5px solid #f59e0b;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:800;cursor:pointer;margin-left:8px;">↩ Ongedaan</button>
+<button class="teacher-btn teacher-only" onclick="openTeacherModal()" style="margin-left:auto;">⚙️ Beheer</button>
+<button onclick="showKindClosed()" style="margin-left:8px;border:none;background:#ef4444;color:#fff;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">✕ Klaar</button>
+</div>
+<div class="task-list" id="taskList"></div>
+<div class="empty-box" id="emptyTasks" style="display:none;">
+<div class="empty-title">Er zijn nog geen taken</div>
+<div class="empty-text">Deze leerling heeft momenteel geen actieve taken om te maken.</div>
+</div>
+<button class="back-fab back-btn-orange" id="backBtn">← Terug naar namen</button>
+</section>
+</div>
+<!-- QR MODAL -->
+<div id="qr-takenbord-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
+<div style="max-width:360px;width:90%;background:#fff;border-radius:20px;padding:24px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.2);">
+  <div class="modal-title">📱 QR-code voor leerlingen</div>
+  <p class="modal-sub" style="margin-bottom:16px;">Laat leerlingen deze code scannen om hun taken te zien.</p>
+  <div id="qr-takenbord-container" style="display:flex;justify-content:center;margin:16px 0;"></div>
+  <p id="qr-takenbord-url" style="font-size:11px;color:#94a3b8;word-break:break-all;margin-bottom:16px;"></p>
+  <div class="modal-btns">
+    <button class="btn btn-secondary" onclick="document.getElementById('qr-takenbord-modal').style.display='none'">Sluiten</button>
+  </div>
+</div>
+</div>
+
+<!-- SETUP UITLEG OVERLAY -->
+<div class="overlay" id="setup-help-overlay">
+<div class="popup" style="text-align:left;max-width:620px;width:100%;max-height:85vh;overflow-y:auto;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+  <h3 style="font-size:20px;margin:0;">❓ Uitleg — Beheerpagina</h3>
+  <button type="button" class="apply-btn teacher-btn" onclick="document.getElementById('setup-help-overlay').classList.remove('show')" style="padding:8px 20px;">✓ Begrepen!</button>
+</div>
+<p style="font-size:14px;color:#6b7280;margin-bottom:20px;">Gebruik de zijbalk links om tussen de 2 stappen te navigeren.</p>
+
+<div style="margin-bottom:18px;padding:14px 16px;background:#f8fafc;border-radius:12px;border:1.5px solid #e0e7ff;">
+  <div style="font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:10px;">👦 Stap 1 — Namen</div>
+  <ul style="font-size:13px;color:#4b5563;line-height:1.8;margin:0;padding-left:18px;">
+    <li><strong>Klaslijst plakken</strong> — kopieer namen uit Smartschool, Excel of Word, plak ze in het tekstvak (één naam per regel) en klik Toevoegen.</li>
+    <li><strong>Volgorde instellen vóór je plakt</strong> — kies Voornaam Achternaam of Achternaam Voornaam. Fout gekozen? Klik "Lijst leeg" en begin opnieuw.</li>
+    <li><strong>Achternaam tonen</strong> — zet aan als meerdere kinderen dezelfde voornaam hebben.</li>
+    <li><strong>📥 Bibliotheek</strong> — namen overnemen uit een ander bord.</li>
+  </ul>
+</div>
+
+<div style="margin-bottom:18px;padding:14px 16px;background:#f8fafc;border-radius:12px;border:1.5px solid #e0e7ff;">
+  <div style="font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:10px;">📋 Stap 2 — Taken toewijzen</div>
+  <ul style="font-size:13px;color:#4b5563;line-height:1.8;margin:0;padding-left:18px;">
+    <li><strong>Leerlingen selecteren</strong> (links) — vink één of meerdere leerlingen aan.</li>
+    <li><strong>Taken selecteren</strong> (rechts) — klik op de takentegels die je wil toewijzen.</li>
+    <li><strong>⚙ knopje</strong> op een tegel — naam wijzigen of eigen afbeelding uploaden.</li>
+    <li><strong>Toewijzen</strong> — klik de groene knop om de geselecteerde taken toe te wijzen aan de geselecteerde leerlingen.</li>
+    <li><strong>Eigen taak toevoegen</strong> — klik ⭐ voor een pictogram, typ een naam en klik +.</li>
+    <li><strong>🔒 knopje</strong> naast een leerling — privé-bevindingen toevoegen (niet zichtbaar op het bord).</li>
+  </ul>
+</div>
+
+<div style="margin-bottom:18px;padding:14px 16px;background:#f8fafc;border-radius:12px;border:1.5px solid #e0e7ff;">
+  <div style="font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:10px;">👤 Naar het kindbord</div>
+  <ul style="font-size:13px;color:#4b5563;line-height:1.8;margin:0;padding-left:18px;">
+    <li>Klik op de groene knop <strong>"Naar het kindbord"</strong> in de zijbalk om naar de namenweergave te gaan.</li>
+    <li>Dit is de <strong>leerkrachtversie</strong> — kinderen zien dit scherm niet.</li>
+    <li>Gebruik <strong>📺 Smartboard</strong> of <strong>📱 QR-code</strong> om het bord te tonen op het smartboard of iPad.</li>
+  </ul>
+</div>
+
+<div style="display:flex;justify-content:flex-end;">
+  <button type="button" class="apply-btn teacher-btn" onclick="document.getElementById('setup-help-overlay').classList.remove('show')" style="padding:10px 24px;">✓ Begrepen!</button>
+</div>
+</div>
+</div>
+
+<!-- SMILEY OVERLAY -->
+<div class="overlay" id="smileyOverlay">
+<div class="popup">
+<h3>Hoe ging het?</h3>
+<p>Kies een smiley die past bij deze taak.</p>
+<div class="popup-smileys">
+<button class="popup-smiley" data-smiley="1">😊<span class="sml">Super!</span></button>
+<button class="popup-smiley" data-smiley="2">🙂<span class="sml">Goed</span></button>
+<button class="popup-smiley" data-smiley="3">😐<span class="sml">Moeilijk</span></button>
+<button class="popup-smiley" data-smiley="4">😟<span class="sml">Te moeilijk</span></button>
+</div>
+<button class="popup-close" id="popupClose">Overslaan</button>
+</div>
+</div>
+<div class="overlay" id="teacherOverlay">
+<div class="teacher-modal">
+<div class="teacher-header">
+<h3>Taken toewijzen</h3>
+<div style="display:flex;gap:8px;align-items:center;">
+<button type="button" class="small-btn" onclick="document.getElementById('kind-help-overlay').classList.add('show')" style="background:#eef2ff;color:#4338ca;">❓ Uitleg</button>
+<button class="close-btn" id="teacherCloseBtn">Sluiten</button>
+</div>
+</div>
+<div class="teacher-sub">
+  Kinderen volgen standaard de taken van het klasbord. Wil je <strong>per kind of per groepje andere taken</strong> instellen? Klik dan op <strong>🧹 Eigen taken instellen</strong> — daarna kies je zelf welke taken elk kind krijgt.<br/>
+  <span style="font-size:11px;color:#9ca3af;margin-top:4px;display:block;">Wil je later terug naar de taken van het klasbord? Klik dan op "↩ Terug naar klasbord-taken".</span>
+</div>
+<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:8px 12px;margin:0 0 14px;font-size:12px;color:#166534;display:flex;align-items:center;gap:8px;">
+  ✅ <strong>Automatisch opgeslagen</strong> — namen, taken, afbeeldingen en naamwijzigingen blijven bewaard bij elke opening.
+</div>
+<div class="teacher-actions" style="margin-top:0;margin-bottom:18px;">
+<button class="danger-btn teacher-btn" id="emptyBoardBtn">🧹 Eigen taken instellen per kind</button>
+</div>
+<div class="teacher-grid">
+<div class="teacher-card">
+<h4>Kinderen</h4>
+<div class="teacher-actions" style="margin-top:0;margin-bottom:14px;">
+<button class="small-btn" id="selectAllPupilsBtn">Alles selecteren</button>
+<button class="small-btn" id="clearPupilsBtn">Selectie wissen</button>
+</div>
+<div class="select-grid" id="teacherPupilGrid"></div>
+</div>
+<div class="teacher-card">
+<h4>Taken</h4>
+
+<div style="font-size:11px;color:#6b7280;margin-bottom:10px;line-height:1.5;">Klik op een taak om te selecteren. Gebruik <strong>✎ naam</strong> om de naam aan te passen en <strong>📷 afb.</strong> voor een eigen afbeelding — alles wordt automatisch bewaard.</div>
+<div class="teacher-actions" style="margin-top:0;margin-bottom:14px;">
+<button class="small-btn" id="selectActiveTasksBtn">Alle actieve taken</button>
+<button class="small-btn" id="clearTasksBtn">Taken wissen</button>
+</div>
+<div class="task-chip-grid" id="teacherTaskGrid"></div>
+<div class="custom-task-box">
+<div class="custom-task-title">Eigen taak toevoegen</div>
+<div style="font-size:11px;color:#6b7280;margin-bottom:8px;">Eigen taken blijven bewaard en kunnen aan/uit gezet worden zoals de andere taken.</div>
+<div class="emoji-picker" id="emojiPicker"></div>
+<div class="custom-task-row">
+<input class="custom-task-input" id="customTaskInput" placeholder="Typ hier je eigen taak..." type="text"/>
+<button class="add-task-btn" id="addCustomTaskBtn">+ Toevoegen</button>
+</div>
+</div>
+</div>
+</div>
+<div class="teacher-actions">
+<button class="apply-btn" id="applyAssignmentsBtn">Toewijzen aan selectie</button>
+<button class="close-btn" id="clearAssignmentsBtn">Persoonlijke taken wissen voor selectie</button>
+<button class="teacher-btn" id="teacherDoneBtn">Klaar</button>
+</div>
+<div style="border-top:2px solid #e5e7eb;margin-top:16px;padding-top:14px;">
+  <button type="button" onclick="openKindNewSchoolYear()" style="width:100%;border:none;background:#f3f4f6;color:#6b7280;border-radius:12px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;">🎒 Nieuw schooljaar — klas wissen</button>
+</div>
+</div>
+</div>
+<script>
+const STORAGE_KEY = (function(){
+  const params = new URLSearchParams(window.location.search);
+  const bordId = params.get('bordid');
+  const type = params.get('type') || 'kindbord';
+  if(bordId){
+    try {
+      const all = JSON.parse(localStorage.getItem('borden_v1')||'{}');
+      const lijst = all[type] || [];
+      const bord = lijst.find(function(b){ return b.id === bordId; });
+      if(bord && bord.storageKey) return bord.storageKey;
+    } catch{}
+    return 'kind_'+bordId;
+  }
+  return 'takenbord_kind_v1';
+})();
+const SMILEYS = ['', '😊', '🙂', '😐', '😟'];
+const EMOJIS = ['📖','🔢','✏️','🔤','🎨','💻','✂️','🎵','📄','🗂️','📒','📐','🛒','🔣','📏','⭐','🏆','🎯','🔬','📚','🌍','🎭','🏃','🍎','🧩','🎲','🖍️','🌱','💡','🧪','🎸','⚽','🏊','🌈','🖊️','📝'];
+const SMILEY_LABELS = ['', 'Heel goed', 'Goed', 'Ging wel', 'Moeilijk'];
+
+const DEFAULT_TASKS = [
+  {id:'lezen',label:'Lezen',icon:'📖'},{id:'rekenen',label:'Rekenen',icon:'🔢'},
+  {id:'schrijven',label:'Schrijven',icon:'✏️'},{id:'spelling',label:'Spelling',icon:'🔤'},
+  {id:'tekenen',label:'Tekenen',icon:'🎨'},{id:'computer',label:'Computer',icon:'💻'},
+  {id:'knippen',label:'Knippen',icon:'✂️'},{id:'muziek',label:'Muziek',icon:'🎵'},
+  {id:'werkblad',label:'Werkblad',icon:'📄'},{id:'project',label:'Project',icon:'🗂️'},
+  {id:'werkboek',label:'Werkboek',icon:'📒'},{id:'meetkunde',label:'Meetkunde',icon:'📐'},
+  {id:'winkeltje',label:'Winkeltje',icon:'🛒'},{id:'getallen',label:'Getallen',icon:'🔣'},
+  {id:'metendrekenen',label:'Metend rekenen',icon:'📏'}
+];
+
+let state = {};
+let currentPupil = null;
+let pendingTaskId = null;
+let teacherSelectedPupils = new Set();
+let teacherSelectedTasks = new Set();
+let selectedEmoji = '⭐';
+let setupNameOrder = 'voornaam';
+let setupShowLastname = false;
+var _kbActief = 'namen';
+
+
+function addSinglePupilFromSetup(){
+  const input = document.getElementById('setupNameInput');
+  const parsed = parseFullNameByOrder(input.value);
+  if(!parsed || !parsed.voornaam){
+    alert('Typ eerst een naam in.');
+    return;
+  }
+
+  state.pupils.push({
+    id: uid(),
+    voornaam: parsed.voornaam,
+    achternaam: parsed.achternaam
+  });
+
+    saveState();
+  input.value = '';
+  renderNames();
+  renderSetupAddedList();
+  showSetupStatus('Naam toegevoegd aan het bord.');
+}
+
+function addBulkPupilsFromSetup(){
+  const textarea = document.getElementById('setupBulkInput');
+  const lines = textarea.value
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  if(!lines.length){
+    alert('Plak eerst één of meer namen.');
+    return;
+  }
+
+  lines.forEach(line => {
+        const parsed = parseFullNameByOrder(line);
+    if(parsed && parsed.voornaam){
+      state.pupils.push({
+        id: uid(),
+        voornaam: parsed.voornaam,
+        achternaam: parsed.achternaam
+      });
+    }
+  });
+
+    saveState();
+  renderNames();
+  renderSetupAddedList();
+  showSetupStatus(`${lines.length} namen toegevoegd aan het bord.`);
+}
+
+function clearAllPupilsFromSetup(){
+  if(!confirm('Wil je alle leerlingen van dit kindbord wissen?')) return;
+
+    state.pupils = [];
+  state.progress = {};
+  state.personalAssignments = {};
+  saveState();
+  renderNames();
+  renderSetupAddedList();
+  showSetupStatus('Alle leerlingen zijn verwijderd van het bord.');
+}
+
+function goToNamesScreen(){
+  if(!state.pupils || !state.pupils.length){
+    alert('Voeg eerst leerlingen toe via Stap 1.');
+    kbToon('namen');
+    return;
+  }
+  document.getElementById('setup-screen').classList.remove('active');
+  document.getElementById('names-screen').style.display = 'block';
+  document.getElementById('tasks-screen').style.display = 'none';
+  currentPupil = null;
+  renderNames();
+}
+
+function goBackToSetup(){
+  currentPupil = null;
+  document.getElementById('tasks-screen').style.display = 'none';
+  document.getElementById('names-screen').style.display = 'none';
+  document.getElementById('setup-screen').classList.add('active');
+  kbToon(_kbActief || 'namen');
+  renderNames();
+  renderSetupAddedList();
+}
+
+// ── KINDBORD ZIJBALK ──────────────────────────────────────────────────────
+
+function kbToon(sectie){
+  _kbActief = sectie;
+  ['namen','taken','inst'].forEach(function(s){
+    var p = document.getElementById('kb-paneel-'+s); if(p) p.classList.toggle('kb-paneel-hidden', s!==sectie);
+    var b = document.getElementById('kb-stap-'+s);  if(b) b.classList.toggle('kb-actief', s===sectie);
+  });
+  if(sectie === 'taken') kbRenderTaken();
+  if(sectie === 'namen') renderSetupAddedList();
+  if(sectie === 'inst'){
+    var sl = document.getElementById('setup-show-lastname'); if(sl) sl.checked = !!setupShowLastname;
+    var op = document.getElementById('setup-only-personal'); if(op) op.checked = !!state.kindBoardOnlyPersonal;
+  }
+  kbUpdateWizard();
+}
+
+function kbUpdateWizard(){
+  var hN = state.pupils && state.pupils.length > 0;
+  var hT = state.personalAssignments && state.pupils && state.pupils.some(function(p){ return Array.isArray(state.personalAssignments[p.id]); });
+  var b1=document.getElementById('kb-badge-namen'); if(b1){b1.textContent=hN?'✓':'1';b1.classList.toggle('kb-badge-klaar',hN);}
+  var b2=document.getElementById('kb-badge-taken'); if(b2){b2.textContent=hT?'✓':'2';b2.classList.toggle('kb-badge-klaar',hT);}
+  var s1=document.getElementById('kb-sub-namen'); if(s1) s1.textContent=hN?state.pupils.length+' leerlingen':'Leerlingen toevoegen';
+  var s2=document.getElementById('kb-sub-taken'); if(s2) s2.textContent=hT?'Taken toegewezen':'Taken toewijzen';
+  var bn=document.getElementById('kb-sb-bord-naam');
+  if(bn){ try{ var borden=JSON.parse(localStorage.getItem('kbBorden')||'[]'); var b=borden.find(function(x){return x.id===bordId;}); bn.textContent=b?b.naam:''; }catch(e){} }
+  // "Enkel eigen taken" toggle sync
+  var op=document.getElementById('setup-only-personal'); if(op) op.checked=!!state.kindBoardOnlyPersonal;
+  var sl=document.getElementById('setup-show-lastname'); if(sl) sl.checked=!!setupShowLastname;
+}
+
+function kbSelectAllPupils(){
+  state.pupils.forEach(function(p){ teacherSelectedPupils.add(p.id); });
+  kbRenderTaken();
+}
+function kbDeselectAllPupils(){
+  teacherSelectedPupils.clear();
+  kbRenderTaken();
+}
+function kbSelectAllTasks(){
+  allTasks().forEach(function(t){ teacherSelectedTasks.add(t.id); });
+  kbRenderTaken();
+}
+function kbDeselectAllTasks(){
+  teacherSelectedTasks.clear();
+  kbRenderTaken();
+}
+
+function toggleOnlyPersonal(){
+  var cb = document.getElementById('setup-only-personal');
+  state.kindBoardOnlyPersonal = cb ? cb.checked : false;
+  saveState();
+}
+
+function toggleKbEmojiPicker(){
+  var popup = document.getElementById('kb-emoji-popup'); if(!popup) return;
+  popup.classList.toggle('open');
+  if(popup.classList.contains('open')){
+    setTimeout(function(){
+      document.addEventListener('click', function closeKbEP(e){
+        if(!popup.contains(e.target) && e.target.id !== 'kb-emoji-btn'){
+          popup.classList.remove('open');
+          document.removeEventListener('click', closeKbEP);
+        }
+      });
+    }, 10);
+  }
+}
+
+function kbRenderTaken(){
+  // Leerlingen kolom
+  var pupilGrid = document.getElementById('teacherPupilGrid');
+  if(!pupilGrid) return;
+  pupilGrid.innerHTML = '';
+  state.pupils.forEach(function(pupil){
+    const hasOwn = hasPersonalAssignments(pupil.id);
+    const photo = state.pupilPhotos[pupil.id];
+    const isSelected = teacherSelectedPupils.has(pupil.id);
+
+    const hasTaken = hasPersonalAssignments(pupil.id);
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:all .12s;border:2px solid '
+      + (isSelected ? '#059669' : hasTaken ? '#a7f3d0' : '#e5e7eb')
+      + ';background:' + (isSelected ? '#ecfdf5' : hasTaken ? '#f0fdf4' : '#f9fafb') + ';';
+    wrap.onclick = function(){
+      if(teacherSelectedPupils.has(pupil.id)) teacherSelectedPupils.delete(pupil.id);
+      else teacherSelectedPupils.add(pupil.id);
+      kbRenderTaken();
+    };
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = isSelected;
+    cb.style.cssText = 'width:18px;height:18px;cursor:pointer;flex-shrink:0;accent-color:#059669;';
+    cb.onclick = function(e){ e.stopPropagation(); };
+    cb.onchange = function(){
+      if(cb.checked) teacherSelectedPupils.add(pupil.id);
+      else teacherSelectedPupils.delete(pupil.id);
+      kbRenderTaken();
+    };
+    wrap.appendChild(cb);
+
+    const photoBtn = document.createElement('button');
+    photoBtn.type = 'button';
+    photoBtn.style.cssText = 'width:32px;height:32px;border:none;border-radius:50%;cursor:pointer;flex-shrink:0;padding:0;overflow:hidden;background:'+(photo?'transparent':'#ede9fe')+';font-size:14px;display:flex;align-items:center;justify-content:center;';
+    photoBtn.innerHTML = photo ? '<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />' : '📷';
+    photoBtn.onclick = function(e){ e.stopPropagation(); uploadPupilPhotoKind(pupil.id); };
+    wrap.appendChild(photoBtn);
+
+    const nameDiv = document.createElement('div');
+    nameDiv.style.cssText = 'flex:1;min-width:0;overflow:hidden;';
+    const assignedCount = hasOwn ? (state.personalAssignments[pupil.id]||[]).length : null;
+    nameDiv.innerHTML = '<div style="font-size:13px;font-weight:800;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+getVisibleName(pupil)+'</div>'
+      + '<div style="font-size:10px;font-weight:700;color:'+(hasOwn?'#059669':state.kindBoardOnlyPersonal?'#dc2626':'#9ca3af')+';margin-top:1px;">'
+      + (hasOwn ? '✓ '+assignedCount+' taken' : state.kindBoardOnlyPersonal ? '⚠️ geen taken' : 'klasbord') + '</div>';
+    wrap.appendChild(nameDiv);
+
+    const notesBtn = document.createElement('button');
+    notesBtn.type = 'button';
+    notesBtn.style.cssText = 'width:30px;height:30px;border:none;border-radius:8px;cursor:pointer;font-size:15px;flex-shrink:0;background:'+(state.notes&&state.notes[pupil.id]?'#fef9c3':'#f3f4f6')+';';
+    notesBtn.textContent = '🔒';
+    notesBtn.title = 'Bevindingen';
+    notesBtn.onclick = function(e){ e.stopPropagation(); openNotesModal(pupil.id); };
+    wrap.appendChild(notesBtn);
+
+    pupilGrid.appendChild(wrap);
+  });
+
+  // Taken kolom
+  var taskGrid = document.getElementById('teacherTaskGrid');
+  if(!taskGrid) return;
+  taskGrid.innerHTML = '';
+
+  // Global click listener voor dropdowns
+  if(!taskGrid._dropdownBound){
+    taskGrid._dropdownBound = true;
+    document.addEventListener('click', function(){
+      document.querySelectorAll('.kb-task-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+    });
+  }
+
+  allTasks().forEach(function(task){
+    const ci = state.customIcons && state.customIcons[task.id];
+    const isSelected = teacherSelectedTasks.has(task.id);
+
+    const wrap = document.createElement('div');
+    wrap.style.position = 'relative';
+
+    const chip = document.createElement('div');
+    chip.className = 'kb-task-chip' + (isSelected ? ' active' : '');
+    chip.onclick = function(){
+      if(teacherSelectedTasks.has(task.id)) teacherSelectedTasks.delete(task.id);
+      else teacherSelectedTasks.add(task.id);
+      kbRenderTaken();
+    };
+
+    const iconEl = document.createElement('div');
+    iconEl.className = 'chip-icon';
+    iconEl.style.fontSize = '24px';
+    if(ci){ iconEl.innerHTML = '<img src="'+ci+'" style="width:30px;height:30px;object-fit:contain;border-radius:5px;" alt="" />'; }
+    else { iconEl.textContent = task.icon; }
+    chip.appendChild(iconEl);
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'chip-label';
+    labelEl.style.cssText = 'font-size:11px;font-weight:800;color:'+(isSelected?'#065f46':'#94a3b8')+';text-align:center;line-height:1.2;word-break:break-word;';
+    labelEl.textContent = task.label;
+    chip.appendChild(labelEl);
+
+    // Gear knop
+    const dropdown = document.createElement('div');
+    dropdown.className = 'kb-task-dropdown';
+
+    const gear = document.createElement('button');
+    gear.type = 'button';
+    gear.className = 'kb-task-gear';
+    gear.textContent = '⚙';
+    gear.onclick = function(e){
+      e.stopPropagation();
+      document.querySelectorAll('.kb-task-dropdown.open').forEach(function(d){ if(d!==dropdown) d.classList.remove('open'); });
+      dropdown.classList.toggle('open');
+    };
+    chip.appendChild(gear);
+    wrap.appendChild(chip);
+
+    // Dropdown items
+    const r1 = document.createElement('button'); r1.type='button'; r1.className='kb-task-menu-item';
+    r1.innerHTML = '✎ &nbsp;Naam wijzigen';
+    r1.onclick = function(e){ e.stopPropagation(); dropdown.classList.remove('open'); openTaskRenameKind(task.id, task.label); };
+    dropdown.appendChild(r1);
+
+    const r2 = document.createElement('button'); r2.type='button'; r2.className='kb-task-menu-item';
+    r2.innerHTML = ci ? '📷 &nbsp;Afbeelding wijzigen' : '📷 &nbsp;Eigen afbeelding';
+    r2.onclick = function(e){ e.stopPropagation(); dropdown.classList.remove('open'); uploadTaskIconKind(task.id); };
+    dropdown.appendChild(r2);
+
+    if(task.id.startsWith('c_')){
+      const sep = document.createElement('div'); sep.className='kb-task-menu-sep'; dropdown.appendChild(sep);
+      const r3 = document.createElement('button'); r3.type='button'; r3.className='kb-task-menu-item kb-task-menu-danger';
+      r3.innerHTML = '🗑 &nbsp;Taak verwijderen';
+      r3.onclick = function(e){ e.stopPropagation(); dropdown.classList.remove('open');
+        state.customTasks = (state.customTasks||[]).filter(function(t){ return t.id!==task.id; });
+        saveState(); kbRenderTaken();
+      };
+      dropdown.appendChild(r3);
+    }
+    wrap.appendChild(dropdown);
+    taskGrid.appendChild(wrap);
+  });
+
+  // Hint toewijzen bijwerken
+  var hint = document.getElementById('kb-assign-hint');
+  if(hint){
+    var np = teacherSelectedPupils.size, nt = teacherSelectedTasks.size;
+    if(np>0 && nt>0) hint.textContent = np+' leerling'+(np>1?'en':'')+' geselecteerd · '+nt+' taak'+(nt>1?'en':'')+' geselecteerd → Klik Toewijzen';
+    else hint.textContent = 'Selecteer leerlingen en taken hierboven, dan klik Toewijzen.';
+  }
+
+  // Emoji-picker vullen
+  renderEmojiPicker();
+  var kbBtn = document.getElementById('kb-emoji-btn');
+  if(kbBtn) kbBtn.textContent = selectedEmoji;
+
+  kbUpdateWizard();
+}
+
+function assignTasksToSelected(){
+  if(!teacherSelectedPupils.size){ alert('Selecteer eerst leerlingen.'); return; }
+  if(!teacherSelectedTasks.size){ alert('Selecteer eerst taken.'); return; }
+  if(!state.personalAssignments) state.personalAssignments = {};
+  teacherSelectedPupils.forEach(function(pid){
+    state.personalAssignments[pid] = Array.from(teacherSelectedTasks);
+  });
+  saveState(); kbRenderTaken(); kbUpdateWizard();
+}
+
+function clearAssignmentsSelected(){
+  if(!teacherSelectedPupils.size){ alert('Selecteer eerst leerlingen.'); return; }
+  if(!state.personalAssignments) state.personalAssignments = {};
+  teacherSelectedPupils.forEach(function(pid){
+    delete state.personalAssignments[pid];
+  });
+  saveState(); kbRenderTaken(); kbUpdateWizard();
+}
+
+function openBackupKind(){
+  // Hergebruik bestaande backup-functionaliteit
+  var el = document.getElementById('backupModal') || document.getElementById('exportOverlay');
+  if(el) el.classList.add('show');
+}
+
+// ── EINDE KINDBORD ZIJBALK ─────────────────────────────────────────────────
+
+function loadState(){
+  try{
+    const r = localStorage.getItem(STORAGE_KEY);
+    state = r ? JSON.parse(r) : {};
+  }catch(e){
+    state = {};
+  }
+  applyStateDefaults();
+  // Laad via gedeelde collectie — als leeg, migreer van privé naar shared
+  if(window.fbLoadShared){
+    window.fbLoadShared(STORAGE_KEY).then(function(sharedData){
+      if(sharedData && sharedData.pupils && sharedData.pupils.length > 0){
+        // Shared data beschikbaar
+        state = Object.assign({}, state, sharedData);
+        applyStateDefaults();
+        try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
+        renderNames();
+        renderSetupAddedList();
+      } else if(window.fbLoad){
+        // Geen shared data — laad privé en migreer naar shared
+        window.fbLoad(STORAGE_KEY).then(function(privData){
+          if(privData){
+            state = Object.assign({}, state, privData);
+            applyStateDefaults();
+            // Migreer naar shared zodat kinderen het kunnen zien
+            if(window.fbSaveShared) window.fbSaveShared(STORAGE_KEY, state).catch(console.warn);
+            try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
+            renderNames();
+            renderSetupAddedList();
+          }
+        }).catch(console.warn);
+      }
+    }).catch(console.warn);
+  } else if(window.fbLoad){
+    window.fbLoad(STORAGE_KEY).then(function(fbData){
+      if(fbData){
+        state = Object.assign({}, state, fbData);
+        applyStateDefaults();
+        try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
+        renderNames();
+        renderSetupAddedList();
+      }
+    }).catch(console.warn);
+  }
+  // Realtime listener: als kind iets aanpast ziet leerkracht het live
+  if(window.fbListenShared){
+    window.fbListenShared(STORAGE_KEY, function(fbData){
+      if(fbData){
+        state = Object.assign({}, state, fbData);
+        applyStateDefaults();
+        try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){}
+        renderNames();
+      }
+    });
+  }
+}
+
+function applyStateDefaults(){
+  state.pupils = state.pupils || [];
+  state.activeTasks = state.activeTasks || [];
+  state.progress = state.progress || {};
+  state.customTasks = state.customTasks || [];
+  state.personalAssignments = state.personalAssignments || {};
+  state.kindBoardOnlyPersonal = !!state.kindBoardOnlyPersonal;
+  state.nameOrder = state.nameOrder || 'voornaam';
+  state.showLastname = !!state.showLastname;
+  state.customIcons = state.customIcons || {};
+  state.pupilPhotos = state.pupilPhotos || {};
+  state.taskLabelOverrides = state.taskLabelOverrides || {};
+  state.notes = state.notes || {};
+  state.boardSize = state.boardSize || 'normal';
+  setupNameOrder = state.nameOrder;
+  setupShowLastname = state.showLastname;
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  // Sla op via gedeelde collectie zodat kind en leerkracht dezelfde data zien
+  const saver = window.fbSaveShared || window.fbSave;
+  if(saver) saver(STORAGE_KEY, state).catch(console.warn);
+  // Timestamp bijwerken in borden-index
+  try{
+    const params = new URLSearchParams(window.location.search);
+    const bordId = params.get('bordid');
+    const type = params.get('type')||'kindbord';
+    if(bordId){
+      const all = JSON.parse(localStorage.getItem('borden_v1')||'{}');
+      const lijst = all[type]||[];
+      const bord = lijst.find(function(b){ return b.id===bordId; });
+      if(bord){
+        bord.bijgewerkt=Date.now();
+        localStorage.setItem('borden_v1',JSON.stringify(all));
+        if(window.fbSaveMeta) window.fbSaveMeta(all).catch(console.warn);
+      }
+    }
+  }catch(e){}
+}
+
+function uid(){
+  return '_' + Math.random().toString(36).slice(2) + Date.now();
+}
+
+function hasDuplicateFirstName(voornaam, excludeId = null){
+  const target = (voornaam || '').trim().toLowerCase();
+  if(!target) return false;
+
+  const matches = state.pupils.filter(pupil => {
+    if(excludeId && pupil.id === excludeId) return false;
+    return (pupil.voornaam || '').trim().toLowerCase() === target;
+  });
+
+  return matches.length > 1;
+}
+
+function getVisibleName(pupil){
+  const voornaam = (pupil.voornaam || '').trim();
+  const achternaam = (pupil.achternaam || '').trim();
+
+  if(!voornaam) return '';
+
+  if(hasDuplicateFirstName(voornaam)){
+    return achternaam ? `${voornaam} ${achternaam}` : voornaam;
+  }
+
+  return voornaam;
+}
+
+function getSetupDisplayName(pupil){
+  const voornaam = (pupil.voornaam || '').trim();
+  const achternaam = (pupil.achternaam || '').trim();
+
+  if(setupShowLastname && achternaam){
+    return `${voornaam} ${achternaam}`.trim();
+  }
+
+  if(hasDuplicateFirstName(voornaam)){
+    return achternaam ? `${voornaam} ${achternaam}` : voornaam;
+  }
+
+  return voornaam;
+}
+
+function parseFullNameByOrder(fullName){
+  const cleaned = (fullName || '').trim().replace(/\s+/g, ' ');
+  if(!cleaned) return null;
+
+  const parts = cleaned.split(' ');
+  if(parts.length === 1){
+    return { voornaam: parts[0], achternaam: '' };
+  }
+
+  if(setupNameOrder === 'achternaam'){
+    const voornaam = parts.pop() || '';
+    const achternaam = parts.join(' ');
+    return { voornaam, achternaam };
+  }
+
+  const voornaam = parts.shift() || '';
+  const achternaam = parts.join(' ');
+  return { voornaam, achternaam };
+}
+
+function setSetupOrder(order){
+  setupNameOrder = order;
+  state.nameOrder = order;
+  saveState();
+
+  const btnVoor = document.getElementById('setup-order-voor');
+  const btnAch = document.getElementById('setup-order-ach');
+
+  if(btnVoor && btnAch){
+    btnVoor.classList.toggle('active', order === 'voornaam');
+    btnAch.classList.toggle('active', order === 'achternaam');
+  }
+}
+
+function toggleSetupLastname(){
+  const checkbox = document.getElementById('setup-show-lastname');
+  setupShowLastname = !!checkbox.checked;
+  state.showLastname = setupShowLastname;
+  saveState();
+  renderNames();
+  renderSetupAddedList();
+}
+
+function showSetupStatus(message){
+  const box = document.getElementById('setupStatus');
+  box.textContent = message;
+  box.classList.add('show');
+
+  clearTimeout(showSetupStatus._timer);
+  showSetupStatus._timer = setTimeout(() => {
+    box.classList.remove('show');
+    box.textContent = '';
+  }, 2200);
+}
+
+function renderSetupAddedList(){
+  const wrap = document.getElementById('setupAddedList');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  // Update teller
+  const counter = document.getElementById('setup-count');
+  if(counter) counter.textContent = state.pupils.length;
+
+  if(!state.pupils.length){
+    wrap.innerHTML = '<div class="setup-empty">Nog geen leerlingen toegevoegd.</div>';
+    return;
+  }
+
+  state.pupils.forEach((pupil, index) => {
+    const row = document.createElement('div');
+    row.className = 'setup-added-item';
+    row.innerHTML = `
+      <span class="setup-added-name">${index + 1}. ${getSetupDisplayName(pupil)}</span>
+      <button type="button" class="setup-remove-btn" onclick="removeSetupPupil('${pupil.id}')">✕</button>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function removeSetupPupil(pupilId){
+  state.pupils = state.pupils.filter(pupil => pupil.id !== pupilId);
+  delete state.progress[pupilId];
+  delete state.personalAssignments[pupilId];
+  saveState();
+  renderNames();
+  renderSetupAddedList();
+  showSetupStatus('Leerling verwijderd van het bord.');
+}
+
+function allTasks(){
+  const overrides = state.taskLabelOverrides || {};
+  const defaults = DEFAULT_TASKS.map(t => overrides[t.id] ? {...t, label: overrides[t.id]} : t);
+  return [...defaults, ...(state.customTasks || [])];
+}
+
+function taskById(taskId){
+  return allTasks().find(t => t.id === taskId) || { id:taskId, label:taskId, icon:'📝' };
+}
+
+function hasPersonalAssignments(pupilId){
+  return Array.isArray(state.personalAssignments?.[pupilId]);
+}
+
+function getEntry(pupilId, taskId){
+  return ((state.progress || {})[pupilId] || {})[taskId] || { status:0, smiley:0 };
+}
+
+function getAssignedTaskIds(pupilId){
+  const personal = state.personalAssignments?.[pupilId];
+  if(Array.isArray(personal)){
+    return personal;
+  }
+  if(state.kindBoardOnlyPersonal){
+    return [];
+  }
+  return state.activeTasks || [];
+}
+
+function getTasksForPupil(pupil){
+  return getAssignedTaskIds(pupil.id).map(taskById);
+}
+
+function remainingCount(pupil){
+  const tasks = getTasksForPupil(pupil);
+  let remaining = 0;
+  tasks.forEach(task => {
+    if (getEntry(pupil.id, task.id).status !== 2) remaining++;
+  });
+  return remaining;
+}
+
+function taskText(count, pupilId){
+  const assignedTaskIds = getAssignedTaskIds(pupilId) || [];
+
+  if(!assignedTaskIds.length){
+    return 'Nog geen taken';
+  }
+
+  if(count === 0) return 'Alles is klaar';
+  if(count === 1) return 'Nog 1 taak';
+  return `Nog ${count} taken`;
+}
+
+function updateModeBadge(){}
+
+function renderNames(){
+  const grid = document.getElementById('nameGrid');
+  const empty = document.getElementById('emptyNames');
+  grid.innerHTML = '';
+
+  if(!state.pupils.length){
+    empty.style.display = 'block';
+    updateModeBadge();
+    return;
+  }
+  empty.style.display = 'none';
+  updateModeBadge();
+
+  // Punt 3: eerste-keer-hint foto's
+  const kindHintEl = document.getElementById('kind-hint-photos');
+  if(kindHintEl){
+    const hasPhoto = state.pupils.some(p => state.pupilPhotos[p.id]);
+    const dismissed = localStorage.getItem('kind_hint_photos');
+    kindHintEl.style.display = (!hasPhoto && !dismissed && state.pupils.length > 2) ? 'flex' : 'none';
+  }
+
+  state.pupils.forEach((pupil, index) => {
+    const needsAssignment = state.kindBoardOnlyPersonal && !hasPersonalAssignments(pupil.id);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `name-card p${(index % 6) + 1}` + (needsAssignment ? ' needs-assignment' : '');
+    const photo = state.pupilPhotos[pupil.id];
+    const photoHtml = photo ? `<div class="name-card-photo-wrap"><img class="name-card-photo" src="${photo}" alt="${getVisibleName(pupil)}" /></div>` : '';
+
+    // Voortgangsbalk onderaan naamkaart
+    const tasks = getTasksForPupil(pupil);
+    const prog = state.progress[pupil.id] || {};
+    const done = tasks.filter(t => (prog[t.id]?.status||0) === 2).length;
+    const total = tasks.length;
+    const pct = total > 0 ? Math.round((done/total)*100) : 0;
+    const barColor = pct === 100 ? '#22c55e' : pct > 50 ? '#84cc16' : pct > 0 ? '#f59e0b' : '#e2e8f0';
+    const progressBar = total > 0 ? `
+      <div style="width:100%;height:6px;background:#e2e8f0;border-radius:3px;margin-top:8px;position:relative;">
+        <div style="position:absolute;top:0;left:0;height:6px;width:${pct}%;background:${barColor};border-radius:3px;transition:width .4s;min-width:${pct>0?'6px':'0'};"></div>
+      </div>` : '';
+
+    btn.innerHTML = `
+      ${photoHtml}
+      <div class="name">${getVisibleName(pupil)}</div>
+      <div class="task-info">${taskText(remainingCount(pupil), pupil.id)}</div>
+      ${needsAssignment ? '<span class="assign-hint">Nog taken geven</span>' : ''}
+      ${progressBar}
+    `;
+    btn.addEventListener('click', () => openPupil(pupil.id));
+
+    // Notities-knop — alleen zichtbaar voor leerkracht
+    const hasNotes = !!(state.notes && state.notes[pupil.id]);
+    const notesWrap = document.createElement('div');
+    notesWrap.className = 'kind-notes-wrap teacher-only';
+    notesWrap.style.cssText = 'position:relative;';
+    const notesBtn = document.createElement('button');
+    notesBtn.type = 'button';
+    notesBtn.className = 'kind-notes-btn' + (hasNotes ? ' has-notes' : '');
+    notesBtn.textContent = '🔒';
+    notesBtn.title = hasNotes ? 'Opmerking bekijken/bewerken' : 'Opmerking toevoegen';
+    notesBtn.addEventListener('click', (e) => { e.stopPropagation(); openNotesModal(pupil.id); });
+    notesWrap.appendChild(notesBtn);
+
+    const cardWrap = document.createElement('div');
+    cardWrap.className = 'kind-card-wrap';
+    cardWrap.appendChild(btn);
+    cardWrap.appendChild(notesWrap);
+    grid.appendChild(cardWrap);
+  });
+}
+
+function openPupil(pupilId){
+  currentPupil = state.pupils.find(p => p.id === pupilId);
+  if(!currentPupil) return;
+  document.getElementById('names-screen').style.display = 'none';
+  document.getElementById('tasks-screen').style.display = 'block';
+    document.getElementById('pupilTitle').textContent = getVisibleName(currentPupil);
+  renderTasks();
+}
+
+function goBack(){
+  currentPupil = null;
+  document.getElementById('tasks-screen').style.display = 'none';
+  document.getElementById('names-screen').style.display = 'block';
+  renderNames();
+}
+
+let kindLastAction = null;
+let kindUndoTimer = null;
+
+function setStatus(taskId, status){
+  if(!currentPupil) return;
+  if(!state.progress[currentPupil.id]) state.progress[currentPupil.id] = {};
+  const old = state.progress[currentPupil.id][taskId] || { status:0, smiley:0 };
+  // Bewaar voor undo
+  kindLastAction = { pid: currentPupil.id, tid: taskId, prevStatus: old.status, prevSmiley: old.smiley||0 };
+  // Smiley wissen als taak niet meer klaar is
+  const newSmiley = status === 2 ? (old.smiley||0) : 0;
+  state.progress[currentPupil.id][taskId] = { ...old, status, smiley: newSmiley };
+  saveState();
+  renderTasks();
+  renderNames();
+  showKindUndoBtn();
+  if(status === 2){
+    pendingTaskId = taskId;
+    openSmileyPopup();
+  }
+}
+
+function undoKindAction(){
+  if(!kindLastAction) return;
+  const { pid, tid, prevStatus, prevSmiley } = kindLastAction;
+  if(!state.progress[pid]) state.progress[pid] = {};
+  state.progress[pid][tid] = { status: prevStatus, smiley: prevSmiley };
+  saveState();
+  renderTasks();
+  renderNames();
+  kindLastAction = null;
+  hideKindUndoBtn();
+}
+
+function showKindUndoBtn(){
+  const btn = document.getElementById('kind-undo-btn');
+  if(btn) btn.style.display = 'inline-block';
+  clearTimeout(kindUndoTimer);
+  kindUndoTimer = setTimeout(() => { hideKindUndoBtn(); kindLastAction = null; }, 8000);
+}
+function hideKindUndoBtn(){
+  const btn = document.getElementById('kind-undo-btn');
+  if(btn) btn.style.display = 'none';
+}
+
+function setSmiley(smiley){
+  if(!currentPupil || !pendingTaskId) return;
+  if(!state.progress[currentPupil.id]) state.progress[currentPupil.id] = {};
+  const old = state.progress[currentPupil.id][pendingTaskId] || { status:2, smiley:0 };
+  state.progress[currentPupil.id][pendingTaskId] = { ...old, status:2, smiley:smiley };
+  saveState();
+  closeSmileyPopup();
+  renderTasks();
+  renderNames();
+}
+
+function openSmileyPopup(){
+  document.getElementById('smileyOverlay').classList.add('show');
+}
+function closeSmileyPopup(){
+  document.getElementById('smileyOverlay').classList.remove('show');
+  setTimeout(function(){ pendingTaskId = null; }, 100);
+}
+
+function statusText(status){
+  if(status === 2) return 'Deze taak is klaar';
+  if(status === 1) return 'Je bent hier nog mee bezig';
+  return 'Deze taak moet je nog maken';
+}
+
+function renderTasks(){
+  const list = document.getElementById('taskList');
+  const empty = document.getElementById('emptyTasks');
+  list.innerHTML = '';
+
+  const tasks = getTasksForPupil(currentPupil || {});
+  if(!tasks.length){
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tasks.forEach(task => {
+    const entry = getEntry(currentPupil.id, task.id);
+    const row = document.createElement('div');
+    row.className = `task-row status-${entry.status}-row`;
+
+    const ci = state.customIcons[task.id];
+    const iconContent = ci
+      ? `<img class="task-icon-img" src="${ci}" alt="${task.label}" />`
+      : `<div class="task-icon">${task.icon}</div>`;
+
+    const left = document.createElement('div');
+    left.className = 'task-left';
+    left.innerHTML = `
+      ${iconContent}
+      <div>
+        <div class="task-label">${task.label}</div>
+        <div class="task-sub">${statusText(entry.status)}</div>
+      </div>
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'task-actions';
+
+    [0,1,2].forEach(status => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `status-btn status-${status}` + (entry.status === status ? ' active' : '');
+      btn.textContent = status === 0 ? '○' : status === 1 ? '↻' : '✓';
+      btn.addEventListener('click', () => setStatus(task.id, status));
+      actions.appendChild(btn);
+    });
+
+    row.appendChild(left);
+    row.appendChild(actions);
+
+    // Smiley: toon enkel de gekozen smiley als klikbaar knopje om te wijzigen
+    if(entry.smiley > 0){
+      const smileyRow = document.createElement('div');
+      smileyRow.className = 'smiley-row smiley-row-single';
+      const s = document.createElement('button');
+      s.type = 'button';
+      s.className = 'smiley-chip smiley-chip-chosen active';
+      s.textContent = SMILEYS[entry.smiley];
+      s.title = 'Klik om te wijzigen';
+      s.addEventListener('click', () => {
+        pendingTaskId = task.id;
+        openSmileyPopup();
+      });
+      smileyRow.appendChild(s);
+      const wrapper = document.createElement('div');
+      wrapper.style.width = '100%';
+      wrapper.appendChild(smileyRow);
+      row.appendChild(wrapper);
+    }
+
+    list.appendChild(row);
+  });
+}
+
+/* Teacher modal */
+function openTeacherModal(){
+  teacherSelectedPupils = new Set();
+  teacherSelectedTasks = new Set();
+  renderTeacherModal();
+  renderEmojiPicker();
+  document.getElementById('teacherOverlay').classList.add('show');
+}
+
+function closeTeacherModal(){
+  document.getElementById('teacherOverlay').classList.remove('show');
+}
+
+// ── AFBEELDINGEN UPLOADEN ────────────────────────────────────────────────────
+function resizeImageToDataURL(file, size, cb){
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const ratio = Math.min(size / img.width, size / img.height);
+      const w = img.width * ratio, h = img.height * ratio;
+      const x = (size - w) / 2, y = (size - h) / 2;
+      ctx.clearRect(0, 0, size, size);
+      ctx.drawImage(img, x, y, w, h);
+      cb(canvas.toDataURL('image/png'));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function uploadTaskIconKind(taskId){
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml';
+  inp.onchange = e => {
+    const f = e.target.files[0]; if(!f) return;
+    resizeImageToDataURL(f, 80, dataURL => {
+      state.customIcons[taskId] = dataURL;
+      saveState();
+      renderTeacherModal();
+      renderTasks();
+    });
+  };
+  inp.click();
+}
+
+function removeTaskIconKind(taskId){
+  delete state.customIcons[taskId];
+  saveState();
+  renderTeacherModal();
+  renderTasks();
+}
+
+function uploadPupilPhotoKind(pupilId){
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/jpeg,image/png,image/gif,image/webp';
+  inp.onchange = e => {
+    const f = e.target.files[0]; if(!f) return;
+    resizeImageToDataURL(f, 64, dataURL => {
+      state.pupilPhotos[pupilId] = dataURL;
+      saveState();
+      renderTeacherModal();
+      renderNames();
+    });
+  };
+  inp.click();
+}
+
+function removePupilPhotoKind(pupilId){
+  delete state.pupilPhotos[pupilId];
+  saveState();
+  renderTeacherModal();
+  renderNames();
+}
+// ── EINDE AFBEELDINGEN ───────────────────────────────────────────────────────
+
+function renderTeacherModal(){
+  const pupilGrid = document.getElementById('teacherPupilGrid');
+  const taskGrid = document.getElementById('teacherTaskGrid');
+  pupilGrid.innerHTML = '';
+  taskGrid.innerHTML = '';
+
+  // Leerlingen selectie: selectiepil + bevindingen knop ernaast
+  state.pupils.forEach(pupil => {
+    const hasOwn = hasPersonalAssignments(pupil.id);
+    const needsTask = state.kindBoardOnlyPersonal && !hasOwn;
+    const photo = state.pupilPhotos[pupil.id];
+    const hasNotes = !!state.notes[pupil.id];
+    const isSelected = teacherSelectedPupils.has(pupil.id);
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:12px;background:'+(isSelected?'#e0e7ff':'#f9fafb')+';border:2px solid '+(isSelected?'#6366f1':'#e5e7eb')+';transition:all .12s;';
+
+    // Aanvinkhokje
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = isSelected;
+    cb.style.cssText = 'width:18px;height:18px;cursor:pointer;flex-shrink:0;accent-color:#6366f1;';
+    cb.addEventListener('change', () => {
+      if(cb.checked) teacherSelectedPupils.add(pupil.id);
+      else teacherSelectedPupils.delete(pupil.id);
+      renderTeacherModal();
+    });
+    wrap.appendChild(cb);
+
+    // Foto-thumbnail (klikbaar voor upload)
+    const photoBtn = document.createElement('button');
+    photoBtn.type = 'button';
+    photoBtn.title = photo ? 'Foto wijzigen' : 'Foto toevoegen';
+    photoBtn.style.cssText = 'width:32px;height:32px;border:none;border-radius:50%;cursor:pointer;flex-shrink:0;padding:0;overflow:hidden;background:'+(photo?'transparent':'#ede9fe')+';font-size:14px;display:flex;align-items:center;justify-content:center;';
+    photoBtn.innerHTML = photo ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />` : '📷';
+    photoBtn.addEventListener('click', () => uploadPupilPhotoKind(pupil.id));
+    wrap.appendChild(photoBtn);
+
+    // Naam + status info (klik selecteert ook)
+    const nameDiv = document.createElement('div');
+    nameDiv.style.cssText = 'flex:1;cursor:pointer;';
+    nameDiv.innerHTML = `<div style="font-size:15px;font-weight:800;color:#1f2937;">${getVisibleName(pupil)}</div>`
+      + `<div style="font-size:11px;color:#6b7280;">${needsTask ? '⚠️ nog taken geven' : hasOwn ? '✓ '+((state.personalAssignments[pupil.id]||[]).length)+' eigen taken' : 'volgt klasbord'}</div>`;
+    nameDiv.addEventListener('click', () => {
+      if(teacherSelectedPupils.has(pupil.id)) teacherSelectedPupils.delete(pupil.id);
+      else teacherSelectedPupils.add(pupil.id);
+      renderTeacherModal();
+    });
+    wrap.appendChild(nameDiv);
+
+    // Bevindingen-knop
+    const notesBtn = document.createElement('button');
+    notesBtn.type = 'button';
+    notesBtn.title = hasNotes ? 'Bevindingen bekijken/aanpassen' : 'Bevindingen toevoegen';
+    notesBtn.style.cssText = 'width:32px;height:32px;border:none;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;background:'+(hasNotes?'#fef9c3':'#f3f4f6')+';';
+    notesBtn.textContent = '🔒';
+    notesBtn.addEventListener('click', () => openNotesModal(pupil.id));
+    wrap.appendChild(notesBtn);
+
+    pupilGrid.appendChild(wrap);
+  });
+
+  // Taken selectie: chip + naam-wijzig + afbeelding knop
+  allTasks().forEach(task => {
+    const ci = state.customIcons[task.id];
+
+    const wrap = document.createElement('div');
+    wrap.className = 'kind-task-wrap';
+
+    // Selectiechip
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'task-chip' + (teacherSelectedTasks.has(task.id) ? ' active' : '');
+    const imgHtml = ci ? `<img class="chip-task-img" src="${ci}" alt="" />` : '';
+    btn.innerHTML = `${imgHtml}${ci ? '' : task.icon} ${task.label}`;
+    btn.addEventListener('click', () => {
+      if(teacherSelectedTasks.has(task.id)) teacherSelectedTasks.delete(task.id);
+      else teacherSelectedTasks.add(task.id);
+      renderTeacherModal();
+    });
+    wrap.appendChild(btn);
+
+    // Knopjesrij: naam wijzigen + afbeelding
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:4px;justify-content:center;margin-top:3px;';
+
+    const renameBtn = document.createElement('button');
+    renameBtn.type = 'button';
+    renameBtn.textContent = '✎ naam';
+    renameBtn.style.cssText = 'border:none;background:#f0fdf4;color:#16a34a;border-radius:6px;font-size:10px;font-weight:700;padding:2px 6px;cursor:pointer;';
+    renameBtn.addEventListener('click', () => openTaskRenameKind(task.id, task.label));
+    btnRow.appendChild(renameBtn);
+
+    const uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button';
+    uploadBtn.textContent = ci ? '📷 wijzig' : '📷 afb.';
+    uploadBtn.style.cssText = `border:none;background:${ci?'#fef9c3':'#f0f0ff'};color:${ci?'#92400e':'#6366f1'};border-radius:6px;font-size:10px;font-weight:700;padding:2px 6px;cursor:pointer;`;
+    uploadBtn.addEventListener('click', () => uploadTaskIconKind(task.id));
+    btnRow.appendChild(uploadBtn);
+
+    if(ci){
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.textContent = '🗑';
+      delBtn.style.cssText = 'border:none;background:none;color:#fca5a5;font-size:11px;cursor:pointer;padding:0 2px;';
+      delBtn.addEventListener('click', () => removeTaskIconKind(task.id));
+      btnRow.appendChild(delBtn);
+    }
+    wrap.appendChild(btnRow);
+    taskGrid.appendChild(wrap);
+  });
+}
+
+function renderEmojiPicker(){
+  const wrap = document.getElementById('emojiPicker');
+  wrap.innerHTML = '';
+  EMOJIS.forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'emoji-btn' + (selectedEmoji === emoji ? ' active' : '');
+    btn.textContent = emoji;
+    btn.addEventListener('click', () => {
+      selectedEmoji = emoji;
+      renderEmojiPicker();
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function addCustomTask(){
+  const input = document.getElementById('customTaskInput');
+  const label = input.value.trim();
+  if(!label){
+    alert('Typ eerst een taaknaam.');
+    input.focus();
+    return;
+  }
+  const exists = allTasks().some(t => t.label.toLowerCase() === label.toLowerCase());
+  if(exists){
+    alert('Deze taak bestaat al.');
+    return;
+  }
+  state.customTasks.push({
+    id: uid(),
+    label,
+    icon: selectedEmoji
+  });
+  saveState();
+  input.value = '';
+  teacherSelectedTasks = new Set([...teacherSelectedTasks, state.customTasks[state.customTasks.length - 1].id]);
+  renderTeacherModal();
+}
+
+function selectAllPupils(){
+  teacherSelectedPupils = new Set(state.pupils.map(p => p.id));
+  renderTeacherModal();
+}
+function clearPupilSelection(){
+  teacherSelectedPupils = new Set();
+  renderTeacherModal();
+}
+function selectActiveTasks(){
+  teacherSelectedTasks = new Set(state.activeTasks || []);
+  renderTeacherModal();
+}
+function clearTaskSelection(){
+  teacherSelectedTasks = new Set();
+  renderTeacherModal();
+}
+
+function applyAssignmentsToSelection(){
+  if(!teacherSelectedPupils.size){
+    alert('Selecteer eerst minstens één kind.');
+    return;
+  }
+  const tasks = Array.from(teacherSelectedTasks);
+  teacherSelectedPupils.forEach(pid => {
+    state.personalAssignments[pid] = [...tasks];
+  });
+  saveState();
+  renderNames();
+  if(currentPupil) renderTasks();
+
+  // handig om verder te werken zonder telkens terug naar het namenoverzicht te gaan
+  teacherSelectedPupils = new Set();
+  teacherSelectedTasks = new Set();
+  renderTeacherModal();
+}
+
+function clearAssignmentsForSelection(){
+  if(!teacherSelectedPupils.size){
+    alert('Selecteer eerst minstens één kind.');
+    return;
+  }
+  teacherSelectedPupils.forEach(pid => {
+    delete state.personalAssignments[pid];
+  });
+  saveState();
+  closeTeacherModal();
+  renderNames();
+  if(currentPupil) renderTasks();
+}
+
+function emptyKindBoard(){
+  if(!confirm('Wil je het kindbord leeg maken? Daarna zien kinderen geen taken meer uit klasbord, tot jij hier taken per kind of per groepje toewijst.')) return;
+  state.kindBoardOnlyPersonal = true;
+  state.personalAssignments = {};
+  saveState();
+  closeTeacherModal();
+  renderNames();
+  if(currentPupil) renderTasks();
+}
+
+// ── BEVINDINGEN (NOTITIES) ───────────────────────────────────────────────────
+let editingNotesId = null;
+function openNotesModal(pupilId){
+  editingNotesId = pupilId;
+  const p = state.pupils.find(x => x.id === pupilId);
+  if(!p) return;
+  document.getElementById('kind-notes-title').textContent = '🔒 Bevindingen: ' + getVisibleName(p);
+  document.getElementById('kind-notes-input').value = state.notes[pupilId] || '';
+  document.getElementById('kind-notes-overlay').classList.add('show');
+  setTimeout(() => document.getElementById('kind-notes-input').focus(), 50);
+}
+function saveNotesKind(){
+  if(!editingNotesId) return;
+  const val = document.getElementById('kind-notes-input').value.trim();
+  if(val) state.notes[editingNotesId] = val;
+  else delete state.notes[editingNotesId];
+  saveState();
+  closeNotesModal();
+  renderTeacherModal();
+}
+function closeNotesModal(){
+  document.getElementById('kind-notes-overlay').classList.remove('show');
+  editingNotesId = null;
+}
+
+// ── TAAKNAAM HERNOEMEN ───────────────────────────────────────────────────────
+let renamingTaskId = null;
+function openTaskRenameKind(taskId, currentLabel){
+  renamingTaskId = taskId;
+  document.getElementById('kind-rename-input').value = currentLabel;
+  document.getElementById('kind-rename-overlay').classList.add('show');
+  setTimeout(() => { const inp = document.getElementById('kind-rename-input'); inp.focus(); inp.select(); }, 50);
+}
+function saveTaskRenameKind(){
+  const newLabel = document.getElementById('kind-rename-input').value.trim();
+  if(!newLabel || !renamingTaskId) return;
+  const ct = state.customTasks.find(t => t.id === renamingTaskId);
+  if(ct){ ct.label = newLabel; }
+  else {
+    if(!state.taskLabelOverrides) state.taskLabelOverrides = {};
+    state.taskLabelOverrides[renamingTaskId] = newLabel;
+  }
+  saveState();
+  closeTaskRenameKind();
+  renderTeacherModal();
+  if(currentPupil) renderTasks();
+}
+function closeTaskRenameKind(){
+  document.getElementById('kind-rename-overlay').classList.remove('show');
+  renamingTaskId = null;
+}
+
+// ── SMARTBOARD / IPAD MODUS ───────────────────────────────────────────────────
+const isSmartboard = new URLSearchParams(window.location.search).get('modus') === 'smartboard';
+const isIpad = new URLSearchParams(window.location.search).get('modus') === 'ipad';
+
+function exportTakenbord(){
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'takenbord-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importTakenbord(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const imported = JSON.parse(e.target.result);
+      if(!imported.pupils){ alert('Ongeldig backupbestand.'); return; }
+      if(!confirm('Wil je de backup terugzetten? Het huidige bord wordt vervangen.')) return;
+      state = imported;
+      saveState();
+      renderNames();
+      alert('✅ Backup succesvol teruggezet!');
+    } catch(err){
+      alert('Fout bij het lezen van het bestand. Is het een geldig backupbestand?');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function toggleTakenbordMeer(){
+  var m = document.getElementById('takenbord-meer-menu');
+  if(m) m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+function closeTakenbordMeer(){
+  var m = document.getElementById('takenbord-meer-menu');
+  if(m) m.style.display = 'none';
+}
+document.addEventListener('click', function(e){
+  var w = document.querySelector('.meer-opties-wrap');
+  if(w && !w.contains(e.target)) closeTakenbordMeer();
+});
+
+function openSmartboardTakenbord(){
+  var params = new URLSearchParams(window.location.search);
+  params.set('modus','smartboard');
+  window.open(window.location.pathname + '?' + params.toString(), '_blank');
+}
+
+function openQrTakenbord(){
+  var modal = document.getElementById('qr-takenbord-modal');
+  if(!modal) return;
+  // Bouw URL naar public kindversie (zonder beheerknoppen)
+  var params = new URLSearchParams(window.location.search);
+  params.delete('modus');
+  var url = window.location.origin + window.location.pathname.replace('takenbord_kind.html','takenbord_kind_public.html') + '?' + params.toString();
+  document.getElementById('qr-takenbord-url').textContent = url;
+  var container = document.getElementById('qr-takenbord-container');
+  if(container){
+    container.innerHTML = '';
+    new QRCode(container, {
+      text: url,
+      width: 240,
+      height: 240,
+      colorDark: '#1e3a8a',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+  modal.style.display = 'flex';
+}
+
+function applySmartboardMode(){
+  if(!isSmartboard && !isIpad) return;
+  document.body.classList.add('smartboard');
+  var topBtns = document.getElementById('smartboard-top-btns');
+  if(topBtns) topBtns.style.display = 'flex';
+  if(isIpad) document.body.classList.add('ipad-modus');
+  setTimeout(updateKindScrollArrows, 500);
+  setTimeout(updateKindScrollArrows, 1500);
+}
+
+function exitKindSmartboard(dest){
+  document.getElementById('kind-exit-overlay').classList.remove('show');
+  if(dest === 'welkom'){
+    window.location.href = 'welkomstbord.html';
+  } else {
+    // Verwijder smartboard-modus en ga naar beheer
+    document.body.classList.remove('smartboard');
+    var btn = document.getElementById('smartboard-exit-btn');
+    if(btn) btn.style.display = 'none';
+    goBackToSetup();
+  }
+}
+
+// ── PDF RAPPORT ──────────────────────────────────────────────────────────────
+function openPdfModalKind(){
+  const today = new Date().toISOString().slice(0,10);
+  if(!document.getElementById('kind-pdf-from').value) document.getElementById('kind-pdf-from').value = today;
+  if(!document.getElementById('kind-pdf-to').value) document.getElementById('kind-pdf-to').value = today;
+  document.getElementById('kind-pdf-overlay').classList.add('show');
+}
+function closePdfModalKind(){
+  document.getElementById('kind-pdf-overlay').classList.remove('show');
+}
+function fmtDateKind(str){ if(!str) return ''; try{ return new Date(str).toLocaleDateString('nl-BE',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch{ return str; } }
+
+// Strip emoji uit tekst voor PDF
+function stripEmoji(str){
+  return (str||'').replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}]/gu, '').replace(/\s+/g,' ').trim();
+}
+
+
+function showToastKind(msg){ var t=document.getElementById("kind-toast"); if(t){t.textContent=msg;t.style.opacity=1;setTimeout(function(){t.style.opacity=0;},3000);} }
+
+function generateKindPdf(mode){
+  var jspdfLib = window.jspdf;
+  if(!jspdfLib || !jspdfLib.jsPDF){ alert('PDF-bibliotheek niet geladen. Ververs de pagina.'); return; }
+  var jsPDF = jspdfLib.jsPDF;
+
+  var periodName = document.getElementById('kind-pdf-period').value.trim();
+  var dateFrom   = document.getElementById('kind-pdf-from').value;
+  var dateTo     = document.getElementById('kind-pdf-to').value;
+  var pl = [periodName];
+  if(dateFrom||dateTo) pl.push(fmtDateKind(dateFrom)+(dateTo&&dateTo!==dateFrom?' - '+fmtDateKind(dateTo):''));
+  var periodLabel = pl.filter(Boolean).join('  .  ');
+  var today = fmtDateKind(new Date().toISOString().slice(0,10));
+
+  var doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  var pw = doc.internal.pageSize.getWidth();
+  var ph = doc.internal.pageSize.getHeight();
+  var BLUE  = [30, 58, 138];
+  var GREEN = [21, 128, 61];
+  var RED   = [220, 38, 38];
+  var pageNum = 1;
+
+  function se(s){ return stripEmoji(s||''); }
+
+  function hdr(title, sub){
+    doc.setFillColor(BLUE[0],BLUE[1],BLUE[2]);
+    doc.rect(0,0,pw,14,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(12); doc.setFont('helvetica','bold');
+    doc.text(title, 10, 9);
+    if(sub){ doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text(sub, pw-8, 9, {align:'right'}); }
+    doc.setTextColor(0,0,0);
+  }
+  function ftr(){
+    doc.setFontSize(7); doc.setTextColor(150,150,150);
+    doc.text('Kindbord - Juf Zisa - '+today, 10, ph-3);
+    doc.text(''+pageNum, pw-8, ph-3, {align:'right'});
+    doc.setTextColor(0,0,0);
+  }
+
+  // Hulpfuncties
+  function isKlaar(pupilId){
+    var tasks = getTasksForPupil(state.pupils.find(function(p){ return p.id===pupilId; })||{});
+    if(!tasks.length) return false;
+    return tasks.every(function(t){ return ((state.progress[pupilId]||{})[t.id]||{}).status===2; });
+  }
+  function getNaam(p){
+    return se(state.showLastname && p.achternaam ? p.voornaam+' '+p.achternaam : p.voornaam);
+  }
+
+  // ── OVERZICHT ─────────────────────────────────────────────────────────────
+  var sub = (periodLabel?'Periode: '+periodLabel+'  .  ':'')+' Gegenereerd op '+today;
+  hdr('Kindbord - Overzicht', sub);
+
+  // Verzamel alle unieke taken
+  var allTaskIds = [];
+  var seenIds = {};
+  state.pupils.forEach(function(p){
+    getTasksForPupil(p).forEach(function(t){
+      if(!seenIds[t.id]){ seenIds[t.id]=true; allTaskIds.push(t); }
+    });
+  });
+
+  var complete  = state.pupils.filter(function(p){ return isKlaar(p.id); });
+  var incomplete = state.pupils.filter(function(p){ return !isKlaar(p.id); });
+  doc.setFontSize(9); doc.setFont('helvetica','bold');
+  doc.setTextColor(GREEN[0],GREEN[1],GREEN[2]); doc.text('Volledig klaar: '+complete.length, 10, 20);
+  doc.setTextColor(RED[0],RED[1],RED[2]);       doc.text('Niet volledig: '+incomplete.length, 70, 20);
+  doc.setTextColor(0,0,0); doc.setFont('helvetica','normal');
+
+  var taskCols = allTaskIds.map(function(t){
+    var lbl = se(t.label);
+    return lbl.length > 14 ? lbl.slice(0,13)+'.' : lbl;
+  });
+
+  var ovHead = [['Leerling'].concat(taskCols)];
+  var ovBody = state.pupils.map(function(p){
+    var pid = p.id;
+    var myIds = new Set(getTasksForPupil(p).map(function(t){ return t.id; }));
+    var row = [getNaam(p)];
+    allTaskIds.forEach(function(t){
+      if(!myIds.has(t.id)){ row.push('-'); return; }
+      var st = ((state.progress[pid]||{})[t.id]||{}).status||0;
+      if(st===2) row.push('Klaar');
+      else if(st===1) row.push('Bezig');
+      else row.push('');
+    });
+    return row;
+  });
+
+  var taskColW = allTaskIds.length > 0 ? Math.min(28, (pw-20-40)/allTaskIds.length) : 28;
+  var colStyles = { 0:{ cellWidth:40, halign:'left', fontStyle:'bold' } };
+  allTaskIds.forEach(function(_,i){ colStyles[i+1]={ cellWidth:taskColW, halign:'center' }; });
+
+  doc.autoTable({
+    head: ovHead, body: ovBody,
+    startY: 24,
+    styles:{ fontSize: allTaskIds.length>8?7:8, cellPadding:2, overflow:'ellipsize' },
+    headStyles:{ fillColor:BLUE, textColor:255, fontStyle:'bold', halign:'center', fontSize: allTaskIds.length>8?6:7 },
+    columnStyles: colStyles,
+    didParseCell: function(data){
+      if(data.section==='body' && data.column.index>0){
+        var v = data.cell.raw;
+        if(v==='Klaar')      { data.cell.styles.textColor=GREEN; data.cell.styles.fontStyle='bold'; }
+        else if(v==='Bezig') { data.cell.styles.textColor=[180,100,0]; }
+        else if(v==='-')     { data.cell.styles.textColor=[180,180,180]; }
+      }
+    },
+    alternateRowStyles:{ fillColor:[248,250,252] },
+    margin:{ left:10, right:10 }
+  });
+  ftr();
+
+  // ── PER LEERLING ──────────────────────────────────────────────────────────
+  state.pupils.forEach(function(p){
+    doc.addPage(); pageNum++;
+    var pid = p.id;
+    var tasks = getTasksForPupil(p);
+    var done = tasks.filter(function(t){ return ((state.progress[pid]||{})[t.id]||{}).status===2; }).length;
+    var total = tasks.length;
+    var klaar = isKlaar(pid);
+    var fullName = se(p.voornaam+(p.achternaam?' '+p.achternaam:''));
+
+    hdr(getNaam(p)+' - Detailrapport', (periodLabel?periodLabel+' . ':'')+today);
+
+    var badgeColor = klaar ? GREEN : done>0 ? [180,100,0] : RED;
+    var badgeTxt   = klaar ? 'Volledig klaar' : done>0 ? done+'/'+total+' klaar' : 'Nog niet gestart';
+    doc.setFillColor(badgeColor[0],badgeColor[1],badgeColor[2]);
+    doc.roundedRect(pw-70, 15, 62, 8, 2, 2, 'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.text(badgeTxt, pw-39, 20.5, {align:'center'});
+    doc.setTextColor(0,0,0); doc.setFont('helvetica','normal');
+
+    doc.setFontSize(14); doc.setFont('helvetica','bold');
+    doc.text(fullName, 10, 22);
+    doc.setFont('helvetica','normal');
+
+    var startY = 26;
+    if(periodLabel){
+      doc.setFontSize(8); doc.setTextColor(30,64,175);
+      doc.text('Periode: '+se(periodLabel), 10, startY);
+      doc.setTextColor(0,0,0);
+      startY = 31;
+    }
+
+    var taskRows = tasks.map(function(t){
+      var pr = (state.progress[pid]||{})[t.id]||{};
+      var st = pr.status||0;
+      var sm = pr.smiley||0;
+      var statusTxt = st===2?'Klaar':st===1?'Bezig':'Niet gestart';
+      var smileyTxt = sm ? se(SMILEYS[sm])+' '+se(SMILEY_LABELS[sm]) : '-';
+      return [se(t.label), statusTxt, smileyTxt];
+    });
+
+    doc.autoTable({
+      head:[['Taak','Status','Zelfbeoordeling']],
+      body: taskRows,
+      startY: startY,
+      styles:{ fontSize:9, cellPadding:3, overflow:'linebreak' },
+      headStyles:{ fillColor:[241,245,249], textColor:[71,85,105], fontStyle:'bold', fontSize:8 },
+      columnStyles:{
+        0:{ cellWidth:pw-20-55-75, halign:'left' },
+        1:{ cellWidth:55, halign:'left', fontStyle:'bold' },
+        2:{ cellWidth:75, halign:'left' }
+      },
+      didParseCell: function(data){
+        if(data.section==='body' && data.column.index===1){
+          var v = data.cell.raw;
+          if(v==='Klaar')            { data.cell.styles.textColor=GREEN; data.cell.styles.fillColor=[240,253,244]; }
+          else if(v==='Bezig')       { data.cell.styles.textColor=[180,100,0]; data.cell.styles.fillColor=[255,251,235]; }
+          else if(v==='Niet gestart'){ data.cell.styles.textColor=[30,58,138]; data.cell.styles.fillColor=[239,246,255]; }
+        }
+      },
+      alternateRowStyles:{ fillColor:[250,250,252] },
+      margin:{ left:10, right:10 }
+    });
+
+    // Bevindingen
+    var note = state.notes && state.notes[pid];
+    if(note){
+      var y = doc.lastAutoTable.finalY + 6;
+      var noteLines = doc.splitTextToSize(se(note), pw-40);
+      var boxH = 8 + noteLines.length * 5 + 4;
+      if(y+boxH > ph-10){ doc.addPage(); pageNum++; hdr(getNaam(p)+' - Bevindingen',''); ftr(); y=20; }
+      doc.setFillColor(255,251,235);
+      doc.setDrawColor(253,230,138);
+      doc.roundedRect(10, y, pw-20, boxH, 2, 2, 'FD');
+      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(146,64,14);
+      doc.text('BEVINDINGEN LEERKRACHT', 16, y+5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(26,32,44);
+      doc.text(noteLines, 16, y+11);
+    }
+    ftr();
+  });
+
+  document.getElementById('kind-pdf-overlay').classList.remove('show');
+  if(mode === 'print'){
+    var blob = doc.output('blob');
+    var url = URL.createObjectURL(blob);
+    var win = window.open(url, '_blank');
+    if(win){
+      win.addEventListener('load', function(){ win.print(); }, false);
+    } else {
+      var filename = 'kindbord-rapport-'+new Date().toISOString().slice(0,10)+'.pdf';
+      doc.save(filename);
+      showToastKind('Afdrukvenster geblokkeerd — PDF gedownload.');
+    }
+  } else {
+    var filename = 'kindbord-rapport-'+new Date().toISOString().slice(0,10)+'.pdf';
+    doc.save(filename);
+    showToastKind('PDF gedownload: '+filename);
+  }
+}
+
+/* Swipe support */
+(function(){
+  var startX = 0, startY = 0;
+  document.addEventListener('touchstart', function(e){
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - startX;
+    var dy = e.changedTouches[0].clientY - startY;
+    if(Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    var tl = document.getElementById('taskList');
+    if(tl) tl.scrollBy({left: dx < 0 ? 200 : -200, behavior:'smooth'});
+    setTimeout(updateKindScrollArrows, 300);
+  }, {passive:true});
+})();
+
+/* Event listeners */
+document.getElementById('backBtn').addEventListener('click', goBack);
+document.getElementById('popupClose').addEventListener('click', closeSmileyPopup);
+document.querySelectorAll('.popup-smiley').forEach(btn => {
+  btn.addEventListener('click', () => setSmiley(Number(btn.dataset.smiley)));
+});
+
+const _openTeacherBtn = document.getElementById('openTeacherBtn'); if(_openTeacherBtn) _openTeacherBtn.addEventListener('click', openTeacherModal);
+document.getElementById('teacherCloseBtn').addEventListener('click', closeTeacherModal);
+document.getElementById('selectAllPupilsBtn').addEventListener('click', selectAllPupils);
+document.getElementById('clearPupilsBtn').addEventListener('click', clearPupilSelection);
+document.getElementById('selectActiveTasksBtn').addEventListener('click', selectActiveTasks);
+document.getElementById('clearTasksBtn').addEventListener('click', clearTaskSelection);
+document.getElementById('applyAssignmentsBtn').addEventListener('click', applyAssignmentsToSelection);
+document.getElementById('clearAssignmentsBtn').addEventListener('click', clearAssignmentsForSelection);
+document.getElementById('teacherDoneBtn').addEventListener('click', closeTeacherModal);
+document.getElementById('emptyBoardBtn').addEventListener('click', emptyKindBoard);
+document.getElementById('addCustomTaskBtn').addEventListener('click', addCustomTask);
+document.getElementById('customTaskInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') addCustomTask();
+});
+
+function initKindbordAfterLoad(){
+  document.body.classList.add('kb-ready');
+  var heeftLeerlingen = state.pupils && state.pupils.length > 0;
+  var heeftTaken = state.activeTasks && state.activeTasks.length > 0;
+  var bordKlaar = heeftLeerlingen && (heeftTaken || (state.personalAssignments && Object.keys(state.personalAssignments).length > 0));
+
+  // Ga direct naar bord als: smartboard/iPad, of bord is al volledig ingesteld
+  if(((isSmartboard || isIpad) && heeftLeerlingen) || (!isSmartboard && !isIpad && bordKlaar)){
+    document.getElementById('setup-screen').classList.remove('active');
+    document.getElementById('names-screen').style.display = 'block';
+    document.getElementById('tasks-screen').style.display = 'none';
+  } else {
+    document.getElementById('setup-screen').classList.add('active');kbUpdateWizard();
+    document.getElementById('names-screen').style.display = 'none';
+    document.getElementById('tasks-screen').style.display = 'none';
+  }
+
+  renderNames();
+  renderSetupAddedList();
+  setSetupOrder(state.nameOrder || 'voornaam');
+  applySmartboardMode();
+// Verberg scroll-pijltjes op touch-apparaten
+if('ontouchstart' in window || navigator.maxTouchPoints > 0){
+  var arL = document.getElementById('kind-scroll-left');
+  var arR = document.getElementById('kind-scroll-right');
+  if(arL) arL.style.setProperty('display','none','important');
+  if(arR) arR.style.setProperty('display','none','important');
+}
+
+  const setupLastnameCheckbox = document.getElementById('setup-show-lastname');
+  if(setupLastnameCheckbox){
+    setupLastnameCheckbox.checked = !!state.showLastname;
+  }
+}
+
+if (window.fbOnReady) {
+  window.fbOnReady(function(){
+    loadState();
+    setTimeout(initKindbordAfterLoad, 0);
+  });
+} else {
+  loadState();
+  setTimeout(initKindbordAfterLoad, 0);
+}
+
+function openKindNewSchoolYear(){
+  closeTeacherModal();
+  document.getElementById('kind-nsy-overlay').classList.add('show');
+}
+
+function doKindNewSchoolYear(){
+  const keepTasks    = document.getElementById('knsy-keep-tasks').checked;
+  const keepIcons    = document.getElementById('knsy-keep-icons').checked;
+  const wipePupils   = document.getElementById('knsy-wipe-pupils').checked;
+  const wipeProgress = document.getElementById('knsy-wipe-progress').checked;
+
+  if(!wipePupils && !wipeProgress){
+    alert('Selecteer minstens één item om te wissen.');
+    return;
+  }
+  if(wipePupils){
+    state.pupils = [];
+    state.notes = {};
+    state.personalAssignments = {};
+    state.pupilPhotos = {};
+  }
+  if(wipeProgress){
+    state.progress = {};
+  }
+  if(!keepTasks){
+    state.customTasks = [];
+    state.activeTasks = [];
+    state.taskLabelOverrides = {};
+  }
+  if(!keepIcons){
+    state.customIcons = {};
+  }
+  saveState();
+  document.getElementById('kind-nsy-overlay').classList.remove('show');
+  renderNames();
+  renderSetupAddedList();
+  // Ga terug naar setup als leerlingen gewist
+  if(wipePupils) goBackToSetup();
+  // Toast
+  const wiped = [];
+  if(wipePupils) wiped.push('leerlingen');
+  if(wipeProgress) wiped.push('voortgang');
+  if(!keepTasks) wiped.push('taken');
+  if(!keepIcons) wiped.push('afbeeldingen');
+  // Simpele melding
+  alert('🎒 Klaar voor nieuwe klas! Gewist: ' + wiped.join(', ') + '.');
+}
+
+// Toon bordnaam
+(function(){
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const bordId = params.get('bordid');
+    const type = params.get('type') || 'kindbord';
+    if(!bordId) return;
+    const all = JSON.parse(localStorage.getItem('borden_v1')||'{}');
+    const bord = (all[type]||[]).find(function(b){ return b.id === bordId; });
+    if(bord){
+      const el = document.getElementById('kind-bord-naam');
+      if(el) el.textContent = '👤 ' + bord.naam;
+    }
+  } catch {}
+})();
+
+
+function goBackToWelcome(){
+  window.location.href = 'welkomstbord.html';
+}
+
+// ── TIMER ────────────────────────────────────────────────────────────────────
+var timerTotalSeconds = 15 * 60;
+var timerRemaining    = 15 * 60;
+var timerInterval     = null;
+var timerPaused       = false;
+var timerView         = 'both'; // 'both' | 'analog' | 'digital'
+var timerFlashInterval = null;
+
+function toggleTimer(){
+  var p = document.getElementById('timer-popup');
+  if(!p) return;
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+// Weergave: analoog + digitaal / enkel analoog / enkel digitaal
+function setTimerView(mode){
+  timerView = mode;
+  var clock = document.getElementById('timer-clock');
+  var digWrap = document.getElementById('timer-digital-wrap');
+  var displayWrap = document.getElementById('timer-display-wrap');
+  if(!clock || !digWrap) return;
+
+  if(mode === 'both'){
+    clock.style.display   = 'block';
+    digWrap.style.display = 'flex';
+    displayWrap.style.flexDirection = 'row';
+  } else if(mode === 'analog'){
+    clock.style.display   = 'block';
+    digWrap.style.display = 'none';
+    displayWrap.style.flexDirection = 'column';
+  } else { // digital only
+    clock.style.display   = 'none';
+    digWrap.style.display = 'flex';
+    displayWrap.style.flexDirection = 'column';
+  }
+
+  // Highlight actieve knop
+  ['both','analog','digital'].forEach(function(v){
+    var btn = document.getElementById('tv-' + v);
+    if(!btn) return;
+    var active = v === mode;
+    btn.style.borderColor = active ? '#6366f1' : '#e0e7ff';
+    btn.style.background  = active ? '#eef2ff' : '#f8fafc';
+    btn.style.color       = active ? '#6366f1' : '#6b7280';
+  });
+
+  drawClock();
+}
+
+function adjustTime(delta){
+  timerTotalSeconds = Math.max(60, timerTotalSeconds + delta * 60);
+  timerRemaining    = timerTotalSeconds;
+  updateSetDisplay();
+}
+function setTimerPreset(minutes){
+  timerTotalSeconds = minutes * 60;
+  timerRemaining    = timerTotalSeconds;
+  updateSetDisplay();
+}
+function updateSetDisplay(){
+  var el = document.getElementById('timer-set-display');
+  if(!el) return;
+  var m = Math.floor(timerTotalSeconds / 60), s = timerTotalSeconds % 60;
+  el.textContent = timerPad(m) + ':' + timerPad(s);
+}
+function timerPad(n){ return n < 10 ? '0' + n : '' + n; }
+
+function startTimer(){
+  timerRemaining = timerTotalSeconds;
+  timerPaused    = false;
+  document.getElementById('timer-setup').style.display   = 'none';
+  document.getElementById('timer-running').style.display = 'block';
+  document.getElementById('timer-done').style.display    = 'none';
+  setTimerView(timerView);
+  clearInterval(timerInterval);
+  timerInterval = setInterval(timerTick, 1000);
+  timerTick();
+}
+function timerTick(){
+  if(timerPaused) return;
+  updateTimerDigital();
+  drawClock();
+  updateTimerProgress();
+  if(timerRemaining <= 0){
+    clearInterval(timerInterval);
+    timerDone();
+    return;
+  }
+  timerRemaining--;
+}
+function updateTimerDigital(){
+  var el = document.getElementById('timer-digital');
+  if(!el) return;
+  var m = Math.floor(timerRemaining / 60), s = timerRemaining % 60;
+  el.textContent = timerPad(m) + ':' + timerPad(s);
+  el.style.color = timerRemaining < 60 ? '#dc2626' : '#1e1b4b';
+}
+function updateTimerProgress(){
+  var bar = document.getElementById('timer-progress');
+  if(!bar) return;
+  var pct = timerTotalSeconds > 0 ? (timerRemaining / timerTotalSeconds) * 100 : 0;
+  bar.style.width = pct + '%';
+  if(pct > 50)      bar.style.background = 'linear-gradient(90deg,#6366f1,#22c55e)';
+  else if(pct > 20) bar.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
+  else              bar.style.background = 'linear-gradient(90deg,#dc2626,#f87171)';
+}
+function drawClock(){
+  var canvas = document.getElementById('timer-clock');
+  if(!canvas || canvas.style.display === 'none') return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height, cx = W/2, cy = H/2, r = W/2 - 6;
+  ctx.clearRect(0, 0, W, H);
+
+  var pct = timerTotalSeconds > 0 ? timerRemaining / timerTotalSeconds : 0;
+  var fillColor = pct > 0.5 ? '#6366f1' : pct > 0.2 ? '#f59e0b' : '#dc2626';
+
+  // Lege achtergrondcirkel (het al verstreken deel)
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.fillStyle = '#f0f4f8'; ctx.fill();
+  ctx.strokeStyle = '#e0e7ff'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Gekleurde taartpunt = resterende tijd
+  // Start bovenaan (12 uur = -90°), eindigt op de huidige "wijzerstand"
+  // De schijf loopt van de huidige positie TOT bovenaan, met de klok mee
+  // = van -90° + (2π * (1-pct))  tot  -90° + 2π
+  // Wat gelijk is aan: de schijf vult van "huidige positie" naar "12 uur" met klok mee
+  // Simpelste correcte aanpak:
+  // - De LEGE sector loopt van 12 uur (boven) MET de klok mee, grootte = verstreken fractie
+  // - De VOLLE sector is de rest
+  if(pct > 0){
+    var top = -Math.PI / 2;
+    // Huidige "wijzerstand": hoeveel is verstreken = (1 - pct) van de cirkel
+    var elapsed_angle = top + 2 * Math.PI * (1 - pct);
+    // Volle schijf = van elapsed_angle tot top + 2π (= terug naar boven), met klok mee
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r - 2, elapsed_angle, top + 2 * Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+  }
+
+  // Rand bovenop
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.strokeStyle = '#e0e7ff'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Uurmarkeringen (wit, bovenop schijf)
+  for(var i = 0; i < 12; i++){
+    var a = (i / 12) * 2 * Math.PI - Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * (r - 2),  cy + Math.sin(a) * (r - 2));
+    ctx.lineTo(cx + Math.cos(a) * (r - (i % 3 === 0 ? 11 : 7)), cy + Math.sin(a) * (r - (i % 3 === 0 ? 11 : 7)));
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.lineWidth = i % 3 === 0 ? 2.5 : 1.5;
+    ctx.stroke();
+  }
+
+  // Middelpunt
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 2*Math.PI);
+  ctx.fillStyle = '#fff'; ctx.fill();
+
+  // Tijd in het midden
+  ctx.fillStyle = pct > 0.15 ? '#fff' : '#dc2626';
+  ctx.font = 'bold ' + Math.round(r * 0.28) + 'px Nunito,Arial,sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if(timerRemaining < 60){
+    ctx.fillText('0:' + timerPad(timerRemaining % 60), cx, cy);
+  } else {
+    ctx.fillText(Math.ceil(timerRemaining / 60) + "'", cx, cy);
+  }
+}
+
+function pauseResumeTimer(){
+  timerPaused = !timerPaused;
+  var btn = document.getElementById('timer-pause-btn');
+  if(btn) btn.textContent = timerPaused ? '▶ Verder' : '⏸ Pauze';
+}
+function resetTimer(){
+  clearInterval(timerInterval);
+  timerInterval = null;
+  // Stop knipperen en herstel stijl
+  if(typeof timerFlashInterval !== 'undefined'){ clearInterval(timerFlashInterval); timerFlashInterval = null; }
+  var pop = document.getElementById('timer-popup');
+  if(pop){ pop.style.background = '#fff'; pop.style.border = '3px solid #e0e7ff'; pop.style.boxShadow = '0 8px 40px rgba(0,0,0,.22)'; }
+  timerPaused   = false;
+  timerRemaining = timerTotalSeconds;
+  document.getElementById('timer-setup').style.display   = 'block';
+  document.getElementById('timer-running').style.display = 'none';
+  document.getElementById('timer-done').style.display    = 'none';
+  updateSetDisplay();
+}
+function timerDone(){
+  document.getElementById('timer-running').style.display = 'none';
+  document.getElementById('timer-done').style.display    = 'block';
+
+  // Geluid: herhalend alarm gedurende ~10 seconden
+  // 3 tonen per cyclus, 5 cycli met korte pauze ertussen
+  try {
+    var ac = new (window.AudioContext || window.webkitAudioContext)();
+    // Melodie: hoog-laag-hoog patroon, 5 keer herhalen
+    var pattern = [
+      {freq:880, t:0},    {freq:660, t:0.18}, {freq:880, t:0.36},
+      {freq:880, t:0.9},  {freq:660, t:1.08}, {freq:880, t:1.26},
+      {freq:880, t:1.8},  {freq:660, t:1.98}, {freq:880, t:2.16},
+      {freq:880, t:2.7},  {freq:660, t:2.88}, {freq:880, t:3.06},
+      {freq:880, t:3.6},  {freq:660, t:3.78}, {freq:880, t:3.96},
+      {freq:1046,t:4.8},  {freq:1046,t:5.0},  {freq:1046,t:5.2}  // 3 hoge slottonen
+    ];
+    pattern.forEach(function(note){
+      var osc = ac.createOscillator(), gain = ac.createGain();
+      osc.connect(gain); gain.connect(ac.destination);
+      osc.frequency.value = note.freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.45, ac.currentTime + note.t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + note.t + 0.16);
+      osc.start(ac.currentTime + note.t);
+      osc.stop(ac.currentTime + note.t + 0.2);
+    });
+  } catch(e){}
+
+  // Visuele puls: blijft knipperen tot leerkracht op "Nieuwe timer" klikt
+  var pop = document.getElementById('timer-popup');
+  pop.style.border = '3px solid #dc2626';
+  pop.style.boxShadow = '0 0 0 0 rgba(220,38,38,0.7)';
+  var fc = 0;
+  timerFlashInterval = setInterval(function(){
+    fc++;
+    pop.style.background = fc % 2 === 0 ? '#fff5f5' : '#fff';
+    pop.style.border     = fc % 2 === 0 ? '3px solid #dc2626' : '3px solid #fca5a5';
+  }, 600);
+}
+
+// Draggable + resizable
+(function(){
+  var el, ox, oy, ol, ot, dragging = false;
+  var resizing = false, rx, rw;
+  document.addEventListener('mousedown', function(e){
+    el = document.getElementById('timer-popup');
+    if(!el) return;
+    var handle = document.getElementById('timer-drag-handle');
+    var resizeH = document.getElementById('timer-resize');
+    if(resizeH && e.target === resizeH){
+      rx = e.clientX; rw = el.offsetWidth; resizing = true; e.preventDefault();
+    } else if(handle && handle.contains(e.target) && e.target.tagName !== 'BUTTON'){
+      var rect = el.getBoundingClientRect();
+      ox=e.clientX; oy=e.clientY; ol=rect.left; ot=rect.top;
+      dragging=true; e.preventDefault();
+    }
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!el) return;
+    if(dragging){ el.style.left=(ol+e.clientX-ox)+'px'; el.style.top=(ot+e.clientY-oy)+'px'; el.style.right='auto'; }
+    if(resizing){
+      var newW = Math.max(170, rw+(e.clientX-rx));
+      el.style.width = newW + 'px';
+      // Canvas mee schalen
+      var canvas = document.getElementById('timer-clock');
+      if(canvas && timerView !== 'digital'){
+        var cSize = Math.min(newW * 0.42, 180);
+        canvas.width = cSize; canvas.height = cSize;
+        drawClock();
+      }
+    }
+  });
+  document.addEventListener('mouseup', function(){ dragging=false; resizing=false; });
+})();
+</script>
+
+<!-- HELP OVERLAY KINDBORD -->
+<div class="overlay" id="kind-help-overlay">
+<div class="popup" style="text-align:left;max-width:540px;width:100%;max-height:88vh;overflow-y:auto;">
+<h3 style="font-size:20px;margin-bottom:4px;">❓ Uitleg — Kindbord</h3>
+<p style="font-size:14px;color:#6b7280;margin-bottom:16px;">Alles wat je moet weten over het kindbord en de instellingen.</p>
+
+<div style="margin-bottom:14px;">
+<div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:6px;">👦 Leerlingen &amp; namen</div>
+<ul style="font-size:13px;color:#4b5563;line-height:1.8;padding-left:18px;">
+<li>Namen invoeren via het <strong>setup-scherm</strong> (verschijnt automatisch bij eerste gebruik).</li>
+<li>Klik <strong>📷</strong> naast een naam om een foto toe te voegen — verschijnt op de naamkaart.</li>
+<li>Klik <strong>🔒</strong> naast een naam om privé bevindingen toe te voegen. Zichtbaar in het PDF-rapport.</li>
+</ul>
+</div>
+
+<div style="margin-bottom:14px;">
+<div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:6px;">📋 Taken toewijzen</div>
+<ul style="font-size:13px;color:#4b5563;line-height:1.8;padding-left:18px;">
+<li>Vink één of meer kinderen aan via het ☑️-hokje. Selecteer dan taken en klik <strong>"Toewijzen aan selectie"</strong>.</li>
+<li>Standaard volgen kinderen het klasbord. Klik <strong>"🧹 Kindbord leeg maken"</strong> als je eigen taken per kind wil geven.</li>
+<li><strong>✎ naam</strong> onder een taak = naam aanpassen, bv. "Rekenen" → "Rekenhoek".</li>
+<li><strong>📷 afb.</strong> onder een taak = eigen afbeelding uploaden als pictogram.</li>
+</ul>
+</div>
+
+<div style="margin-bottom:14px;">
+<div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:6px;">📺 Smartboard-weergave</div>
+<p style="font-size:13px;color:#4b5563;line-height:1.7;">Open via het welkomstscherm. Alle beheerknoppen zijn verborgen — kinderen zien enkel namen en taken. <strong>Terug naar beheer:</strong> klik het kleine 🔒 rechtsonder in het scherm.</p>
+</div>
+
+<div style="margin-bottom:14px;">
+<div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:6px;">⏱️ Werktimer</div>
+<p style="font-size:13px;color:#4b5563;line-height:1.7;">Klik <strong>"⏱️ Timer"</strong> in de balk. Stel de tijd in, klik Starten. Versleep de timer aan de titelbalk. Kies analoog, digitaal of beide. Geluid + rode knippering als tijd om is.</p>
+</div>
+
+<div style="margin-bottom:14px;">
+<div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:6px;">📄 PDF rapport</div>
+<p style="font-size:13px;color:#4b5563;line-height:1.7;">Klik <strong>"📄 PDF rapport"</strong> in de balk. Per leerling een pagina met taken, smileys en bevindingen. Kies "⬇️ Downloaden" — het afdrukvenster opent. Kies <em>Bestemming: Opslaan als PDF</em>.</p>
+</div>
+
+<div style="display:flex;justify-content:flex-end;">
+<button type="button" class="apply-btn teacher-btn" onclick="document.getElementById('kind-help-overlay').classList.remove('show')" style="padding:10px 24px;">Begrepen!</button>
+</div>
+</div>
+</div>
+
+<!-- EXIT SMARTBOARD MODAL -->
+<div class="overlay" id="kind-exit-overlay">
+<div class="popup" style="text-align:center;max-width:340px;width:100%;">
+<div style="font-size:36px;margin-bottom:8px;">⚙️</div>
+<h3 style="font-size:20px;margin-bottom:8px;">Leerkracht-menu</h3>
+<p style="font-size:14px;color:#6b7280;margin-bottom:16px;">Kies wat je wil doen.</p>
+<div style="display:flex;flex-direction:column;gap:8px;">
+<button type="button" class="primary-big-btn" onclick="exitKindSmartboard('beheer')" style="font-size:16px;padding:12px;">⚙️ Terug naar beheer</button>
+<button type="button" class="secondary-big-btn" onclick="exitKindSmartboard('welkom')" style="font-size:16px;padding:12px;">🏠 Terug naar welkomstscherm</button>
+<button type="button" class="close-btn" onclick="document.getElementById('kind-exit-overlay').classList.remove('show')" style="font-size:15px;padding:10px;">Annuleren (blijf op bord)</button>
+</div>
+</div>
+</div>
+
+<!-- BEVINDINGEN MODAL -->
+<div class="overlay" id="kind-notes-overlay">
+<div class="popup" style="text-align:left;max-width:500px;width:100%;">
+<h3 id="kind-notes-title" style="font-size:20px;margin-bottom:8px;">🔒 Bevindingen</h3>
+<p style="font-size:14px;color:#6b7280;margin-bottom:12px;">Privé notities — nooit zichtbaar op het bord. Verschijnen wel in het PDF-rapport.</p>
+<textarea id="kind-notes-input" style="width:100%;min-height:120px;border:2px solid #c7d2fe;border-radius:14px;padding:12px;font-size:15px;font-family:Nunito,Arial,sans-serif;resize:vertical;" placeholder="bv. Werkte zelfstandig · Had hulp nodig · Meer uitdaging nodig…"></textarea>
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+  <button class="close-btn" onclick="closeNotesModal()" type="button">Annuleren</button>
+  <button class="apply-btn teacher-btn" onclick="saveNotesKind()" type="button">💾 Opslaan</button>
+</div>
+</div>
+</div>
+
+<!-- TAAKNAAM MODAL -->
+<div class="overlay" id="kind-rename-overlay">
+<div class="popup" style="text-align:left;max-width:420px;width:100%;">
+<h3 style="font-size:20px;margin-bottom:8px;">✎ Taaknaam aanpassen</h3>
+<p style="font-size:14px;color:#6b7280;margin-bottom:12px;">Geef deze taak een naam die past bij jouw klas, bv. "Rekenhoek" of "Leesmap".</p>
+<input id="kind-rename-input" type="text" style="width:100%;border:2px solid #c7d2fe;border-radius:14px;padding:12px;font-size:16px;font-family:Nunito,Arial,sans-serif;margin-bottom:4px;" placeholder="Nieuwe naam…" onkeydown="if(event.key==='Enter')saveTaskRenameKind()" />
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+  <button class="close-btn" onclick="closeTaskRenameKind()" type="button">Annuleren</button>
+  <button class="apply-btn teacher-btn" onclick="saveTaskRenameKind()" type="button">✓ Opslaan</button>
+</div>
+</div>
+</div>
+
+<!-- PDF MODAL -->
+<div class="overlay" id="kind-pdf-overlay">
+<div class="popup" style="text-align:left;max-width:460px;width:100%;">
+<h3 style="font-size:22px;margin-bottom:8px;">📄 PDF rapport</h3>
+<p style="font-size:14px;color:#6b7280;margin-bottom:14px;">Per leerling: taken, smileys en bevindingen.</p>
+<div style="margin-bottom:10px;">
+  <label style="font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Naam van de periode</label>
+  <input id="kind-pdf-period" type="text" placeholder="bv. Week 14" style="width:100%;border:2px solid #c7d2fe;border-radius:12px;padding:10px;font-size:15px;font-family:Nunito,Arial,sans-serif;" />
+</div>
+<div style="display:flex;gap:10px;margin-bottom:14px;">
+  <div style="flex:1;"><label style="font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Van</label><input id="kind-pdf-from" type="date" style="width:100%;border:2px solid #c7d2fe;border-radius:12px;padding:10px;font-size:14px;font-family:Nunito,Arial,sans-serif;" /></div>
+  <div style="flex:1;"><label style="font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Tot</label><input id="kind-pdf-to" type="date" style="width:100%;border:2px solid #c7d2fe;border-radius:12px;padding:10px;font-size:14px;font-family:Nunito,Arial,sans-serif;" /></div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+  <button class="apply-btn teacher-btn" onclick="generateKindPdf('download')" type="button" style="flex:1;">⬇️ Downloaden als PDF</button>
+  <button class="close-btn" onclick="generateKindPdf('print')" type="button" style="flex:1;">🖨️ Afdrukken</button>
+</div>
+<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:11px;color:#1e40af;line-height:1.7;margin-bottom:12px;">
+  <strong>⬇️ Downloaden</strong> — PDF komt direct in je Downloads-map.<br/>
+  <strong>🖨️ Afdrukken</strong> — kies "Opslaan als PDF" als bestemming.
+</div>
+<div style="display:flex;justify-content:flex-end;">
+  <button class="close-btn" onclick="closePdfModalKind()" type="button">Annuleren</button>
+</div>
+</div>
+</div>
+
+<!-- TIMER POPUP -->
+<div id="timer-popup" style="display:none;position:fixed;z-index:8000;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.22);border:3px solid #e0e7ff;padding:14px 16px;user-select:none;top:80px;right:30px;min-width:180px;">
+  <!-- Titelbalk (drag handle) -->
+  <div id="timer-drag-handle" style="cursor:move;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;">
+    <span style="font-weight:800;font-size:13px;color:#6366f1;white-space:nowrap;">⏱️ Werktimer</span>
+    <div style="display:flex;gap:3px;align-items:center;">
+      <!-- Weergave-knoppen -->
+      <button onclick="setTimerView('both')" id="tv-both" title="Analoog + digitaal" style="border:2px solid #6366f1;background:#eef2ff;color:#6366f1;border-radius:6px;padding:2px 5px;cursor:pointer;font-size:10px;font-weight:800;">◷+</button>
+      <button onclick="setTimerView('analog')" id="tv-analog" title="Enkel analoog" style="border:2px solid #e0e7ff;background:#f8fafc;color:#6b7280;border-radius:6px;padding:2px 5px;cursor:pointer;font-size:10px;font-weight:800;">◷</button>
+      <button onclick="setTimerView('digital')" id="tv-digital" title="Enkel digitaal" style="border:2px solid #e0e7ff;background:#f8fafc;color:#6b7280;border-radius:6px;padding:2px 5px;cursor:pointer;font-size:10px;font-weight:800;">0:00</button>
+      <button onclick="toggleTimer()" style="border:none;background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:13px;margin-left:2px;">✕</button>
+    </div>
+  </div>
+
+  <!-- INSTELLEN -->
+  <div id="timer-setup" style="text-align:center;">
+    <div style="font-size:11px;font-weight:700;color:#6b7280;margin-bottom:6px;">Stel de werktijd in</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
+      <button onclick="adjustTime(-5)" style="border:none;background:#e0e7ff;color:#4338ca;border-radius:8px;width:28px;height:28px;font-size:16px;cursor:pointer;font-weight:800;line-height:1;">−</button>
+      <span id="timer-set-display" style="font-size:24px;font-weight:800;color:#1e1b4b;min-width:60px;text-align:center;">15:00</span>
+      <button onclick="adjustTime(5)" style="border:none;background:#e0e7ff;color:#4338ca;border-radius:8px;width:28px;height:28px;font-size:16px;cursor:pointer;font-weight:800;line-height:1;">+</button>
+    </div>
+    <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+      <button onclick="setTimerPreset(5)"  class="timer-preset">5'</button>
+      <button onclick="setTimerPreset(10)" class="timer-preset">10'</button>
+      <button onclick="setTimerPreset(15)" class="timer-preset">15'</button>
+      <button onclick="setTimerPreset(20)" class="timer-preset">20'</button>
+      <button onclick="setTimerPreset(30)" class="timer-preset">30'</button>
+    </div>
+    <button onclick="startTimer()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:9px 0;font-size:15px;font-weight:800;cursor:pointer;width:100%;">▶ Starten</button>
+  </div>
+
+  <!-- LOPEND -->
+  <div id="timer-running" style="display:none;">
+    <div id="timer-display-wrap" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+      <!-- Analoge klok -->
+      <canvas id="timer-clock" width="120" height="120" id="timer-clock" style="display:block;flex-shrink:0;"></canvas>
+      <!-- Digitale weergave -->
+      <div id="timer-digital-wrap" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div id="timer-digital" style="font-size:32px;font-weight:800;color:#1e1b4b;letter-spacing:1px;line-height:1;">15:00</div>
+        <div style="background:#e0e7ff;border-radius:5px;height:7px;width:90px;overflow:hidden;">
+          <div id="timer-progress" style="height:100%;background:linear-gradient(90deg,#6366f1,#22c55e);border-radius:5px;width:100%;transition:width .5s;"></div>
+        </div>
+        <div style="display:flex;gap:5px;">
+          <button onclick="pauseResumeTimer()" id="timer-pause-btn" style="background:#fef3c7;color:#92400e;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;">⏸ Pauze</button>
+          <button onclick="resetTimer()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;">↺ Stop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFGELOPEN -->
+  <div id="timer-done" style="display:none;text-align:center;">
+    <div style="font-size:40px;margin-bottom:6px;">🔔</div>
+    <div style="font-size:18px;font-weight:800;color:#16a34a;margin-bottom:10px;">Tijd is om!</div>
+    <button onclick="resetTimer()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:9px 0;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Nieuwe timer</button>
+  </div>
+
+  <!-- Resize-handvat -->
+  <div id="timer-resize" style="position:absolute;bottom:3px;right:3px;width:14px;height:14px;cursor:se-resize;opacity:.35;font-size:11px;text-align:center;line-height:14px;">⊿</div>
+</div>
+<style>
+.timer-preset{border:1.5px solid #e0e7ff;background:#f8f9ff;color:#4338ca;border-radius:7px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;}
+.timer-preset:hover{background:#e0e7ff;}
+
+/* ══ KINDBORD ZIJBALK BEHEER ════════════════════════════════════════════ */
+.setup-screen { display:none !important; padding:0 !important; }
+.setup-screen.active { display:flex !important; flex-direction:column; }
+
+.kb-setup-layout { display:flex; width:100%; height:calc(100vh - 44px); overflow:hidden; background:#f0f4f8; flex:1; }
+
+.kb-sb-nav { width:190px; min-width:190px; flex-shrink:0; background:#1e1b4b; display:flex; flex-direction:column; padding:14px 12px 16px; overflow-y:auto; gap:2px; }
+.kb-sb-nav::-webkit-scrollbar { width:3px; }
+.kb-sb-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.2); border-radius:2px; }
+
+.kb-sb-back { width:100%; border:none; background:rgba(255,255,255,.13); color:rgba(255,255,255,.9); border-radius:10px; padding:11px 14px; font-size:13px; font-weight:800; cursor:pointer; font-family:inherit; text-align:left; margin-bottom:8px; transition:background .15s; }
+.kb-sb-back:hover { background:rgba(255,255,255,.22); }
+
+.kb-sb-bord-naam { font-size:12px; font-weight:800; color:rgba(255,255,255,.45); padding:0 4px; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.kb-sb-label { font-size:10px; font-weight:800; color:rgba(255,255,255,.3); text-transform:uppercase; letter-spacing:.08em; padding:10px 6px 4px; }
+
+.kb-sb-stap { display:flex; align-items:center; gap:10px; padding:11px 10px; border-radius:10px; border:none; background:transparent; cursor:pointer; font-family:inherit; text-align:left; transition:background .15s; width:100%; margin-bottom:2px; }
+.kb-sb-stap:hover { background:rgba(255,255,255,.1); }
+.kb-sb-stap.kb-actief { background:rgba(255,255,255,.18); }
+
+.kb-sb-badge { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; flex-shrink:0; background:#dbeafe; color:#1e40af; transition:all .2s; }
+.kb-badge-2 { background:#dcfce7; color:#15803d; }
+.kb-badge-3 { background:#f3e8ff; color:#7c3aed; }
+.kb-badge-klaar { background:#bbf7d0 !important; color:#15803d !important; }
+
+.kb-sb-info { overflow:hidden; flex:1; }
+.kb-sb-titel { font-size:13px; font-weight:800; color:rgba(255,255,255,.92); line-height:1.2; }
+.kb-sb-sub { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.kb-sb-go { display:block; width:100%; background:#059669; color:#fff; border:none; border-radius:11px; padding:13px 10px; font-size:13px; font-weight:800; cursor:pointer; font-family:inherit; text-align:center; margin-top:12px; transition:background .15s; }
+.kb-sb-go:hover { background:#047857; }
+
+.kb-sb-extra { display:flex; align-items:center; gap:8px; width:100%; border:none; background:rgba(255,255,255,.08); color:rgba(255,255,255,.75); font-size:13px; font-weight:700; padding:10px 12px; border-radius:9px; cursor:pointer; font-family:inherit; text-align:left; transition:background .15s; margin-bottom:4px; }
+.kb-sb-extra:hover { background:rgba(255,255,255,.16); color:#fff; }
+
+.kb-sb-content { flex:1; min-width:0; overflow-y:auto; padding:28px 36px 60px; width:100%; }
+.kb-sb-content::-webkit-scrollbar { width:7px; }
+.kb-sb-content::-webkit-scrollbar-track { background:#e0e7ff; }
+.kb-sb-content::-webkit-scrollbar-thumb { background:#059669; border-radius:3px; }
+
+.kb-paneel { width:100%; }
+.kb-paneel-hidden { display:none !important; }
+.kb-paneel-titel { font-size:22px; font-weight:800; color:#1e1b4b; margin-bottom:22px; padding-bottom:14px; border-bottom:2px solid #e0e7ff; }
+
+/* Taken-toewijzen layout */
+.kb-taken-layout { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:720px){ .kb-taken-layout { grid-template-columns:1fr; } }
+.kb-taken-col { background:#fff; border:1.5px solid #e0e7ff; border-radius:14px; padding:18px; }
+.kb-taken-col-titel { font-size:15px; font-weight:800; color:#1e1b4b; margin-bottom:12px; }
+.kb-task-grid { display:flex; flex-wrap:wrap; gap:8px; }
+
+/* Taak-tegels in kindbord beheer */
+.kb-task-chip {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:5px; padding:10px 8px; min-width:80px; min-height:70px;
+  border-radius:12px; border:2.5px solid #e0e7ff; background:#f8fafc;
+  cursor:pointer; position:relative; transition:all .15s; text-align:center;
+}
+.kb-task-chip:hover { border-color:#818cf8; background:#eef2ff; transform:translateY(-1px); }
+.kb-task-chip.active { border-color:#059669; background:#ecfdf5; }
+.kb-task-chip .chip-icon { font-size:24px; line-height:1; }
+.kb-task-chip .chip-label { font-size:11px; font-weight:800; color:#94a3b8; line-height:1.2; word-break:break-word; }
+.kb-task-chip.active .chip-label { color:#065f46; }
+.kb-task-gear { position:absolute; top:4px; right:4px; width:18px; height:18px; border-radius:5px; border:1px solid #e0e7ff; background:rgba(255,255,255,.9); color:#6366f1; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .12s; }
+.kb-task-chip:hover .kb-task-gear { opacity:1; }
+.kb-task-dropdown { display:none; position:absolute; top:calc(100% + 4px); right:0; background:#fff; border:1.5px solid #e0e7ff; border-radius:10px; padding:5px; box-shadow:0 6px 20px rgba(0,0,0,.12); min-width:170px; z-index:9999; }
+.kb-task-dropdown.open { display:block; }
+.kb-task-menu-item { display:flex; align-items:center; width:100%; border:none; background:none; padding:8px 10px; border-radius:7px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; color:#374151; text-align:left; }
+.kb-task-menu-item:hover { background:#f1f5f9; }
+.kb-task-menu-danger { color:#dc2626; }
+.kb-task-menu-danger:hover { background:#fff5f5; }
+.kb-task-menu-sep { height:1px; background:#f1f5f9; margin:3px 0; }
+
+/* Leerling-rijen in taken paneel */
+.kb-pupil-row { display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:12px; background:#f9fafb; border:2px solid #e5e7eb; margin-bottom:8px; transition:all .12s; cursor:pointer; }
+.kb-pupil-row.selected { background:#ecfdf5; border-color:#059669; }
+.kb-pupil-row:hover { border-color:#a7f3d0; }
+
+/* ══ NAMEN INVOER (kindbord beheer) ════════════════════════════════════ */
+.namen-bib-banner { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; background:#ecfdf5; border-radius:12px; border:1.5px solid #a7f3d0; margin-bottom:20px; flex-wrap:wrap; font-size:14px; font-weight:800; color:#065f46; }
+.namen-bib-btn { border:1.5px solid #059669; background:#fff; color:#059669; border-radius:9px; padding:8px 16px; font-size:13px; font-weight:800; cursor:pointer; font-family:inherit; white-space:nowrap; }
+.namen-bib-btn:hover { background:#ecfdf5; }
+
+.namen-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; align-items:start; width:100%; }
+@media(max-width:720px){ .namen-grid { grid-template-columns:1fr; } }
+.namen-invoer-col { display:flex; flex-direction:column; gap:16px; }
+.namen-lijst-col { display:flex; flex-direction:column; }
+.namen-lijst-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
+.namen-count { font-weight:800; font-size:15px; color:#1e1b4b; }
+.namen-lijst-hint { font-size:13px; color:#a0aec0; margin-bottom:12px; line-height:1.8; }
+
+.invoer-blok { background:#fff; border:1.5px solid #e0e7ff; border-radius:14px; padding:18px 20px; }
+.invoer-blok-titel { font-size:15px; font-weight:800; color:#1e1b4b; margin-bottom:6px; }
+.invoer-blok-hint { font-size:13px; color:#94a3b8; margin-bottom:14px; line-height:1.5; }
+
+.volgorde-rij { display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.volgorde-label { font-size:13px; font-weight:800; color:#6b7280; }
+.sort-chip { padding:7px 16px; border-radius:20px; font-size:13px; font-weight:700; border:1.5px solid #e0e7ff; background:#f8fafc; color:#94a3b8; cursor:pointer; transition:all .12s; font-family:inherit; }
+.sort-chip.active { border-color:#059669; background:#ecfdf5; color:#065f46; }
+
+.namen-textarea { width:100%; min-height:100px; font-size:15px; padding:12px 14px; border:1.5px solid #e0e7ff; border-radius:10px; resize:vertical; font-family:inherit; color:#1a202c; background:#f7fafc; line-height:1.6; margin-bottom:12px; box-sizing:border-box; }
+.namen-textarea:focus { outline:none; border-color:#059669; box-shadow:0 0 0 3px #d1fae5; }
+
+.invoer-btns-rij { display:flex; gap:10px; }
+.invoer-btn { flex:1; padding:12px 16px; border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; font-family:inherit; border:none; transition:opacity .15s; }
+.invoer-btn:hover { opacity:.88; }
+.invoer-btn-primary { background:#3b82f6; color:#fff; }
+.invoer-btn-secondary { background:#e2e8f0; color:#4a5568; }
+.invoer-btn-full { width:100%; margin-top:6px; flex:unset; }
+
+.naam-input { width:100%; padding:12px 14px; font-size:15px; font-family:inherit; border:1.5px solid #e0e7ff; border-radius:10px; background:#f7fafc; color:#1a202c; box-sizing:border-box; }
+.naam-input:focus { outline:none; border-color:#059669; box-shadow:0 0 0 3px #d1fae5; }
+.naam-label { font-size:12px; font-weight:800; color:#6b7280; text-transform:uppercase; letter-spacing:.04em; }
+
+/* Toggle-row hergebruik */
+.toggle-label { font-size:14px; font-weight:700; color:#374151; margin-left:10px; }
+
+/* Eigen taak toevoegen (kindbord) */
+.eigen-taak-wrap { margin-top:16px; padding:18px 20px; background:#fff; border:1.5px solid #e0e7ff; border-radius:14px; }
+.eigen-taak-titel { font-size:15px; font-weight:800; color:#1e1b4b; margin-bottom:4px; }
+.eigen-taak-hint { font-size:13px; color:#64748b; margin-bottom:14px; }
+.eigen-taak-rij { display:flex; gap:10px; align-items:center; }
+.eigen-taak-emoji-btn { width:46px; height:46px; border-radius:10px; font-size:24px; border:2px solid #e0e7ff; background:#f8fafc; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .12s; }
+.eigen-taak-emoji-btn:hover { border-color:#059669; background:#ecfdf5; }
+.emoji-picker-popup { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:200; background:#fff; border:1.5px solid #e0e7ff; border-radius:14px; padding:14px; box-shadow:0 8px 24px rgba(0,0,0,.12); max-width:340px; }
+.emoji-picker-popup.open { display:block; }
+
+/* ══ KNOP OPMAAK KINDBORD BEHEER ═══════════════════════════════════════ */
+
+/* Groene primaire knop voor kindbord */
+.invoer-btn-green { background:#059669; color:#fff; }
+.invoer-btn-green:hover { background:#047857; }
+
+/* Alle knoppen in de setup zonder opmaak krijgen basisstijl */
+.kb-sb-content button:not([class]),
+.kb-sb-content input[type="button"]:not([class]) {
+  font-family:inherit;
+  cursor:pointer;
+}
+
+/* Setup-added-item knoppen (verwijder x) */
+.setup-added-item button {
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+/* Namen-bib-banner knop */
+.namen-bib-btn {
+  border:1.5px solid #059669;
+  background:#fff;
+  color:#059669;
+  border-radius:9px;
+  padding:8px 16px;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  font-family:inherit;
+  white-space:nowrap;
+  transition:background .15s;
+}
+.namen-bib-btn:hover { background:#ecfdf5; }
+
+/* Sort chips groen voor kindbord */
+.sort-chip.active {
+  border-color:#059669 !important;
+  background:#ecfdf5 !important;
+  color:#065f46 !important;
+}
+
+/* Leerlingen toevoegen knoppen */
+.namen-textarea + .invoer-btns-rij .invoer-btn-primary,
+button.invoer-btn-primary { background:#3b82f6; color:#fff; }
+
+/* Knopjes in setup-added-list */
+.setup-added-item .remove-btn,
+.setup-added-item button {
+  width:28px; height:28px;
+  border-radius:7px;
+  background:#fee2e2;
+  color:#dc2626;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  transition:background .12s;
+}
+.setup-added-item button:hover { background:#fecaca; }
+
+/* kbUpdateWizard badge zonder stap 3 */
+#kb-badge-inst { display:none; }
+#kb-stap-inst  { display:none; }
+</style>
+<!-- NIEUW SCHOOLJAAR MODAL -->
+<div class="overlay" id="kind-nsy-overlay">
+<div class="popup" style="text-align:left;max-width:460px;width:100%;">
+<h3 style="font-size:20px;margin-bottom:4px;">🎒 Nieuw schooljaar starten</h3>
+<p style="font-size:14px;color:#6b7280;margin-bottom:14px;">Kies wat je bewaart voor volgend schooljaar.</p>
+
+<div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400e;line-height:1.7;">
+  ⚠️ Maak eerst een backup als je de voortgang nog nodig hebt.
+</div>
+
+<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;">
+  <label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:#f8fafc;border-radius:10px;border:2px solid #e0e7ff;cursor:pointer;">
+    <input type="checkbox" id="knsy-keep-tasks" checked style="width:17px;height:17px;margin-top:1px;flex-shrink:0;accent-color:#6366f1;">
+    <div><div style="font-size:13px;font-weight:800;color:#1f2937;">📋 Taken bewaren</div>
+    <div style="font-size:11px;color:#6b7280;margin-top:1px;">Alle taken, eigen toegevoegde taken en aangepaste namen blijven.</div></div>
+  </label>
+  <label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:#f8fafc;border-radius:10px;border:2px solid #e0e7ff;cursor:pointer;">
+    <input type="checkbox" id="knsy-keep-icons" checked style="width:17px;height:17px;margin-top:1px;flex-shrink:0;accent-color:#6366f1;">
+    <div><div style="font-size:13px;font-weight:800;color:#1f2937;">🖼️ Eigen afbeeldingen bij taken bewaren</div>
+    <div style="font-size:11px;color:#6b7280;margin-top:1px;">De afbeeldingen die je bij taken hebt toegevoegd.</div></div>
+  </label>
+  <label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:#fff5f5;border-radius:10px;border:2px solid #fecaca;cursor:pointer;">
+    <input type="checkbox" id="knsy-wipe-pupils" checked style="width:17px;height:17px;margin-top:1px;flex-shrink:0;accent-color:#dc2626;">
+    <div><div style="font-size:13px;font-weight:800;color:#dc2626;">🗑️ Leerlingen wissen</div>
+    <div style="font-size:11px;color:#6b7280;margin-top:1px;">Alle namen, foto's en bevindingen worden verwijderd.</div></div>
+  </label>
+  <label style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:#fff5f5;border-radius:10px;border:2px solid #fecaca;cursor:pointer;">
+    <input type="checkbox" id="knsy-wipe-progress" checked style="width:17px;height:17px;margin-top:1px;flex-shrink:0;accent-color:#dc2626;">
+    <div><div style="font-size:13px;font-weight:800;color:#dc2626;">🗑️ Voortgang wissen</div>
+    <div style="font-size:11px;color:#6b7280;margin-top:1px;">Alle vinkjes en smileys worden leeggemaakt.</div></div>
+  </label>
+</div>
+
+<div style="display:flex;gap:8px;justify-content:flex-end;">
+  <button type="button" class="close-btn" onclick="document.getElementById('kind-nsy-overlay').classList.remove('show')">Annuleren</button>
+  <button type="button" class="apply-btn teacher-btn" onclick="doKindNewSchoolYear()">🎒 Starten</button>
+</div>
+</div>
+</div>
+
+  <script>
+function showKindClosed(){
+  // Toon een eenvoudig afsluit-scherm
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#f8fafc,#eef2ff);display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:24px;padding:32px 28px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.1);text-align:center;">'
+    + '<div style="font-size:48px;margin-bottom:12px;">✅</div>'
+    + '<div style="font-size:22px;font-weight:800;color:#1e1b4b;margin-bottom:8px;">Klaar voor vandaag!</div>'
+    + '<div style="font-size:15px;color:#64748b;line-height:1.6;">Goed gedaan! Je taken zijn opgeslagen.</div>'
+    + '</div>';
+  document.body.appendChild(overlay);
+}
+</script>
+
+<style>
+/* ══ NOTITIES-KNOP OP KINDBORD ═════════════════════════════════════════ */
+.kind-card-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.kind-notes-wrap {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 10;
+}
+.kind-notes-btn {
+  width: 28px; height: 28px;
+  border-radius: 7px; border: 1.5px solid #e0e7ff;
+  background: rgba(255,255,255,.85);
+  color: #cbd5e1; font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.5; transition: all .15s;
+}
+.kind-card-wrap:hover .kind-notes-btn { opacity: 1; }
+.kind-notes-btn.has-notes {
+  background: #fef3c7; border-color: #f59e0b;
+  color: #92400e; opacity: 1;
+}
+body.smartboard .kind-notes-wrap,
+body.ipad-modus .kind-notes-wrap { display: none !important; }
+
+/* ══ LEERKRACHT-BANNER KINDBORD ════════════════════════════════════════ */
+.kind-teacher-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; background: #fef3c7; border: 1.5px solid #f59e0b;
+  border-radius: 10px; padding: 10px 16px; margin: 0 0 12px;
+  font-size: 13px; color: #92400e; line-height: 1.5; flex-wrap: wrap;
+}
+body.smartboard .kind-teacher-banner,
+body.ipad-modus .kind-teacher-banner { display: none !important; }
+
+/* ══ PRO-BANNER ═════════════════════════════════════════════════════════ */
+.pro-header {
+  display:flex; align-items:center; justify-content:space-between;
+  background:linear-gradient(135deg,#1e3a8a,#2563eb);
+  color:#fff; padding:10px 20px;
+  font-family:Nunito,sans-serif;
+  position:fixed; top:0; left:0; right:0;
+  z-index:1000; height:44px; box-sizing:border-box;
+}
+.pro-header-left { display:flex; align-items:center; gap:10px; }
+.pro-back-btn {
+  border:none; background:rgba(255,255,255,.2); color:#fff;
+  border-radius:8px; padding:5px 12px; font-size:13px; font-weight:800;
+  cursor:pointer; font-family:inherit; text-decoration:none;
+  display:inline-flex; align-items:center; gap:5px;
+}
+.pro-back-btn:hover { background:rgba(255,255,255,.3); }
+.pro-header-title { font-size:14px; font-weight:800; opacity:.9; }
+.pro-badge {
+  background:#f5c200; color:#0b3060;
+  border-radius:6px; padding:2px 9px;
+  font-size:0.78rem; font-weight:800;
+}
+
+/* Ruimte voor vaste banner */
+body { padding-top:44px !important; }
+
+/* ══ WARME GROENE ZIJBALK (kindbord) ═════════════════════════════════════ */
+.kb-sb-nav {
+  background:#f0fff8 !important;
+  border-right:2px solid #a7f3d0 !important;
+}
+.kb-sb-back {
+  background:#a7f3d0 !important;
+  color:#065f46 !important;
+  border:none;
+}
+.kb-sb-back:hover { background:#6ee7b7 !important; }
+.kb-sb-bord-naam { color:#059669 !important; }
+.kb-sb-label { color:#047857 !important; }
+
+/* Stap-knoppen duidelijk klikbaar */
+.kb-sb-stap {
+  background:#fff !important;
+  border:2px solid #a7f3d0 !important;
+  border-radius:12px !important;
+  margin-bottom:6px !important;
+}
+.kb-sb-stap:hover {
+  background:#ecfdf5 !important;
+  border-color:#059669 !important;
+}
+.kb-sb-stap.kb-actief {
+  background:#ecfdf5 !important;
+  border-color:#059669 !important;
+  box-shadow:0 2px 6px rgba(5,150,105,.2) !important;
+}
+.kb-sb-titel { color:#1e1b4b !important; }
+.kb-sb-sub   { color:#047857 !important; }
+
+/* Badges */
+.kb-sb-badge { background:#059669 !important; color:#fff !important; }
+.kb-badge-2  { background:#ede9fe !important; color:#6d28d9 !important; }
+.kb-badge-klaar { background:#d1fae5 !important; color:#065f46 !important; }
+
+/* Naar kindbord knop */
+.kb-sb-go {
+  background:#059669 !important;
+  box-shadow:0 2px 8px rgba(5,150,105,.3) !important;
+}
+.kb-sb-go:hover { background:#047857 !important; }
+
+/* Extra knoppen */
+.kb-sb-extra {
+  background:#fff !important;
+  border:1.5px solid #a7f3d0 !important;
+  color:#065f46 !important;
+}
+.kb-sb-extra:hover { background:#ecfdf5 !important; }
+
+/* Content */
+.kb-sb-content { background:#f0f4fb !important; }
+.kb-paneel-titel { border-bottom-color:#a7f3d0 !important; }
+
+/* Namen-paneel accenten */
+.kb-sb-content .invoer-blok { border-color:#a7f3d0 !important; }
+.kb-sb-content .invoer-blok-titel { color:#065f46 !important; }
+.kb-sb-content .invoer-btn-primary { background:#059669 !important; }
+.kb-sb-content .sort-chip.active {
+  border-color:#059669 !important;
+  background:#ecfdf5 !important;
+  color:#065f46 !important;
+}
+.kb-sb-content .namen-textarea:focus {
+  border-color:#059669 !important;
+  box-shadow:0 0 0 3px #d1fae5 !important;
+}
+.kb-sb-content .naam-input:focus {
+  border-color:#059669 !important;
+  box-shadow:0 0 0 3px #d1fae5 !important;
+}
+
+/* Taken-paneel */
+.kb-task-chip.active {
+  border-color:#059669 !important;
+  background:#ecfdf5 !important;
+}
+.kb-taken-col-titel { color:#065f46 !important; }
+
+/* ══ PAARSE ZIJBALK STIJL (kindbord beheer) ══════════════════════════════ */
+
+/* Pagina-achtergrond */
+.kb-setup-layout { background:#f5f3ff !important; }
+.kb-sb-content { background:#f5f3ff !important; }
+
+/* Zijbalk — warm crème met paarse accenten */
+.kb-sb-nav {
+  background:#faf5ff !important;
+  border-right:2px solid #ddd6fe !important;
+}
+
+/* Terug-knop */
+.kb-sb-back {
+  background:#ddd6fe !important;
+  color:#4c1d95 !important;
+}
+.kb-sb-back:hover { background:#c4b5fd !important; }
+
+/* Bordnaam */
+.kb-sb-bord-naam { color:#7c3aed !important; }
+
+/* Labels */
+.kb-sb-label { color:#6d28d9 !important; }
+
+/* Stap-knoppen — duidelijk als knoppen */
+.kb-sb-stap {
+  background:#fff !important;
+  border:2px solid #ddd6fe !important;
+  border-radius:12px !important;
+  margin-bottom:6px !important;
+}
+.kb-sb-stap:hover {
+  background:#f5f3ff !important;
+  border-color:#a78bfa !important;
+}
+.kb-sb-stap.kb-actief {
+  background:#f5f3ff !important;
+  border-color:#7c3aed !important;
+  box-shadow:0 2px 6px rgba(124,58,237,.2) !important;
+}
+
+/* Stap tekst */
+.kb-sb-titel { color:#1e1b4b !important; }
+.kb-sb-sub   { color:#6d28d9 !important; }
+
+/* Badges */
+.kb-sb-badge { background:#7c3aed !important; color:#fff !important; }
+.kb-badge-2  { background:#ede9fe !important; color:#6d28d9 !important; }
+.kb-badge-klaar { background:#d1fae5 !important; color:#065f46 !important; }
+
+/* Extra knoppen */
+.kb-sb-extra {
+  background:#fff !important;
+  border:1.5px solid #ddd6fe !important;
+  color:#4c1d95 !important;
+}
+.kb-sb-extra:hover { background:#f5f3ff !important; }
+
+/* Naar het kindbord knop */
+.kb-sb-go {
+  background:#7c3aed !important;
+  box-shadow:0 2px 8px rgba(124,58,237,.3) !important;
+}
+.kb-sb-go:hover { background:#6d28d9 !important; }
+
+/* Scrollbar */
+.kb-sb-content::-webkit-scrollbar-thumb { background:#c4b5fd !important; }
+
+/* Paneel-titels */
+.kb-paneel-titel { border-bottom-color:#ddd6fe !important; }
+
+/* Namen-paneel accenten */
+.kb-paneel#kb-paneel-namen .namen-bib-banner,
+#kb-paneel-namen .namen-bib-banner {
+  background:#f5f3ff !important;
+  border-color:#ddd6fe !important;
+  color:#4c1d95 !important;
+}
+#kb-paneel-namen .namen-bib-btn,
+.kb-paneel#kb-paneel-namen .namen-bib-btn {
+  border-color:#7c3aed !important;
+  color:#7c3aed !important;
+}
+
+/* Volgorde sort-chips */
+.sort-chip.active {
+  border-color:#7c3aed !important;
+  background:#f5f3ff !important;
+  color:#4c1d95 !important;
+}
+
+/* Invoer focus */
+.namen-textarea:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px #ede9fe !important; }
+.naam-input:focus { border-color:#7c3aed !important; box-shadow:0 0 0 3px #ede9fe !important; }
+
+/* Knoppen primair → paars */
+.invoer-btn-primary { background:#7c3aed !important; }
+.invoer-btn-primary:hover { opacity:.88; }
+
+/* Taken: selectie-kleur paars */
+.kb-task-chip.active {
+  border-color:#7c3aed !important;
+  background:#f5f3ff !important;
+}
+.kb-pupil-row.selected {
+  background:#f5f3ff !important;
+  border-color:#7c3aed !important;
+}
+
+/* Toewijzen-blok */
+#kb-assign-hint { color:#4c1d95 !important; }
+</style>
+
+<script>
+// ── BIBLIOTHEEK KINDBORD ──────────────────────────────────────────────────
+function escBib(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+var _kindBibBronKey = null;
+
+function openLaadUitBibliotheekKind(){
+  _kindBibBronKey = null;
+  var lijst = document.getElementById('kind-bib-lijst');
+  var opties = document.getElementById('kind-bib-opties');
+  lijst.innerHTML = '';
+  opties.style.display = 'none';
+
+  // Huidige bord-id
+  var params = new URLSearchParams(window.location.search);
+  var huidigBordId = params.get('bordid');
+
+  // Verzamel alle borden (kindborden + klasborden)
+  var allBorden = [];
+  try {
+    var bv1 = JSON.parse(localStorage.getItem('borden_v1') || '{}');
+    ['kindbord','klasbord'].forEach(function(type){
+      (bv1[type]||[]).forEach(function(b){
+        if(b.id !== huidigBordId) allBorden.push({ type:type, bord:b });
+      });
+    });
+  } catch(e){}
+
+  console.log('Bibliotheek borden:', allBorden);
+  if(!allBorden.length){
+    lijst.innerHTML = '<div style="font-size:14px;color:#9ca3af;padding:12px 0;">Geen andere borden gevonden. Maak eerst een ander bord aan via het welkomstscherm.</div>';
+  } else {
+    allBorden.forEach(function(item){
+      var b = item.bord;
+      var storageKey = b.storageKey || (item.type === 'kindbord' ? 'kind_'+b.id : 'klas_'+b.id);
+      // Probeer pupil-count
+      var n = 0;
+      try { n = (JSON.parse(localStorage.getItem(storageKey)||'{}')).pupils.length || 0; } catch(e){}
+      var rij = document.createElement('div');
+      rij.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f8fafc;border:1.5px solid #e0e7ff;border-radius:12px;cursor:pointer;transition:all .12s;gap:10px;';
+      rij.onmouseover = function(){ this.style.borderColor='#059669';this.style.background='#ecfdf5'; };
+      rij.onmouseout  = function(){ this.style.borderColor='#e0e7ff';this.style.background='#f8fafc'; };
+      rij.innerHTML = '<div>'
+        + '<div style="font-size:15px;font-weight:800;color:#1e1b4b;">'+escBib(b.naam||'Naamloos')+'</div>'
+        + '<div style="font-size:12px;color:#94a3b8;margin-top:2px;">'+(item.type==='kindbord'?'Kindbord':'Klasbord')+' · '+(n?n+' leerlingen':'leeg')+'</div>'
+        + '</div>'
+        + '<button style="border:none;background:#059669;color:#fff;border-radius:9px;padding:8px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Kiezen</button>';
+      rij.addEventListener('click', (function(sk, bn){
+        return function(){
+          _kindBibBronKey = sk;
+          document.getElementById('kind-bib-bronnaam').textContent = bn||'dit bord';
+          document.getElementById('kind-bib-opties').style.display = 'block';
+          document.getElementById('kind-bib-opties').scrollIntoView({behavior:'smooth'});
+        };
+      })(storageKey, b.naam));
+      lijst.appendChild(rij);
+    });
+  }
+
+  document.getElementById('kind-bib-overlay').style.display = 'flex';
+}
+
+function closeKindBib(){
+  document.getElementById('kind-bib-overlay').style.display = 'none';
+  _kindBibBronKey = null;
+}
+
+function uitvoerenKindBib(){
+  if(!_kindBibBronKey) return;
+  var bronData = {};
+  try { bronData = JSON.parse(localStorage.getItem(_kindBibBronKey)||'{}'); } catch(e){}
+
+  var optNamen     = document.getElementById('bib-opt-namen').checked;
+  var optTaken     = document.getElementById('bib-opt-taken').checked;
+  var optToewijzing = document.getElementById('bib-opt-toewijzing').checked;
+
+  if(optNamen && bronData.pupils && bronData.pupils.length){
+    // Voeg nieuwe namen toe (geen duplicaten op voornaam+achternaam)
+    var bestaand = state.pupils.map(function(p){ return (p.voornaam+' '+(p.achternaam||'')).trim().toLowerCase(); });
+    bronData.pupils.forEach(function(p){
+      var key = (p.voornaam+' '+(p.achternaam||'')).trim().toLowerCase();
+      if(!bestaand.includes(key)){
+        state.pupils.push({ id: '_'+Math.random().toString(36).slice(2)+Date.now(), voornaam:p.voornaam, achternaam:p.achternaam||'' });
+        bestaand.push(key);
+      }
+    });
+  }
+
+  if(optTaken){
+    // Taken overnemen
+    if(bronData.activeTasks) state.activeTasks = bronData.activeTasks.slice();
+    if(bronData.customTasks) state.customTasks = (bronData.customTasks||[]).slice();
+    if(bronData.customIcons) state.customIcons = Object.assign({}, bronData.customIcons);
+    if(bronData.taskLabelOverrides) state.taskLabelOverrides = Object.assign({}, bronData.taskLabelOverrides);
+  }
+
+  if(optToewijzing && bronData.personalAssignments){
+    // Toewijzingen overnemen voor leerlingen met zelfde naam
+    var bronNamen = bronData.pupils || [];
+    state.pupils.forEach(function(p){
+      var match = bronNamen.find(function(bp){
+        return bp.voornaam.toLowerCase() === p.voornaam.toLowerCase()
+          && (bp.achternaam||'').toLowerCase() === (p.achternaam||'').toLowerCase();
+      });
+      if(match && bronData.personalAssignments[match.id]){
+        if(!state.personalAssignments) state.personalAssignments = {};
+        state.personalAssignments[p.id] = bronData.personalAssignments[match.id].slice();
+      }
+    });
+  }
+
+  saveState();
+  renderSetupAddedList();
+  kbUpdateWizard();
+  closeKindBib();
+  alert('✓ Overgenomen! Controleer de namen en taken in de beheerpagina.');
+}
+</script>
+</body>
+</html>
