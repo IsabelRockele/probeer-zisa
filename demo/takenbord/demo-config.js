@@ -343,21 +343,46 @@
 
   function installeerVerkoopTriggers() {
 
-    // Terug-knop: naar onze probeer-pagina (NIET naar app.html PRO!)
+    // Twee duidelijk verschillende terug-knoppen:
+    // - Originele PRO-knop → naar keuze-pagina (Klasbord/Takenbord-kind)
+    // - Extra gouden knop → naar hoofd-overzicht (alle 3 demo's)
+
+    // Eerst: vervang alle bestaande terug-knoppen
     var backBtns = document.querySelectorAll('.pro-back-btn, .sb-back-btn');
     backBtns.forEach(function(btn) {
       btn.onclick = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        window.location.href = '../../';
+        window.location.href = './';
       };
-      // Als het een <a> is:
       if (btn.tagName === 'A') {
-        btn.href = '../../';
+        btn.href = './';
       }
-      btn.textContent = '← Terug naar overzicht';
+      btn.textContent = '📋 Andere bord-demo';
       btn.style.display = 'inline-flex';
     });
+
+    // Dan: voeg EEN extra knop toe aan de pro-header (maar niet in sidebar)
+    var proHeader = document.querySelector('.pro-header-left');
+    if (proHeader && !proHeader.querySelector('.demo-alle-knop')) {
+      var extraBtn = document.createElement('a');
+      extraBtn.className = 'demo-alle-knop';
+      extraBtn.href = '../../';
+      extraBtn.textContent = '🦓 Alle probeer-tools';
+      extraBtn.style.cssText =
+        'background:#ffcf56;' +
+        'color:#2a2a2a;' +
+        'padding:5px 12px;' +
+        'border-radius:8px;' +
+        'font-size:13px;' +
+        'font-weight:800;' +
+        'text-decoration:none;' +
+        'font-family:inherit;' +
+        'margin-left:8px;' +
+        'display:inline-flex;' +
+        'align-items:center;';
+      proHeader.appendChild(extraBtn);
+    }
 
     // Backup & herstel knop → verkoop-popup
     overschrijfFunctie('openBackupModal', 'Backup & herstel',
@@ -402,10 +427,10 @@
       'In de Spelgenerator kan je tot 4 borden per type aanmaken — perfect voor meerdere klassen of niveaugroepen.',
       '🎯');
 
-    // Welkomstbord: in demo hebben we geen welkomstbord, dus redirect naar overzicht
+    // Welkomstbord: in demo hebben we geen welkomstbord, dus redirect naar keuze
     if (typeof window.goBackToWelcome === 'function') {
       window.goBackToWelcome = function() {
-        window.location.href = '../../';
+        window.location.href = './';
       };
     }
 
