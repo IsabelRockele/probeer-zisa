@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opvolging huistaken</title>
+
+  <link rel="stylesheet" href="opvolging_huistaken.css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  .pro-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: linear-gradient(90deg, #0b3060 0%, #1a5fa8 100%);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+
+  .pro-header span:first-child {
+    background: #f5c200;
+    color: #0b3060;
+    border-radius: 6px;
+    padding: 2px 9px;
+    font-size: 0.78rem;
+  }
+
+  .pro-header a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+  }
+
+  .pro-header a:hover {
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div class="pro-header">
+  <span>🦓 DEMO</span>
+  <span>Opvolging huistaken — voorbeeldklas</span>
+</div>
+
+<div class="app-shell">
+ <aside class="sidebar">
+  <div class="top-left-controls">
+    <button class="keuzemenu-btn" id="keuzemenuBtn" type="button" onclick="window.location.href='../../'">← Terug naar overzicht</button>
+
+    <div class="schooljaar-box">
+      <span class="schooljaar-label">Schooljaar</span>
+
+      <select id="schooljaarSelect" class="schooljaar-select"></select>
+
+      <button class="ghost-btn schooljaar-btn" id="nieuwSchooljaarBtn" type="button">
+        + Nieuw schooljaar
+      </button>
+
+      <div class="schooljaar-info">
+        Bewaring van maximum 2 schooljaren: het huidige en het vorige. Vanaf toevoegen van een 3de schooljaar verdwijnt het oudste.
+      </div>
+    </div>
+  </div>
+
+  <nav class="menu">
+    <button class="menu-btn menu-btn-dashboard is-active" data-view="dashboard">Dashboard</button>
+    <button class="menu-btn menu-btn-instellingen" data-view="instellingen">Instellingen</button>
+    <button class="menu-btn menu-btn-klaslijst" data-view="klaslijst">Klaslijst</button>
+    <button class="menu-btn menu-btn-rapportperiodes" data-view="rapportperiodes">Rapportperiodes</button>
+    <button class="menu-btn menu-btn-registratie" data-view="registratie">Registratie</button>
+  </nav>
+
+  <div class="privacy-box">
+    <button class="ghost-btn" id="openPrivacyBtn" type="button">🔒 Privacy</button>
+  </div>
+</aside>
+
+    <main class="main-content">
+      <header class="page-header card">
+        <div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSubtitle">Basisstructuur om verder op te bouwen.</p>
+        </div>
+      </header>
+
+     <section class="view is-active" id="view-dashboard">
+  <div class="dashboard-stack">
+    <article class="card dashboard-hero dashboard-hero-simple">
+      <div class="dashboard-hero-left">
+        <div class="card-topline">Startscherm</div>
+        <h3>Welkom in Opvolging huistaken</h3>
+        <p class="dashboard-hero-text">
+          Deze tool helpt je om huistaken per schooljaar op te volgen.
+          Je werkt stap voor stap: eerst de instellingen, daarna de klaslijst,
+          vervolgens de rapportperiodes en pas daarna de registraties.
+        </p>
+
+       <div class="dashboard-hero-actions">
+  <button class="primary-btn" id="dashboardStartInstellingenBtn">Instellingen invullen</button>
+</div>
+      </div>
+
+      <div class="dashboard-hero-right">
+        <div class="dashboard-highlight-box">
+          <div class="dashboard-highlight-label">Actief schooljaar</div>
+          <div class="dashboard-highlight-value" id="dashboardSchooljaar">Nog niet ingesteld</div>
+        </div>
+      </div>
+    </article>
+
+<div class="dashboard-single-block">
+  <article class="card dashboard-panel dashboard-panel-narrow">
+    <div class="section-heading">
+      <h3>Stap voor stap</h3>
+    </div>
+
+    <div class="dashboard-steps">
+      <div class="dashboard-step">
+        <div class="dashboard-step-number">1</div>
+        <div>
+          <strong>Instellingen invullen</strong>
+          <p>Vul schoolnaam, klasnaam, titel voor PDF, schoollogo en drempel voor extra opvolging in.</p>
+        </div>
+      </div>
+
+      <div class="dashboard-step">
+        <div class="dashboard-step-number">2</div>
+        <div>
+          <strong>Klaslijst opbouwen</strong>
+          <p>Voeg leerlingen toe met startdatum. Gebruik een einddatum als een leerling later uitgeschreven wordt.</p>
+        </div>
+      </div>
+
+      <div class="dashboard-step">
+        <div class="dashboard-step-number">3</div>
+        <div>
+          <strong>Rapportperiodes aanmaken</strong>
+          <p>Maak per schooljaar de juiste periodes aan.</p>
+        </div>
+      </div>
+
+      <div class="dashboard-step">
+        <div class="dashboard-step-number">4</div>
+        <div>
+          <strong>Registratie invullen</strong>
+          <p>Voeg dagen toe en vul per leerling de status en eventuele opmerking in.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
+  </div>
+</section>
+
+    <section class="view" id="view-instellingen">
+  <div class="card instellingen-card">
+
+
+    <div class="instellingen-stack">
+      <div class="instellingen-blok">
+        <div class="instellingen-blok-header">
+          <h4>Algemene gegevens</h4>
+          <p>Deze gegevens komen terug in de tool en in de PDF’s.</p>
+        </div>
+
+        <div class="form-grid two">
+          <label>
+            <span>Schoolnaam</span>
+            <input type="text" id="schoolNameInput" placeholder="Bijvoorbeeld GO! Basisschool De Linde" />
+          </label>
+
+          <label>
+            <span>Klasnaam</span>
+            <input type="text" id="classNameInput" placeholder="Bijvoorbeeld 2A" />
+          </label>
+        </div>
+
+        <div class="form-grid two" style="margin-top: 16px;">
+          <label>
+            <span>Titel voor PDF</span>
+            <input type="text" id="pdfTitleInput" placeholder="Bijvoorbeeld Opvolging huistaken" />
+          </label>
+
+          <div class="instellingen-kleine-info">
+            Deze titel wordt bovenaan op je PDF’s gebruikt.
+          </div>
+        </div>
+      </div>
+
+      <div class="instellingen-blok">
+        <div class="instellingen-blok-header">
+          <h4>Extra opvolging</h4>
+          <p>Kies vanaf wanneer een leerling extra opvolging nodig heeft.</p>
+        </div>
+
+        <div class="instellingen-opvolging-grid">
+          <label class="instellingen-smal-veld">
+            <span>Extra opvolging vanaf</span>
+            <input type="number" id="extraOpvolgingDrempelInput" min="1" value="4" />
+          </label>
+
+          <div class="notice-box instellingen-uitleg-box" style="margin-top: 0;">
+            <strong>Wanneer heeft een leerling extra opvolging nodig?</strong><br />
+            Vul het aantal keer in dat een leerling in een periode <strong>te laat</strong>, <strong>niet in orde</strong> of <strong>onvolledig</strong> is.<br />
+            Vanaf dat aantal verschijnt de leerling automatisch in de lijst <strong>extra opvolging</strong>.<br />
+            <em>Standaard: 4 keer per rapportperiode.</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="instellingen-blok">
+        <div class="instellingen-blok-header">
+          <h4>Schoollogo</h4>
+          <p>Voeg een logo toe dat gebruikt wordt in je PDF’s.</p>
+        </div>
+
+        <div class="form-grid two">
+          <label>
+            <span>Schoollogo kiezen</span>
+            <input type="file" id="schoolLogoInput" accept="image/*" />
+          </label>
+
+          <div class="instellingen-kleine-info">
+            Kies een nieuw bestand als je je huidige logo wil vervangen.
+          </div>
+        </div>
+
+        <div class="logo-preview-box instellingen-logo-box">
+          <div class="logo-preview-title">Voorbeeld schoollogo</div>
+          <div class="logo-preview instellingen-logo-preview">
+            <img id="logoPreview" alt="Geen logo gekozen" />
+            <div id="logoPreviewPlaceholder" class="logo-placeholder">Nog geen logo gekozen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+   <section class="view" id="view-klaslijst">
+  <div class="card">
+    <div class="uitleg-open-row">
+  <button class="uitleg-open-btn" type="button" data-open-uitleg="uitleg-klaslijst">ℹ️ Uitleg tonen</button>
+</div>
+
+<div class="uitleg-panel hidden" id="uitleg-klaslijst">
+      <div class="uitleg-panel-header">
+        <strong>Uitleg bij klaslijst</strong>
+        <button class="ghost-btn uitleg-toggle-btn" type="button" data-toggle-uitleg="uitleg-klaslijst">Sluiten</button>
+      </div>
+      <div class="uitleg-panel-body">
+        Voeg leerlingen toe met een startdatum. Wanneer een leerling weggaat, geef je een einddatum in.
+        Leerlingen worden dus niet echt verwijderd, zodat vroegere registraties en PDF’s correct blijven.
+        Wat je hier toevoegt of wijzigt, blijft later bewaard.
+      </div>
+    </div>
+
+   <div class="toolbar-row toolbar-row-wrap">
+  <button class="primary-btn" id="openAddLeerlingBtn">+ Leerling toevoegen</button>
+  <button class="ghost-btn" id="plakLijstBtn">📋 Lijst plakken</button>
+  <button class="ghost-btn" id="clearKlaslijstBtn">🗑️ Klaslijst leegmaken</button>
+</div>
+
+  <div class="classlist-box">
+
+  <div class="klaslijst-uitleg">
+    <strong>Leerlingen beheren:</strong><br>
+    ✏️ = aanpassen<br>
+    ↩ = uitschrijven (leerling verlaat de klas, gegevens blijven bewaard)<br>
+  </div>
+
+  <ul id="klaslijst" class="simple-list"></ul>
+</div>
+  </div>
+</section>
+
+     <section class="view" id="view-rapportperiodes">
+  <div class="card">
+    <div class="uitleg-open-row">
+  <button class="uitleg-open-btn" type="button" data-open-uitleg="uitleg-rapportperiodes">ℹ️ Uitleg tonen</button>
+</div>
+
+<div class="uitleg-panel hidden" id="uitleg-rapportperiodes">
+      <div class="uitleg-panel-header">
+        <strong>Uitleg bij rapportperiodes</strong>
+        <button class="ghost-btn uitleg-toggle-btn" type="button" data-toggle-uitleg="uitleg-rapportperiodes">Sluiten</button>
+      </div>
+      <div class="uitleg-panel-body">
+        Je stelt hier zelf je rapportperiodes in. Per rapportperiode kan je later huistaken registreren en een PDF downloaden.
+        De periodes die je toevoegt of wijzigt, blijven later bewaard en zichtbaar wanneer je dit scherm opnieuw opent.
+      </div>
+    </div>
+
+    <div class="period-add-grid">
+      <input type="text" id="periodeNaamInput" placeholder="Naam rapportperiode, bv. Rapportperiode 1" />
+      <input type="date" id="periodeStartInput" />
+      <input type="date" id="periodeEindeInput" />
+      <button class="primary-btn" id="addPeriodeBtn">+ Rapportperiode toevoegen</button>
+    </div>
+
+    <div class="periods-box">
+      <div id="periodesLijst"></div>
+    </div>
+  </div>
+</section>
+
+     <section class="view" id="view-registratie">
+  <div class="card">
+    <div class="registratie-topbar">
+      <div class="uitleg-open-row registratie-uitleg-row">
+        <button class="uitleg-open-btn" type="button" data-open-uitleg="uitleg-registratie">ℹ️ Uitleg tonen</button>
+      </div>
+
+    <div class="registratie-top-actions">
+  <button class="soft-btn" id="pdfKlasBtn">PDF klasoverzicht kleur</button>
+  <button class="ghost-btn" id="pdfKlasZwartWitBtn">PDF klasoverzicht zwart-wit</button>
+  <button class="soft-btn" id="pdfAlleLeerlingenBtn">PDF alle leerlingen kleur</button>
+  <button class="ghost-btn" id="pdfAlleLeerlingenZwartWitBtn">PDF alle leerlingen zwart-wit</button>
+</div>
+    </div>
+
+    <div class="uitleg-panel hidden" id="uitleg-registratie">
+      <div class="uitleg-panel-header">
+        <strong>Uitleg bij registratie</strong>
+        <button class="ghost-btn uitleg-toggle-btn" type="button" data-toggle-uitleg="uitleg-registratie">Sluiten</button>
+      </div>
+      <div class="uitleg-panel-body">
+        Kies eerst een rapportperiode. Voeg daarna een datum toe met de knop <strong>+ Dag</strong>.
+        Per leerling kies je een status en kan je een opmerking typen.
+        Alles wat je hier later invult, blijft bewaard en zichtbaar staan.
+      </div>
+    </div>
+
+    <div class="registration-toolbar sticky-toolbar">
+      <div class="toolbar-left">
+        <div class="toolbar-field-group">
+          <label for="registratiePeriodeSelect">Rapportperiode</label>
+          <select id="registratiePeriodeSelect"></select>
+        </div>
+
+        <div class="toolbar-field-group">
+          <label for="registratieTitelInput">Titel PDF</label>
+          <input type="text" id="registratieTitelInput" placeholder="Opvolging huistaken" />
+        </div>
+      </div>
+
+      <div class="toolbar-right registratie-datum-row">
+        <div class="toolbar-field-group registratie-datum-veld">
+          <label for="dagKolomDatumInput">Datum</label>
+          <input type="date" id="dagKolomDatumInput" />
+        </div>
+
+        <button class="primary-btn" id="addDagKolomBtn">+ Dag</button>
+      </div>
+    </div>
+
+    <div class="table-scroll-wrap" id="tableScrollWrap">
+      <table class="registratie-tabel" id="registratieTabel">
+        <thead id="registratieThead"></thead>
+        <tbody id="registratieTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+    </main>
+  </div>
+
+  <!-- HELP MODAL -->
+  <div class="help-modal" id="helpModal" hidden>
+    <div class="help-backdrop" data-close-help></div>
+    <div class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="help-header">
+        <h3 id="helpTitle">Uitleg</h3>
+        <button class="icon-btn" data-close-help aria-label="Sluiten">✕</button>
+      </div>
+      <div class="help-body" id="helpBody"></div>
+      <div class="help-footer">
+        <button class="primary-btn" data-close-help>Sluiten</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RAPPORTPERIODE BEWERKEN -->
+  <div class="help-modal" id="periodeEditModal" hidden>
+    <div class="help-backdrop" data-close-periode-edit></div>
+    <div class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="periodeEditTitle">
+      <div class="help-header">
+        <h3 id="periodeEditTitle">Rapportperiode bewerken</h3>
+        <button class="icon-btn" data-close-periode-edit aria-label="Sluiten">✕</button>
+      </div>
+
+      <div class="help-body">
+        <div class="form-grid two">
+          <label>
+            <span>Naam rapportperiode</span>
+            <input type="text" id="editPeriodeNaamInput" />
+          </label>
+
+          <label>
+            <span>Startdatum</span>
+            <input type="date" id="editPeriodeStartInput" />
+          </label>
+        </div>
+
+        <div class="form-grid two" style="margin-top: 16px;">
+          <label>
+            <span>Einddatum</span>
+            <input type="date" id="editPeriodeEindeInput" />
+          </label>
+          <div></div>
+        </div>
+      </div>
+
+      <div class="help-footer">
+        <button class="ghost-btn" data-close-periode-edit>Annuleren</button>
+        <button class="primary-btn" id="savePeriodeEditBtn">Opslaan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEERLING TOEVOEGEN / AANPASSEN -->
+  <div class="help-modal" id="leerlingModal" hidden>
+    <div class="help-backdrop" data-close-leerling-modal></div>
+    <div class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="leerlingModalTitle">
+      <div class="help-header">
+        <h3 id="leerlingModalTitle">Leerling toevoegen</h3>
+        <button class="icon-btn" data-close-leerling-modal aria-label="Sluiten">✕</button>
+      </div>
+
+      <div class="help-body">
+        <div class="form-grid two">
+          <label>
+            <span>Naam leerling</span>
+            <input type="text" id="leerlingNaamInput" placeholder="Achternaam Voornaam" />
+          </label>
+
+          <label>
+            <span>Startdatum</span>
+            <input type="date" id="leerlingStartdatumInput" />
+          </label>
+        </div>
+
+        <div class="form-grid two" style="margin-top: 16px;">
+         
+        </div>
+      </div>
+
+      <div class="help-footer">
+        <button class="ghost-btn" data-close-leerling-modal>Annuleren</button>
+        <button class="primary-btn" id="saveLeerlingBtn">Opslaan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEERLING UITSCHRIJVEN -->
+  <div class="help-modal" id="uitschrijfModal" hidden>
+    <div class="help-backdrop" data-close-uitschrijf-modal></div>
+    <div class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="uitschrijfModalTitle">
+      <div class="help-header">
+        <h3 id="uitschrijfModalTitle">Leerling uitschrijven</h3>
+        <button class="icon-btn" data-close-uitschrijf-modal aria-label="Sluiten">✕</button>
+      </div>
+
+      <div class="help-body">
+        <p id="uitschrijfLeerlingNaam" style="font-weight:700; margin-bottom: 16px;"></p>
+        <p>Deze leerling blijft zichtbaar in vroegere registraties en PDF’s. Vanaf de gekozen datum wordt de leerling niet meer opgenomen in nieuwe registraties.</p>
+
+        <label style="margin-top: 16px; display:block;">
+          <span>Einddatum</span>
+          <input type="date" id="uitschrijfEinddatumInput" />
+        </label>
+      </div>
+
+      <div class="help-footer">
+        <button class="ghost-btn" data-close-uitschrijf-modal>Annuleren</button>
+        <button class="primary-btn" id="confirmUitschrijvenBtn">Uitschrijven</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NIEUW SCHOOLJAAR -->
+<div class="help-modal" id="schooljaarModal" hidden>
+  <div class="help-backdrop" data-close-schooljaar-modal></div>
+  <div class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="schooljaarModalTitle">
+    <div class="help-header">
+      <h3 id="schooljaarModalTitle">Nieuw schooljaar starten</h3>
+      <button class="icon-btn" data-close-schooljaar-modal aria-label="Sluiten">✕</button>
+    </div>
+
+    <div class="help-body">
+      <p>
+        Je maakt een nieuw schooljaar aan. Als er al 2 schooljaren bestaan,
+        verdwijnt het oudste schooljaar.
+      </p>
+
+      <div class="form-grid two" style="margin-top: 16px;">
+        <label>
+          <span>Nieuw schooljaar</span>
+          <input type="text" id="nieuwSchooljaarInput" placeholder="Bijvoorbeeld 2026-2027" />
+        </label>
+
+        <div class="notice-box" style="margin-top: 0;">
+          <strong>Instellingen</strong> worden automatisch behouden.
+        </div>
+      </div>
+
+      <div class="form-grid two" style="margin-top: 16px;">
+        <label>
+          <span>Klaslijst</span>
+          <select id="kopieerKlaslijstSelect">
+            <option value="nee">Leeg starten</option>
+            <option value="ja">Klaslijst van vorig schooljaar overnemen</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Rapportperiodes</span>
+          <select id="kopieerPeriodesSelect">
+            <option value="ja">Rapportperiodes overnemen</option>
+            <option value="nee">Leeg starten</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="notice-box" style="margin-top: 16px;">
+        Registraties worden <strong>niet</strong> overgenomen. Het nieuwe schooljaar start leeg.
+      </div>
+    </div>
+
+    <div class="help-footer">
+      <button class="ghost-btn" data-close-schooljaar-modal>Annuleren</button>
+      <button class="primary-btn" id="bevestigNieuwSchooljaarBtn">Nieuw schooljaar starten</button>
+    </div>
+  </div>
+</div>
+
+<div id="pdfLoadingOverlay" class="pdf-loading-overlay hidden">
+  <div class="pdf-loading-box">
+    <div class="pdf-spinner"></div>
+    <p id="pdfLoadingText">Even geduld, PDF wordt samengesteld...</p>
+
+    <div class="pdf-loading-bar">
+      <div id="pdfLoadingBarFill" class="pdf-loading-bar-fill is-indeterminate"></div>
+    </div>
+
+    <div id="pdfLoadingPercent" class="pdf-loading-percent"></div>
+  </div>
+</div>
+
+<div class="help-modal" id="privacyModal" hidden>
+  <div class="help-backdrop" data-close-privacy></div>
+  <div class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle">
+    <div class="help-header">
+      <h3 id="privacyModalTitle">Privacy</h3>
+      <button class="icon-btn" data-close-privacy aria-label="Sluiten">✕</button>
+    </div>
+
+    <div class="help-body">
+      <p>
+        Deze tool slaat enkel gegevens op die nodig zijn om de opvolging van huistaken mogelijk te maken,
+        zoals namen van leerlingen en registraties per dag.
+      </p>
+
+      <p>
+        Alle gegevens worden per gebruiker opgeslagen en zijn enkel toegankelijk voor de ingelogde leerkracht.
+        Er worden geen gegevens gedeeld met derden.
+      </p>
+
+      <p>
+        De gegevens worden veilig bewaard via Google Firebase.
+      </p>
+
+      <p>
+        Als gebruiker blijf je zelf verantwoordelijk voor het correct gebruik van persoonsgegevens binnen de schoolcontext.
+      </p>
+    </div>
+
+    <div class="help-footer">
+      <button class="primary-btn" data-close-privacy>Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<script src="demo-banner-huistaken.js"></script>
+<script type="module" src="opvolging_huistaken-app-demo.js"></script>
+</body>
+</html>
