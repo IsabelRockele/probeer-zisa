@@ -359,7 +359,7 @@
 
   function installeerVerkoopTriggers() {
 
-    // Terug-knop: naar intro-pagina met 2 keuzes
+    // Twee duidelijk verschillende terug-knoppen
     var backBtns = document.querySelectorAll('.pro-back-btn, .kb-sb-back');
     backBtns.forEach(function(btn) {
       btn.onclick = function(e) {
@@ -368,9 +368,31 @@
         window.location.href = './';
       };
       if (btn.tagName === 'A') btn.href = './';
-      btn.textContent = '← Terug naar keuze';
+      btn.textContent = '📋 Andere bord-demo';
       btn.style.display = 'inline-flex';
     });
+
+    // Voeg extra knop toe aan de pro-header
+    var proHeader = document.querySelector('.pro-header-left');
+    if (proHeader && !proHeader.querySelector('.demo-alle-knop')) {
+      var extraBtn = document.createElement('a');
+      extraBtn.className = 'demo-alle-knop';
+      extraBtn.href = '../../';
+      extraBtn.textContent = '🦓 Alle probeer-tools';
+      extraBtn.style.cssText =
+        'background:#ffcf56;' +
+        'color:#2a2a2a;' +
+        'padding:5px 12px;' +
+        'border-radius:8px;' +
+        'font-size:13px;' +
+        'font-weight:800;' +
+        'text-decoration:none;' +
+        'font-family:inherit;' +
+        'margin-left:8px;' +
+        'display:inline-flex;' +
+        'align-items:center;';
+      proHeader.appendChild(extraBtn);
+    }
 
     // Welkomstbord: redirect naar keuze
     if (typeof window.goBackToWelcome === 'function') {
