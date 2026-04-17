@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klasbord — Juf Zisa</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="klasbord.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <!-- DEMO: Firebase vervangen door dummy + voorbeeldklas -->
+  <script src="demo-config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="pro-header">
+  <div class="pro-header-left">
+    <a href="../../" class="pro-back-btn">← Terug naar overzicht</a>
+    <span class="pro-header-title">📋 Klasbord</span>
+  </div>
+  <span class="pro-badge" style="background:#16a085;">DEMO</span>
+</div>
+<div id="app">
+<!-- WELCOME SCREEN -->
+
+<!-- TOPBAR verborgen — alles zit in zijbalk -->
+<div id="topbar" style="display:none;"></div>
+
+<!-- SETTINGS -->
+<div id="settings-wrap">
+<div class="settings-inner">
+<div class="sb-layout">
+
+<!-- ── ZIJBALK ── -->
+<nav class="sb-nav">
+  <button class="sb-back-btn" onclick="goBackToWelcome()">← Welkomstscherm</button>
+  <div class="sb-bord-naam" id="sb-bord-naam"></div>
+  <div class="sb-section-label">Instellen</div>
+  <button class="sb-stap" id="sb-stap-namen" onclick="sbToon('namen')">
+    <div class="sb-stap-badge" id="sb-badge-namen">1</div>
+    <div class="sb-stap-info">
+      <div class="sb-stap-titel">Namen</div>
+      <div class="sb-stap-sub" id="sb-sub-namen">Leerlingen toevoegen</div>
+    </div>
+  </button>
+  <button class="sb-stap" id="sb-stap-taken" onclick="sbToon('taken')">
+    <div class="sb-stap-badge sb-badge-2" id="sb-badge-taken">2</div>
+    <div class="sb-stap-info">
+      <div class="sb-stap-titel">Taken</div>
+      <div class="sb-stap-sub" id="sb-sub-taken">Taken kiezen</div>
+    </div>
+  </button>
+  <button class="sb-stap" id="sb-stap-inst" onclick="sbToon('inst')">
+    <div class="sb-stap-badge sb-badge-3" id="sb-badge-inst">3</div>
+    <div class="sb-stap-info">
+      <div class="sb-stap-titel">Instellingen</div>
+      <div class="sb-stap-sub">Weergave</div>
+    </div>
+  </button>
+  <button class="sb-go-btn" id="sb-go-btn" onclick="closeSettings()" style="margin-top:16px;">📋 Naar het klasbord →</button>
+  <div style="height:16px;"></div>
+  <div class="sb-section-label">Meer</div>
+  <button class="sb-extra-btn" onclick="openBackupModal()">💾 Backup &amp; herstel</button>
+  <button class="sb-extra-btn" onclick="document.getElementById('help-beheer-overlay').classList.remove('hidden')">❓ Uitleg</button>
+</nav>
+
+<!-- ── CONTENT ── -->
+<div class="sb-content">
+
+  <!-- PANEEL 1: NAMEN -->
+  <div class="sb-paneel" id="sb-paneel-namen">
+    <div class="sb-paneel-titel">Namen toevoegen</div>
+    <div class="namen-bib-banner">
+      <span>📚 Namen overnemen uit een ander bord?</span>
+      <button onclick="openLaadUitBibliotheek()" class="namen-bib-btn">📥 Bibliotheek</button>
+    </div>
+    <div class="namen-grid">
+      <div class="namen-invoer-col">
+        <div class="invoer-blok">
+          <div class="invoer-blok-titel">📋 Klaslijst in één keer plakken</div>
+          <div class="invoer-blok-hint">Kopieer namen uit Smartschool, Excel of Word — één naam per regel.</div>
+          <div class="volgorde-rij">
+            <span class="volgorde-label">Volgorde:</span>
+            <button class="sort-chip active" id="order-btn-voor" onclick="setOrder('voornaam')">Voornaam Achternaam</button>
+            <button class="sort-chip" id="order-btn-ach" onclick="setOrder('achternaam')">Achternaam Voornaam</button>
+          </div>
+          <textarea id="bulk-input" class="namen-textarea" placeholder="Jana De Smedt&#10;Thomas Peeters&#10;Lena&#10;..."></textarea>
+          <div class="invoer-btns-rij">
+            <button class="invoer-btn invoer-btn-primary" onclick="bulkAdd()">➕ Toevoegen</button>
+            <button class="invoer-btn invoer-btn-secondary" onclick="bulkReplace()">🔄 Vervangen</button>
+          </div>
+        </div>
+        <div class="invoer-blok">
+          <div class="invoer-blok-titel">✏️ Of één naam toevoegen</div>
+          <div class="naam-velden-rij">
+            <div class="naam-veld">
+              <label class="naam-label">Voornaam *</label>
+              <input id="input-voornaam" class="naam-input" onkeydown="if(event.key==='Enter')document.getElementById('input-achternaam').focus()" placeholder="Jana" type="text"/>
+            </div>
+            <div class="naam-veld">
+              <label class="naam-label">Achternaam</label>
+              <input id="input-achternaam" class="naam-input" onkeydown="if(event.key==='Enter')addPupil()" placeholder="De Smedt" type="text"/>
+            </div>
+          </div>
+          <button class="invoer-btn invoer-btn-primary invoer-btn-full" onclick="addPupil()">+ Toevoegen</button>
+        </div>
+      </div>
+      <div class="namen-lijst-col">
+        <div class="namen-lijst-hdr">
+          <span id="pupil-count-title" class="namen-count">Leerlingen (0)</span>
+          <button class="btn btn-secondary btn-sm" onclick="sortAlpha()">🔤 A–Z</button>
+        </div>
+        <div class="namen-lijst-hint">⠳ sleep · ✎ naam · 📋 taken · 🔒 bevindingen · 📷 foto
+          <button class="help-inline-btn" onclick="document.getElementById('help-beheer-overlay').classList.remove('hidden')">❓ uitleg</button>
+        </div>
+        <div id="hint-photos" style="display:none;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#92400e;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span>💡 Foto toevoegen? Klik het 📷-knopje naast een naam.</span>
+          <button onclick="localStorage.setItem('hint_photos_dismissed','1');this.parentElement.style.display='none'" style="border:none;background:none;color:#a16207;font-size:12px;font-weight:800;cursor:pointer;padding:0;margin-left:auto;">✕</button>
+        </div>
+        <div id="autosave-notice" style="display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#166534;align-items:center;gap:8px;">
+          <span>✅ <strong>Automatisch opgeslagen</strong></span>
+        </div>
+        <div id="pupil-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEEL 2: TAKEN -->
+  <div class="sb-paneel sb-paneel-hidden" id="sb-paneel-taken">
+    <div class="sb-paneel-titel">Taken kiezen</div>
+    <div id="icons-banner" style="display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#166534;align-items:center;gap:8px;">
+      <span>✅ Eigen afbeeldingen opgeslagen</span>
+    </div>
+    <div id="hint-icons" style="display:none;"></div>
+    <div style="font-size:14px;color:#6b7280;margin-bottom:16px;">
+      Klik op een taak om ze <strong>aan</strong> of <strong>uit</strong> te zetten.
+      Klik op ⚙ voor naam wijzigen of eigen afbeelding.
+      <button class="help-inline-btn" onclick="document.getElementById('help-beheer-overlay').classList.remove('hidden')">❓ uitleg</button>
+    </div>
+    <div class="task-chips" id="task-chips"></div>
+    <div class="eigen-taak-wrap">
+      <div class="eigen-taak-titel">➕ Eigen taak toevoegen</div>
+      <div class="eigen-taak-hint">Klik op ⭐ om een pictogram te kiezen, typ dan de naam en klik +</div>
+      <div class="eigen-taak-rij">
+        <button class="eigen-taak-emoji-btn" id="eigen-taak-emoji-btn" onclick="toggleEmojiPicker()" title="Kies een pictogram">⭐</button>
+        <div class="emoji-picker-popup" id="emoji-picker-popup">
+          <div style="font-size:12px;font-weight:800;color:#6b7280;margin-bottom:8px;">Kies een pictogram</div>
+          <div class="emoji-picker" id="emoji-picker"></div>
+        </div>
+        <input id="input-task" onkeydown="if(event.key==='Enter')addCustomTask()" placeholder="Naam van de taak…" style="flex:1;font-size:15px;height:48px;" type="text"/>
+        <button class="btn btn-primary" onclick="addCustomTask()" style="height:48px;padding:0 22px;font-size:16px;">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEEL 3: INSTELLINGEN -->
+  <div class="sb-paneel sb-paneel-hidden" id="sb-paneel-inst">
+    <div class="sb-paneel-titel">Instellingen</div>
+    <div class="invoer-blok">
+      <div class="toggle-row" style="margin-bottom:14px;"><label class="toggle"><input id="toggle-numbers" onchange="toggleNumbers()" type="checkbox"/><span class="toggle-slider"></span></label><span class="toggle-label" style="font-size:15px;">Klasnummers tonen</span></div>
+      <div class="toggle-row" style="margin-bottom:14px;"><label class="toggle"><input id="toggle-lastname" onchange="toggleLastname()" type="checkbox"/><span class="toggle-slider"></span></label><span class="toggle-label" style="font-size:15px;">Achternaam tonen op bord</span></div>
+      <div class="toggle-row" style="margin-bottom:6px;"><label class="toggle"><input id="toggle-smileys" onchange="toggleSmileys()" type="checkbox"/><span class="toggle-slider"></span></label><span class="toggle-label" style="font-size:15px;">Smileys zichtbaar voor anderen</span></div>
+      <div style="font-size:13px;color:#a0aec0;padding-left:52px;">Uit = smiley enkel zichtbaar voor wie hem ingaf</div>
+    </div>
+  </div>
+
+</div><!-- /sb-content -->
+</div><!-- /sb-layout -->
+<div class="hidden" id="tab-content-leerlingen"></div>
+<div class="hidden" id="tab-content-taken"></div>
+</div><!-- /settings-inner -->
+</div><!-- /settings-wrap -->
+<!-- BOARD -->
+<div id="board-wrap">
+
+<!-- Leerkracht-banner (verborgen in smartboard/ipad modus) -->
+<div id="teacher-banner" class="teacher-banner">
+  <span>👩‍🏫 <strong>Leerkrachtweergave</strong> — kinderen zien dit scherm niet. Gebruik <strong>📺 Smartboard</strong> om het bord op het scherm of iPad te tonen.</span>
+  <button onclick="document.getElementById('teacher-banner').style.display='none'" class="teacher-banner-close">✕</button>
+</div>
+
+<!-- Backup-herinnering banner -->
+<div id="backup-reminder" style="display:none;background:#fef3c7;border:1.5px solid #f59e0b;border-radius:10px;padding:9px 14px;margin:8px 12px 0;font-size:12px;color:#92400e;align-items:center;gap:10px;flex-wrap:wrap;">
+  <span>⚠️ <strong>Geen recente backup.</strong> Sla je gegevens op als bestand zodat je ze nooit kwijt bent.</span>
+  <button onclick="openBackupModal()" style="border:none;background:#f59e0b;color:#fff;border-radius:7px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;">💾 Backup maken</button>
+  <button onclick="localStorage.setItem('last_export_'+STORAGE_KEY, Date.now());document.getElementById('backup-reminder').style.display='none'" style="border:none;background:none;color:#a16207;font-size:11px;font-weight:800;cursor:pointer;margin-left:auto;">✕ Later</button>
+</div>
+<div id="board-bar">
+<div class="board-bar-left">
+<span id="board-naam-label" style="font-size:13px;font-weight:800;color:#6366f1;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:4px;"></span>
+<span class="board-progress-text" id="board-progress-text">0/0 klaar</span>
+<button class="btn btn-ghost btn-sm hidden" id="btn-reset" onclick="confirmAction('reset')">🔄 Reset dag</button>
+<button class="btn btn-undo hidden" id="btn-undo" onclick="undoLastAction()" title="Ongedaan maken">↩ Ongedaan</button>
+</div>
+<div class="board-bar-right">
+<input accept=".json" class="hidden" id="import-file" onchange="importData(event)" type="file"/>
+<button class="btn teacher-only" onclick="goBackFromBoard()" style="background:#f97316;color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">← Beheer</button>
+<button class="btn btn-indigo teacher-only" onclick="toggleMode()" style="background:#6366f1;color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">⚙️ Beheer aanpassen</button>
+<button class="btn teacher-only" onclick="openSmartboardVenster()" style="background:#3b82f6;color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">📺 Smartboard</button>
+<button class="btn teacher-only" onclick="document.getElementById('help-overlay').classList.remove('hidden')" style="background:#22c55e;color:#fff;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">❓ Uitleg</button>
+<div class="meer-opties-wrap teacher-only" style="position:relative;">
+  <button onclick="toggleMeerOpties()" style="background:#f1f5f9;color:#374151;border:2px solid #e2e8f0;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Meer opties ▾</button>
+  <div id="meer-opties-menu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:2px solid #e0e7ff;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:180px;z-index:200;padding:8px;">
+    <button onclick="toggleTimer();closeMeerOpties()" id="timerToggleBtn" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">⏱️ Timer</button>
+    <button onclick="openPdfModal();closeMeerOpties()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">📄 PDF rapport</button>
+    <button onclick="openQrModal();closeMeerOpties()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">📱 QR-code tonen</button>
+    <div style="border-top:1px solid #e0e7ff;margin:4px 0;"></div>
+    <div style="padding:6px 12px;font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;">Grootte</div>
+    <div style="display:flex;gap:6px;padding:4px 12px 8px;">
+      <button id="size-compact" onclick="setBoardSize('compact');closeMeerOpties()" style="flex:1;padding:6px;border-radius:8px;border:2px solid #e0e7ff;background:#f8fafc;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">S</button>
+      <button id="size-normal" onclick="setBoardSize('normal');closeMeerOpties()" style="flex:1;padding:6px;border-radius:8px;border:2px solid #6366f1;background:#eef2ff;color:#6366f1;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">M</button>
+      <button id="size-large" onclick="setBoardSize('large');closeMeerOpties()" style="flex:1;padding:6px;border-radius:8px;border:2px solid #e0e7ff;background:#f8fafc;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">L</button>
+    </div>
+    <div style="border-top:1px solid #e0e7ff;margin:4px 0;"></div>
+    <button onclick="openBackupModal();closeMeerOpties()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">💾 Backup opslaan</button>
+    <button onclick="document.getElementById('import-overlay').classList.remove('hidden');closeMeerOpties()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:#374151;">📂 Backup terugzetten</button>
+  </div>
+</div>
+<button id="smartboard-exit-btn" onclick="handleExitBtn()" class="btn btn-ghost btn-sm" style="display:none;">⚙️ Menu</button>
+</div>
+</div>
+
+<!-- Discreet slotje — altijd zichtbaar, ook in smartboard/ipad-modus -->
+
+
+<!-- Exit-modal -->
+<div class="overlay hidden" id="smartboard-exit-overlay">
+<div class="modal" style="max-width:360px;text-align:center;">
+<div style="font-size:36px;margin-bottom:8px;">🔒</div>
+<div class="modal-title" style="text-align:center;font-size:18px;">Leerkracht-menu</div>
+<p class="modal-sub" style="text-align:center;">Kies wat je wil doen.</p>
+<div style="display:flex;flex-direction:column;gap:8px;">
+<button class="btn btn-indigo" onclick="exitSmartboard('beheer')" style="width:100%;padding:12px;">⚙️ Terug naar beheer</button>
+<button class="btn btn-secondary" onclick="exitSmartboard('welkom')" style="width:100%;padding:12px;">🏠 Terug naar welkomstscherm</button>
+<button class="btn btn-ghost" onclick="document.getElementById('smartboard-exit-overlay').classList.add('hidden')" style="width:100%;padding:10px;">Annuleren (blijf op bord)</button>
+</div>
+</div>
+</div>
+<div id="top-fixed" style="flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#f0f9ff,#fef9ff);">
+  <div id="legend" class="hidden">
+    <div id="legend-name"></div>
+    <div id="legend-items">
+      <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#eef2ff,#f5f3ff);border:2px dashed #c7d2fe;font-size:16px;">○</div><span>Nog te doen</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fef9c3;border:1.5px solid #f59e0b;color:#d97706">🔄</div><span>Bezig</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#dcfce7;border:1.5px solid #16a34a;color:#15803d;font-weight:800;">✓</div><span>Klaar</span></div>
+      <span style="font-size:11px;color:#818cf8;font-weight:600;">Klik op een hokje om te schakelen · smiley verschijnt na afvinken</span>
+    </div>
+  </div>
+  <div id="task-header" class="hidden"><div class="header-corner"><span class="board-corner-label">Leerling</span></div></div>
+</div>
+<div id="board-scroll">
+<div id="empty-state"><div class="e-icon">📋</div><p id="empty-text">Klik op ⚙️ Beheer aanpassen om te starten</p></div>
+<div class="hidden" id="board-inner"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- BIBLIOTHEEK MODAL -->
+<div class="overlay hidden" id="bibliotheek-laden-modal">
+<div class="modal" style="max-width:440px;">
+  <div class="modal-title">📥 Laden uit bestaand bord</div>
+  <p class="modal-sub">Kies een bronbord en wat je wil overnemen. Daarna pas je het bord zelf aan in het beheer.</p>
+  
+  <div style="margin:12px 0;">
+    <div style="font-size:12px;font-weight:800;color:#6b7280;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;">Bronbord</div>
+    <select id="bib-bronbord" style="width:100%;padding:8px 10px;border:2px solid #e0e7ff;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;color:#1e1b4b;background:#fff;">
+      <option value="">Bezig met laden...</option>
+    </select>
+  </div>
+
+  <div style="margin:12px 0;">
+    <div style="font-size:12px;font-weight:800;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Wat overnemen?</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;cursor:pointer;"><input type="checkbox" id="bib-load-namen" checked style="width:16px;height:16px;"> Klaslijst (namen + foto's)</label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;cursor:pointer;"><input type="checkbox" id="bib-load-taken" checked style="width:16px;height:16px;"> Eigen taken + taaknamen</label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;cursor:pointer;"><input type="checkbox" id="bib-load-iconen" checked style="width:16px;height:16px;"> Eigen pictogrammen bij taken</label>
+    </div>
+  </div>
+
+  <p style="font-size:11px;color:#92400e;background:#fffbeb;border-radius:8px;padding:8px 10px;">⚠️ Actieve taken en voortgang worden <strong>niet</strong> overschreven. Je stelt het bord daarna zelf samen.</p>
+  
+  <div class="modal-btns">
+    <button class="btn btn-secondary" onclick="document.getElementById('bibliotheek-laden-modal').classList.add('hidden')">Annuleren</button>
+    <button class="btn btn-primary" onclick="laadUitBibliotheek()">📥 Overnemen</button>
+  </div>
+</div>
+</div>
+
+<!-- QR CODE MODAL -->
+<div class="overlay hidden" id="qr-modal">
+<div class="modal" style="max-width:360px;text-align:center;">
+  <div class="modal-title">📱 QR-code voor leerlingen</div>
+  <p class="modal-sub" style="margin-bottom:16px;">Laat leerlingen deze code scannen om het bord te openen op hun tablet.</p>
+  <div id="qr-code-container" style="display:flex;justify-content:center;margin:16px 0;"></div>
+  <p id="qr-url-text" style="font-size:11px;color:#94a3b8;word-break:break-all;margin-bottom:16px;"></p>
+  <div class="modal-btns">
+    <button class="btn btn-secondary" onclick="document.getElementById('qr-modal').classList.add('hidden')">Sluiten</button>
+  </div>
+</div>
+</div>
+
+<div class="hidden" id="smiley-popup">
+<h3 id="sp-title">Hoe vond je het?</h3>
+<p>Kies een smiley die past bij hoe de taak ging.</p>
+<div class="smiley-choices">
+<div class="smiley-choice" onclick="setSmiley(1)"><span class="sc-icon">😊</span><span class="sc-label">Super!</span></div>
+<div class="smiley-choice" onclick="setSmiley(2)"><span class="sc-icon">🙂</span><span class="sc-label">Ging goed</span></div>
+<div class="smiley-choice" onclick="setSmiley(3)"><span class="sc-icon">😐</span><span class="sc-label">Beetje moeilijk</span></div>
+<div class="smiley-choice" onclick="setSmiley(4)"><span class="sc-icon">😟</span><span class="sc-label">Te moeilijk</span></div>
+</div>
+<button class="btn btn-ghost btn-sm" onclick="closeSmileyPopup()" style="width:100%">Overslaan</button>
+</div><div class="overlay hidden" id="confirm-overlay">
+<div class="modal">
+<div class="modal-title" id="confirm-title">Bevestigen</div>
+<p class="modal-sub" id="confirm-text"></p>
+<div class="modal-btns" id="confirm-btns"></div>
+</div>
+</div><div class="overlay hidden" id="edit-overlay">
+<div class="modal">
+<div class="modal-title">Naam aanpassen</div>
+<div class="modal-fields">
+<div class="modal-field"><label>Voornaam *</label><input id="edit-voornaam" onkeydown="if(event.key==='Enter')document.getElementById('edit-achternaam').focus()" type="text"/></div>
+<div class="modal-field"><label>Achternaam</label><input id="edit-achternaam" onkeydown="if(event.key==='Enter')saveEdit()" type="text"/></div>
+</div>
+<div class="modal-btns"><button class="btn btn-secondary" onclick="closeEdit()">Annuleren</button><button class="btn btn-primary" onclick="saveEdit()">Opslaan</button></div>
+</div>
+</div><div class="overlay hidden" id="pupil-tasks-overlay">
+<div class="modal" style="max-width:600px;">
+<div class="modal-title" id="pt-title">Taken voor …</div>
+<p class="modal-sub">Klik op een klassikale taak om ze te <strong>verbergen</strong> voor deze leerling. Voeg extra taken toe die enkel voor hem/haar gelden.</p>
+<div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;">Klassikale taken</div><div class="task-chips" id="pt-class-chips"></div></div>
+<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;">Extra taken voor deze leerling</div><div class="task-chips" id="pt-extra-chips" style="margin-bottom:8px;"></div>
+<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;"><div class="emoji-picker" id="pt-emoji-picker" style="margin-bottom:0;"></div><input id="pt-task-input" onkeydown="if(event.key==='Enter')addPupilTask()" placeholder="Extra taaknaam…" style="flex:1;min-width:140px;" type="text"/><button class="btn btn-primary btn-sm" onclick="addPupilTask()">+</button></div>
+</div>
+<div class="modal-btns"><button class="btn btn-primary" onclick="closePupilTasksModal()">Sluiten</button></div>
+</div>
+</div><div class="overlay hidden" id="notes-overlay">
+<div class="modal" style="max-width:500px;">
+<div class="modal-title" id="notes-title">🔒 Bevindingen</div>
+<p class="modal-sub">Deze notities zijn <strong>alleen voor jou</strong> — nooit zichtbaar op het smartboard. Ze worden opgeslagen en komen in het PDF rapport.</p>
+<textarea id="notes-input" placeholder="bv. Had veel hulp nodig · Werkte vlot en zelfstandig · Verstoorde de rust · Meer uitdaging nodig…" style="min-height:140px;"></textarea>
+<div class="modal-btns"><button class="btn btn-secondary" onclick="closeNotesModal()">Annuleren</button><button class="btn btn-primary" onclick="saveNotes()">Opslaan</button></div>
+</div>
+</div><div class="overlay hidden" id="pdf-overlay">
+<div class="modal" style="max-width:480px;">
+<div class="modal-title">📄 PDF rapport</div>
+<p class="modal-sub">Overzicht van alle leerlingen + detailpagina per leerling met taken, smileys en bevindingen.</p>
+<div class="pdf-field"><label>Naam van de periode</label><input id="pdf-period-name" placeholder="bv. Week 14 of November" type="text"/></div>
+<div class="pdf-row"><div class="pdf-field"><label>Van</label><input id="pdf-date-from" type="date"/></div><div class="pdf-field"><label>Tot</label><input id="pdf-date-to" type="date"/></div></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+  <button class="btn btn-primary" onclick="generateAndPrint('download')" style="flex:1;padding:12px;">⬇️ Downloaden als PDF</button>
+  <button class="btn btn-secondary" onclick="generateAndPrint('print')" style="flex:1;padding:12px;">🖨️ Afdrukken</button>
+</div>
+<div class="info-box blue" style="font-size:11px;line-height:1.6;margin-bottom:0;">
+  <strong>⬇️ Downloaden</strong> — PDF komt direct in je Downloads-map.<br/>
+  <strong>🖨️ Afdrukken</strong> — opent afdrukvenster (ook bruikbaar om op te slaan als PDF).
+</div>
+<div class="modal-btns"><button class="btn btn-secondary" onclick="document.getElementById('pdf-overlay').classList.add('hidden')">Annuleren</button></div>
+</div>
+</div><div class="overlay hidden" id="export-overlay">
+<div class="modal" style="max-width:480px;">
+<div class="modal-title">💾 Backup opslaan</div>
+<div class="info-box blue" style="margin-bottom:10px;">
+  <strong style="display:block;margin-bottom:4px;">📌 Wat is een backup?</strong>
+  Een backup is een bestand dat al je gegevens bevat: namen, taken, voortgang en bevindingen. Je kan het later opnieuw inladen als je browser wordt gewist of als je op een andere computer werkt.
+</div>
+<div class="info-box green">
+<strong>Hoe een backup opslaan (stap voor stap):</strong><br/><br/>
+1. Klik op <strong>"Backup downloaden"</strong> hieronder.<br/>
+2. Er verschijnt onderaan je scherm een bestand (of in je Downloads-map).<br/>
+3. Klik met de <strong>rechtermuisknop</strong> op het bestand → kies <em>"Opslaan als"</em> of sleep het naar een map die je makkelijk terugvindt (bv. een map "Klasbord backups" op je bureaublad).<br/>
+4. ⚠️ <strong>Klik het bestand NIET zomaar open</strong> — je ziet dan rare tekens, dat is normaal, het bestand is niet stuk.<br/>
+5. Om het terug te laden: klik op de <strong>📂 Import-knop</strong> op het klasbord en kies het bewaard bestand.
+</div>
+<div class="info-box amber">
+💡 <strong>Tip:</strong> Maak een backup aan het einde van elke periode. Geef het bestand een duidelijke naam, bv. <em>backup-week14.json</em>.
+</div>
+<div class="modal-btns">
+<button class="btn btn-secondary" onclick="document.getElementById('export-overlay').classList.add('hidden')">Annuleren</button>
+<button class="btn btn-primary" onclick="exportData();document.getElementById('export-overlay').classList.add('hidden')">⬇️ Backup downloaden</button>
+</div>
+</div>
+</div><div class="overlay hidden" id="import-overlay">
+<div class="modal" style="max-width:460px;">
+<div class="modal-title">📂 Backup terugzetten</div>
+<div class="info-box blue" style="margin-bottom:10px;">
+  Een backup is een bestand dat je eerder hebt opgeslagen via de <strong>💾 Export-knop</strong>. Het heeft een naam zoals <em>klasbord-backup-2024-11-15.json</em>.
+</div>
+<div class="info-box green">
+<strong>Hoe een backup terugzetten:</strong><br/><br/>
+1. Zorg dat je het backupbestand weet te vinden op je computer (bv. in Downloads of in je map "Klasbord backups").<br/>
+2. Klik hieronder op <strong>"Kies backupbestand"</strong>.<br/>
+3. Zoek het bestand op en klik op <strong>Openen</strong>.<br/>
+4. Je gegevens worden hersteld.
+</div>
+<div class="info-box amber">
+⚠️ <strong>Let op:</strong> het huidig bord wordt vervangen door de backup. Maak eerst zelf een nieuwe backup als je de huidige gegevens wil bewaren.
+</div>
+<div class="modal-btns">
+<button class="btn btn-secondary" onclick="document.getElementById('import-overlay').classList.add('hidden')">Annuleren</button>
+<button class="btn btn-primary" onclick="document.getElementById('import-overlay').classList.add('hidden');document.getElementById('import-file').click()">📂 Kies backupbestand</button>
+</div>
+</div>
+</div>
+<div class="modal" style="max-width:480px;">
+<div class="modal-title">🔄 Nieuwe periode starten</div>
+<p class="modal-sub">Kies wat je wil bewaren en wat je wil wissen.</p>
+<div class="period-option" id="po1" onclick="selectPeriod(1)">
+<h4>📅 Alleen voortgang wissen</h4>
+<p>Vinkjes en smileys worden gewist. Namen, taken en bevindingen blijven. Handig voor een nieuwe week.</p>
+</div>
+<div class="period-option" id="po2" onclick="selectPeriod(2)">
+<h4>🔄 Voortgang + bevindingen wissen</h4>
+<p>Alles staat terug op nul. Namen en taken blijven staan.</p>
+</div>
+<div class="period-option" id="po3" onclick="selectPeriod(3)">
+<h4>🗑️ Volledig leeg beginnen</h4>
+<p>Alles wordt gewist: namen, taken, voortgang en bevindingen. Bv. voor een nieuw schooljaar.</p>
+</div>
+<div class="info-box amber" style="margin-top:10px;">💡 Maak eerst een <strong>💾 backup</strong> via Export voordat je iets wist!</div>
+<div class="modal-btns">
+<button class="btn btn-secondary" onclick="document.getElementById('new-period-overlay').classList.add('hidden')">Annuleren</button>
+<button class="btn btn-danger" disabled="" id="new-period-confirm" onclick="doNewPeriod()">Bevestigen</button>
+</div>
+</div>
+</div><div class="overlay hidden" id="help-beheer-overlay">
+<div class="modal" style="max-width:780px;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+<div class="modal-title" style="margin-bottom:0;">❓ Uitleg — Beheer</div>
+<button class="btn btn-primary" onclick="document.getElementById('help-beheer-overlay').classList.add('hidden')">✓ Begrepen!</button>
+</div>
+<p class="modal-sub">Gebruik de zijbalk links om tussen de 3 stappen te navigeren: Namen → Taken → Instellingen.</p>
+
+<div class="help-section">
+<h3>👦 Stap 1 — Namen</h3>
+<ul>
+<li><strong>Klaslijst plakken</strong> — kopieer namen uit Smartschool, Excel of Word en plak ze in één keer in het tekstvak. Kies de volgorde (Voornaam Achternaam of omgekeerd) en klik Toevoegen.</li>
+<li><strong>Één naam</strong> — vul voornaam en achternaam in en klik + Toevoegen.</li>
+<li><strong>⠳ Slepen</strong> — versleep namen in de lijst om de volgorde aan te passen.</li>
+<li><strong>✎</strong> — naam aanpassen van een leerling.</li>
+<li><strong>📋</strong> — taken individueel aan/uitzetten voor die leerling (differentiatie).</li>
+<li><strong>🔒</strong> — jouw privé-bevindingen per leerling. Nooit zichtbaar op het bord, wel in het PDF-rapport.</li>
+<li><strong>📷</strong> — foto of afbeelding toevoegen bij een leerling. Die verschijnt op het bord.</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📋 Stap 2 — Taken</h3>
+<ul>
+<li><strong>Aan/uit zetten</strong> — klik op een taak-tegel om die aan of uit te zetten voor de hele klas. Blauw omrand = actief.</li>
+<li><strong>⚙ knopje</strong> — verschijnt bij hover op een tegel. Klik erop voor: naam wijzigen, eigen afbeelding uploaden, of taak verwijderen.</li>
+<li><strong>Eigen taak toevoegen</strong> — klik op ⭐ om een pictogram te kiezen, typ een naam en klik +.</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>⚙️ Stap 3 — Instellingen</h3>
+<ul>
+<li><strong>Klasnummers tonen</strong> — toont een volgnummer voor elke leerling op het bord.</li>
+<li><strong>Achternaam tonen</strong> — toont de achternaam mee op het bord.</li>
+<li><strong>Smileys zichtbaar voor anderen</strong> — uit = leerlingen zien enkel hun eigen smiley, niet die van anderen.</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>💾 Backup &amp; herstel</h3>
+<p>Je gegevens worden automatisch opgeslagen in de cloud. Via <strong>Backup &amp; herstel</strong> in de zijbalk kan je ook een lokaal bestand downloaden als extra zekerheid, of een eerdere backup terugzetten.</p>
+</div>
+
+<div class="modal-btns"><button class="btn btn-primary" onclick="document.getElementById('help-beheer-overlay').classList.add('hidden')">✓ Begrepen!</button></div>
+</div>
+</div>
+
+<div class="overlay hidden" id="help-overlay">
+<div class="modal" style="max-width:780px;max-height:88vh;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+<div class="modal-title" style="margin-bottom:0;">❓ Uitleg — Klasbord</div>
+<button class="btn btn-primary" onclick="document.getElementById('help-overlay').classList.add('hidden')">✓ Begrepen!</button>
+</div>
+<p class="modal-sub">Alles wat je moet weten om het klasbord te gebruiken.</p>
+
+<div class="help-section">
+<h3>📋 Hokjes gebruiken</h3>
+<div class="help-row" style="margin-top:6px">
+  <div class="help-badge" style="background:linear-gradient(135deg,#eef2ff,#f5f3ff);border:2.5px dashed #c7d2fe;font-size:20px;">○</div>
+  <span style="font-size:13px;color:#4b5563"><strong>Leeg</strong> — taak nog niet begonnen. Klik om naar "Bezig" te gaan.</span>
+</div>
+<div class="help-row">
+  <div class="help-badge" style="background:#fef9c3;border:2px solid #f59e0b;">🔄</div>
+  <span style="font-size:13px;color:#4b5563"><strong>Bezig (geel)</strong> — leerling is er mee bezig.</span>
+</div>
+<div class="help-row">
+  <div class="help-badge" style="background:#dcfce7;border:2px solid #16a34a;color:#15803d;font-weight:800;">✓</div>
+  <span style="font-size:13px;color:#4b5563"><strong>Klaar (groen)</strong> — verschijnt een smiley-popup. Afgewerkt!</span>
+</div>
+</div>
+
+<div class="help-section">
+<h3>😊 Smileys</h3>
+<p>Na afvinken vraagt een popup: hoe vond je het? <strong>😊 Super · 🙂 Goed · 😐 Moeilijk · 😟 Te moeilijk</strong>. De gekozen smiley staat nadien als klein icoon onder het vinkje. Klik erop om te wijzigen. Zichtbaar in het PDF-rapport.</p>
+<p style="margin-top:4px;font-size:12px;color:#718096;">Tip: zet "Smileys zichtbaar voor anderen" uit via Beheer → Instellingen als je wil dat enkel het kind zijn eigen smiley ziet.</p>
+</div>
+
+<div class="help-section">
+<h3>📺 Smartboard-weergave</h3>
+<p>Klik op <strong>"📺 Smartboard"</strong> in de balk om het bord in een apart venster te openen. In smartboard-modus zijn alle beheerknoppen verborgen zodat kinderen niets fout kunnen aanklikken.<br/>
+<strong>Terug naar beheer:</strong> klik de knop <strong>⚙️ Menu</strong> rechts in de balk. Dat opent een keuze: terug naar beheer of terug naar het welkomstscherm.</p>
+</div>
+
+<div class="help-section">
+<h3>⏱️ Werktimer</h3>
+<p>Klik op <strong>"Meer opties"</strong> → <strong>"⏱️ Timer"</strong>. Stel de werktijd in en klik "▶ Starten". De timer zweeft boven het bord — versleep hem aan de titelbalk, pas de breedte aan via het ⊿-hoekje. Kies je weergave: analoog, digitaal of beide.<br/>
+Als de tijd om is klinkt een geluidssignaal en knippert de timer rood tot je op "Nieuwe timer" klikt.</p>
+</div>
+
+<div class="help-section">
+<h3>📄 PDF rapport</h3>
+<p>Klik op <strong>"Meer opties"</strong> → <strong>"📄 PDF rapport"</strong>. Kies een periodenaam en datums. Klik <strong>"⬇️ Downloaden als PDF"</strong> — het afdrukvenster opent. Kies bij <em>Bestemming</em>: <strong>Opslaan als PDF</strong> → klik Opslaan.</p>
+</div>
+
+<div class="help-section">
+<h3>📱 QR-code</h3>
+<p>Klik op <strong>"Meer opties"</strong> → <strong>"📱 QR-code tonen"</strong>. Er verschijnt een QR-code die leerlingen kunnen scannen met hun tablet. Ze komen dan rechtstreeks op het kinderbord — zonder dat je terug naar het welkomstscherm moet gaan.</p>
+</div>
+
+<div class="help-section">
+<h3>💾 Backup</h3>
+<p>Je gegevens worden automatisch opgeslagen in de cloud via Firebase. Voor een extra veiligheidsnet kan je via <strong>"Meer opties"</strong> → <strong>"💾 Backup"</strong> je gegevens ook als bestand opslaan op je computer. Handig als extra zekerheid aan het einde van een periode.</p>
+</div>
+
+<div class="modal-btns"><button class="btn btn-primary" onclick="document.getElementById('help-overlay').classList.add('hidden')">Begrepen!</button></div>
+</div>
+</div><div id="celebration" onclick="closeCelebration()">
+<div class="celeb-box"><div class="c-emoji">🎉</div><div class="c-name" id="celeb-name"></div><div class="c-sub">heeft alle taken afgewerkt!</div><div class="c-hint">Tik om te sluiten</div></div>
+</div>
+<!-- RENAME TASK MODAL -->
+<div class="overlay hidden" id="rename-task-overlay">
+<div class="modal" style="max-width:380px;">
+<div class="modal-title">✎ Taaknaam aanpassen</div>
+<p class="modal-sub">Geef deze taak een naam die past bij jouw klas, bv. "Rekenhoek" of "Leesmap".</p>
+<input id="rename-task-input" type="text" placeholder="Nieuwe naam…" onkeydown="if(event.key==='Enter')saveTaskRename()" style="margin-bottom:4px;" />
+<div class="modal-btns">
+  <button class="btn btn-secondary" onclick="closeTaskRename()">Annuleren</button>
+  <button class="btn btn-primary" onclick="saveTaskRename()">Opslaan</button>
+</div>
+</div>
+</div>
+<script src="klasbord.js"></script>
+
+<!-- TIMER POPUP -->
+<div id="timer-popup" style="display:none;position:fixed;z-index:8000;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.22);border:3px solid #e0e7ff;padding:14px 16px;user-select:none;top:80px;right:30px;min-width:180px;">
+  <!-- Titelbalk (drag handle) -->
+  <div id="timer-drag-handle" style="cursor:move;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;">
+    <span style="font-weight:800;font-size:13px;color:#6366f1;white-space:nowrap;">⏱️ Werktimer</span>
+    <div style="display:flex;gap:3px;align-items:center;">
+      <!-- Weergave-knoppen -->
+      <button onclick="setTimerView('both')" id="tv-both" title="Analoog + digitaal" style="border:2px solid #6366f1;background:#eef2ff;color:#6366f1;border-radius:6px;padding:2px 5px;cursor:pointer;font-size:10px;font-weight:800;">◷+</button>
+      <button onclick="setTimerView('analog')" id="tv-analog" title="Enkel analoog" style="border:2px solid #e0e7ff;background:#f8fafc;color:#6b7280;border-radius:6px;padding:2px 5px;cursor:pointer;font-size:10px;font-weight:800;">◷</button>
+      <button onclick="setTimerView('digital')" id="tv-digital" title="Enkel digitaal" style="border:2px solid #e0e7ff;background:#f8fafc;color:#6b7280;border-radius:6px;padding:2px 5px;cursor:pointer;font-size:10px;font-weight:800;">0:00</button>
+      <button onclick="toggleTimer()" style="border:none;background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:13px;margin-left:2px;">✕</button>
+    </div>
+  </div>
+
+  <!-- INSTELLEN -->
+  <div id="timer-setup" style="text-align:center;">
+    <div style="font-size:11px;font-weight:700;color:#6b7280;margin-bottom:6px;">Stel de werktijd in</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
+      <button onclick="adjustTime(-5)" style="border:none;background:#e0e7ff;color:#4338ca;border-radius:8px;width:28px;height:28px;font-size:16px;cursor:pointer;font-weight:800;line-height:1;">−</button>
+      <span id="timer-set-display" style="font-size:24px;font-weight:800;color:#1e1b4b;min-width:60px;text-align:center;">15:00</span>
+      <button onclick="adjustTime(5)" style="border:none;background:#e0e7ff;color:#4338ca;border-radius:8px;width:28px;height:28px;font-size:16px;cursor:pointer;font-weight:800;line-height:1;">+</button>
+    </div>
+    <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+      <button onclick="setTimerPreset(5)"  class="timer-preset">5'</button>
+      <button onclick="setTimerPreset(10)" class="timer-preset">10'</button>
+      <button onclick="setTimerPreset(15)" class="timer-preset">15'</button>
+      <button onclick="setTimerPreset(20)" class="timer-preset">20'</button>
+      <button onclick="setTimerPreset(30)" class="timer-preset">30'</button>
+    </div>
+    <button onclick="startTimer()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:9px 0;font-size:15px;font-weight:800;cursor:pointer;width:100%;">▶ Starten</button>
+  </div>
+
+  <!-- LOPEND -->
+  <div id="timer-running" style="display:none;">
+    <div id="timer-display-wrap" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+      <!-- Analoge klok -->
+      <canvas id="timer-clock" width="120" height="120" id="timer-clock" style="display:block;flex-shrink:0;"></canvas>
+      <!-- Digitale weergave -->
+      <div id="timer-digital-wrap" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <div id="timer-digital" style="font-size:32px;font-weight:800;color:#1e1b4b;letter-spacing:1px;line-height:1;">15:00</div>
+        <div style="background:#e0e7ff;border-radius:5px;height:7px;width:90px;overflow:hidden;">
+          <div id="timer-progress" style="height:100%;background:linear-gradient(90deg,#6366f1,#22c55e);border-radius:5px;width:100%;transition:width .5s;"></div>
+        </div>
+        <div style="display:flex;gap:5px;">
+          <button onclick="pauseResumeTimer()" id="timer-pause-btn" style="background:#fef3c7;color:#92400e;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;">⏸ Pauze</button>
+          <button onclick="resetTimer()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer;">↺ Stop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFGELOPEN -->
+  <div id="timer-done" style="display:none;text-align:center;">
+    <div style="font-size:40px;margin-bottom:6px;">🔔</div>
+    <div style="font-size:18px;font-weight:800;color:#16a34a;margin-bottom:10px;">Tijd is om!</div>
+    <button onclick="resetTimer()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:9px 0;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Nieuwe timer</button>
+  </div>
+
+  <!-- Resize-handvat -->
+  <div id="timer-resize" style="position:absolute;bottom:3px;right:3px;width:14px;height:14px;cursor:se-resize;opacity:.35;font-size:11px;text-align:center;line-height:14px;">⊿</div>
+</div>
+<style>
+.timer-preset{border:1.5px solid #e0e7ff;background:#f8f9ff;color:#4338ca;border-radius:7px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;}
+.timer-preset:hover{background:#e0e7ff;}
+
+/* ── PRO HEADER ── */
+.pro-header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:10px 20px;font-family:Nunito,sans-serif;position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;box-sizing:border-box;}
+.pro-header-left{display:flex;align-items:center;gap:10px;}
+.pro-back-btn{border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.pro-back-btn:hover{background:rgba(255,255,255,.3);}
+.pro-header-title{font-size:14px;font-weight:800;opacity:.9;}
+.pro-badge{background:rgba(255,255,255,.2);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800;letter-spacing:.05em;}
+body{padding-top:44px!important;}
+</style>
+<!-- BACKUP MODAL -->
+<div class="overlay hidden" id="backup-modal">
+<div class="modal" style="max-width:460px;">
+  <div class="modal-title">💾 Backup</div>
+  <p class="modal-sub">Je gegevens worden automatisch bewaard door de app. Een backup is enkel nodig als noodoplossing — bv. als je van computer wisselt of de browser-cache wordt leeggemaakt.</p>
+
+  <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#166534;line-height:1.7;">
+    ✅ <strong>Alles staat automatisch opgeslagen.</strong><br/>
+    Namen, taken, afbeeldingen en voortgang blijven bewaard bij elke opening van de app — je hoeft zelf niets te doen.
+  </div>
+
+  <div style="margin-bottom:12px;">
+    <div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:8px;">📥 Backup maken</div>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:10px;line-height:1.7;">Klik op de knop hieronder. Het bestand wordt automatisch gedownload. Je vindt het in je <strong>Downloads-map</strong> — klik daar op het <strong>mapje</strong> naast de bestandsnaam om het ergens op te slaan.</p>
+    <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#92400e;line-height:1.6;">💡 Het bestand eindigt op <strong>.json</strong>. Als je het openklikt zie je codes en tekens — dat is normaal, het is computertaal. Je hoeft het niet te begrijpen, enkel op te slaan op een veilige plek.</div>
+    <button class="btn btn-primary" onclick="exportData();closeBM()" style="width:100%;">⬇️ Backup downloaden</button>
+  </div>
+
+  <div style="border-top:1px solid #e2e8f0;padding-top:12px;margin-bottom:12px;">
+    <div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:8px;">📤 Backup terugzetten</div>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:8px;line-height:1.6;">Zet een eerder gemaakte backup terug. <strong>Let op:</strong> dit vervangt alle huidige gegevens.</p>
+    <button class="btn btn-secondary" onclick="document.getElementById('import-file').click();closeBM()" style="width:100%;">📂 Backup terugzetten</button>
+  </div>
+
+  <div style="border-top:1px solid #e2e8f0;padding-top:12px;">
+    <div style="font-size:13px;font-weight:800;color:#374151;margin-bottom:8px;">🎒 Nieuw schooljaar</div>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:8px;line-height:1.6;">Start een nieuwe klas. Kies zelf wat je bewaart en wat je wist.</p>
+    <button class="btn btn-ghost" onclick="closeBM();openNewSchoolYear()" style="width:100%;">🎒 Nieuw schooljaar starten</button>
+  </div>
+
+  <div class="modal-btns"><button class="btn btn-ghost" onclick="closeBM()">Sluiten</button></div>
+</div>
+</div>
+
+<button id="scroll-left-arrow"  class="hidden" onclick="scrollBoardLeft()">&#8249;</button>
+<button id="scroll-right-arrow" class="hidden" onclick="scrollBoardRight()">&#8250;</button>
+</body></html>
