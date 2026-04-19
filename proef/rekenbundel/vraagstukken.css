@@ -1,0 +1,515 @@
+/* ── VRAAGSTUKKEN MODULE — jufzisa.be ───────────────────────── */
+
+/* Limiet badge */
+.vs-limiet-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+  margin-left: 8px;
+}
+.vs-limiet-badge.weinig {
+  background: #fff8e1;
+  color: #f57f17;
+  border-color: #ffe082;
+}
+.vs-limiet-badge.leeg {
+  background: #ffebee;
+  color: #c62828;
+  border-color: #ef9a9a;
+}
+
+/* ── CONFIGURATIE KAARTEN ────────────────────────────────────── */
+#tab-vraagstukken .config-kaart {
+  /* hergebruikt bestaande stijl */
+}
+
+/* Bewerking chips — kleurcodering */
+.vs-bewerking-groep {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.vs-bew-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+  transition: all 0.15s;
+  user-select: none;
+}
+.vs-bew-chip input { display: none; }
+.vs-bew-chip.geselecteerd { color: #fff; border-color: transparent; }
+.vs-bew-chip[data-bew="optellen"].geselecteerd    { background: #2196f3; }
+.vs-bew-chip[data-bew="aftrekken"].geselecteerd   { background: #e53935; }
+.vs-bew-chip[data-bew="vermenigvuldigen"].geselecteerd { background: #7b1fa2; }
+.vs-bew-chip[data-bew="delen"].geselecteerd       { background: #2e7d32; }
+
+/* ── GENEREER-KNOP ───────────────────────────────────────────── */
+.vs-btn-genereer {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.2s;
+  letter-spacing: 0.3px;
+}
+.vs-btn-genereer:hover { opacity: 0.9; }
+.vs-btn-genereer:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── PREVIEW ZONE ────────────────────────────────────────────── */
+.vs-preview-sectie {
+  margin-top: 16px;
+}
+.vs-preview-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+#vs-preview {
+  min-height: 60px;
+}
+.vs-laden {
+  text-align: center;
+  color: #1565c0;
+  font-size: 14px;
+  padding: 16px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  animation: vs-puls 1.2s ease-in-out infinite;
+}
+@keyframes vs-puls {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.vs-fout {
+  color: #c62828;
+  background: #ffebee;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+}
+
+/* Vraagstuk kaart */
+.vs-kaart {
+  background: #fff;
+  border: 1.5px solid #e3f2fd;
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(21,101,192,0.07);
+  max-width: 520px;
+}
+.vs-kaart-tekst {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+}
+
+/* ── SCHEMA'S ────────────────────────────────────────────────── */
+.vs-schemas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.vs-schema-blok {
+  background: #f8f9fa;
+  border-radius: 7px;
+  padding: 8px 12px;
+}
+.vs-schema-label {
+  font-size: 11px;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Tekenschema */
+.vs-tekenschema {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vs-ts-vak {
+  width: 48px;
+  height: 28px;
+  border-bottom: 2px solid #333;
+  text-align: center;
+  font-size: 13px;
+  color: #aaa;
+  line-height: 28px;
+}
+.vs-ts-teken {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1565c0;
+}
+
+/* Schrijflijnen */
+.vs-schrijflijnen {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.vs-schrijflijn {
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Cijferschema */
+.vs-cijferschema {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.vs-cs-rij {
+  display: flex;
+  gap: 2px;
+}
+.vs-cs-cel {
+  width: 32px;
+  height: 28px;
+  border: 1px solid #ccc;
+  text-align: center;
+  line-height: 28px;
+  font-size: 13px;
+  background: #fff;
+  border-radius: 3px;
+  color: #555;
+}
+.vs-cs-lijn .vs-cs-cel {
+  border-bottom: 2px solid #333;
+}
+
+/* Actieknoppen */
+.vs-acties {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.vs-btn-toevoegen {
+  flex: 1;
+  padding: 8px;
+  background: #1565c0;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.vs-btn-toevoegen:hover { opacity: 0.85; }
+.vs-btn-opnieuw {
+  padding: 8px 12px;
+  background: #f5f5f5;
+  color: #333;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.vs-btn-opnieuw:hover { background: #eeeeee; }
+
+/* ── BUNDEL LIJST ────────────────────────────────────────────── */
+.vs-bundel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 8px;
+}
+.vs-bundel-titel {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+#vs-bundel-teller {
+  font-size: 12px;
+  color: #888;
+}
+.vs-bundel-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.vs-leeg {
+  color: #aaa;
+  font-size: 13px;
+  text-align: center;
+  padding: 12px;
+}
+.vs-bundel-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+}
+.vs-bundel-nummer {
+  font-weight: 700;
+  color: #1565c0;
+  min-width: 18px;
+}
+.vs-bundel-tekst {
+  flex: 1;
+  color: #333;
+  line-height: 1.5;
+}
+.vs-bundel-verwijder {
+  background: none;
+  border: none;
+  color: #e53935;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+/* Bulk selector */
+.vs-bulk-rij {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vs-bulk-rij select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1.5px solid #ddd;
+  font-size: 13px;
+}
+
+/* ── THEMA CHIPS ─────────────────────────────────────────────── */
+.vs-thema-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.vs-thema-chip {
+  padding: 4px 10px;
+  border-radius: 16px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.vs-thema-chip:hover { border-color: #1565c0; color: #1565c0; }
+.vs-thema-chip.actief { background: #1565c0; color: #fff; border-color: #1565c0; }
+
+/* ── ROOSTER SCHEMA ──────────────────────────────────────────── */
+.vs-schema-zone {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0 0 0;
+  align-items: flex-start;
+  max-width: 500px; /* niet te breed */
+}
+.vs-schema-links {
+  flex: 0 0 auto;
+}
+.vs-schema-rechts {
+  flex: 0 0 180px; /* vaste breedte voor bewerking */
+}
+.vs-rooster {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #aaa;
+}
+.vs-rooster-rij {
+  display: flex;
+}
+.vs-rooster-cel {
+  width: 16px;
+  height: 16px;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Bewerking blok */
+.vs-bewerking-blok {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.vs-bew-label {
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+  margin-bottom: 16px; /* witruimte onder label */
+}
+.vs-bew-stap {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+.vs-bew-lijn {
+  width: 100%;
+  border-bottom: 1px solid #999;
+  margin-bottom: 24px; /* ruimere schrijfruimte voor kinderen */
+}
+
+/* Antwoordzin */
+.vs-antwoordzin-rij {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 16px; /* meer witruimte boven antwoordzin */
+  max-width: 500px;
+}
+.vs-antw-label {
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.vs-antw-tekst {
+  font-size: 13px;
+  color: #333;
+  flex: 1;
+}
+.vs-antw-lijn {
+  flex: 1;
+  border-bottom: 1px solid #999;
+}
+
+/* ── CIJFER SCHEMA ───────────────────────────────────────────── */
+.vs-cijfer-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.vs-cijfer-stappen {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.vs-cijfer-schema-blok {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.vs-cs-staplabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+.vs-cs-grid {
+  display: grid;
+  gap: 0;
+  border: 1px solid #999;
+  border-collapse: collapse;
+}
+/* Header cellen */
+.vs-cs-header {
+  width: 32px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  border-right: 1px solid #999;
+  border-bottom: 1px solid #999;
+  box-sizing: border-box;
+}
+.vs-cs-header:last-child { border-right: none; }
+
+/* Gewone cellen */
+.vs-cs-cel {
+  width: 32px;
+  height: 28px;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  background: #fff;
+  box-sizing: border-box;
+}
+.vs-cs-cel:last-child { border-right: none; }
+.vs-cs-grijs { background: #d8d8d8; }
+.vs-cs-dik-onder { border-bottom: 2.5px solid #444 !important; }
+
+/* Komma kolom — smal maar MET lijntjes */
+.vs-cs-komma-header {
+  width: 14px;
+  min-width: 14px;
+  height: 28px;
+  background: #aaa;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  border-right: 1px solid #999;
+  border-bottom: 1px solid #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.vs-cs-komma-cel {
+  width: 14px;
+  min-width: 14px;
+  height: 28px;
+  background: #e8e8e8;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  box-sizing: border-box;
+}
+.vs-cs-komma-cel.vs-cs-dik-onder {
+  border-bottom: 2.5px solid #444 !important;
+}
+
+/* ── Deelschema split-layout ──────────────────────────────── */
+.vs-deel-schema-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-top: 4px;
+}
+.vs-deel-links {
+  display: flex;
+  flex-direction: column;
+}
+.vs-deel-lijn {
+  width: 2px;
+  background: #444;
+  align-self: stretch;
+  margin: 0 4px;
+  min-height: 60px;
+}
+.vs-deel-rechts {
+  display: flex;
+  flex-direction: column;
+}
