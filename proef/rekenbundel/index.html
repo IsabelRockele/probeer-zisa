@@ -143,6 +143,97 @@
       margin-top: 12px;
     }
 
+    /* ── Aftelklok ── */
+    .aftelklok {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 20px 0 16px;
+      flex-wrap: wrap;
+    }
+    .aftel-blok {
+      background: rgba(255, 207, 86, 0.15);
+      border: 2px solid var(--gold);
+      border-radius: 12px;
+      padding: 12px 16px;
+      min-width: 78px;
+    }
+    .aftel-cijfer {
+      font-family: 'Nunito', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .aftel-label {
+      font-size: 0.72rem;
+      color: #ddd;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+
+    /* ── Grote start-knop (tijdens proefmaand) ── */
+    .start-knop {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--dark);
+      padding: 18px 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      margin: 20px 0 10px;
+      box-shadow: 0 6px 24px rgba(255, 207, 86, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+      animation: start-pulse 2s ease-in-out infinite;
+    }
+    .start-knop:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(255, 207, 86, 0.5);
+      animation: none;
+    }
+    @keyframes start-pulse {
+      0%, 100% { box-shadow: 0 6px 24px rgba(255, 207, 86, 0.4); }
+      50% { box-shadow: 0 6px 32px rgba(255, 207, 86, 0.7); }
+    }
+    .extra-info {
+      font-size: 0.9rem;
+      color: #bbb;
+      margin-top: 6px;
+    }
+
+    /* ── Status-label: Proef actief ── */
+    .status-actief {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(39, 174, 96, 0.2);
+      color: #4ade80;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .status-actief::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+      animation: status-blink 1.5s ease-in-out infinite;
+    }
+    @keyframes status-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
     .info-card {
       background: var(--white);
       border-radius: 14px;
@@ -330,12 +421,11 @@
 
   <div class="container">
 
-    <div class="countdown-card">
-      <h2>🎉 Start van de proefmaand</h2>
-      <div class="subtitle">De Rekenbundel Generator gaat gratis open vanaf</div>
-      <div class="big-date">1 mei 2026</div>
-      <div class="subtitle">Eén maand lang — maximum 3 gratis bundels per bezoeker</div>
-      <div class="badge">Nog even geduld!</div>
+    <!-- Dynamische countdown-card: inhoud wordt door JS ingevuld op basis
+         van Firestore-instellingen (actief, start_datum, eind_datum). -->
+    <div class="countdown-card" id="countdown-card">
+      <h2>⏳ Even geduld…</h2>
+      <div class="subtitle">We checken of de proef al open is.</div>
     </div>
 
     <div class="info-card green">
@@ -387,6 +477,180 @@
     <a href="../../" class="back-link">← Terug naar overzicht</a>
 
   </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       DYNAMISCHE COUNTDOWN + FIREBASE STATUS CHECK
+       Bekijkt instellingen/gratis_rekenbundel en toont juiste card:
+       - Vóór start_datum:   aftelklok naar start
+       - Tussen start en eind (en actief=true):  grote "Start de proef" knop
+       - Na eind_datum of actief=false:  "Proefmaand afgelopen"
+       ═══════════════════════════════════════════════════════════════════ -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCq6Yy-rGVmKjZgqETvz_ZgupgjnDduzYo",
+      authDomain: "probeer-zisa.firebaseapp.com",
+      projectId: "probeer-zisa",
+      storageBucket: "probeer-zisa.firebasestorage.app",
+      messagingSenderId: "670942957144",
+      appId: "1:670942957144:web:68bace33ae4a5e8e2b442d"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const card = document.getElementById('countdown-card');
+
+    // ── Helpers ─────────────────────────────────────────────────────────
+    function parseerDatum(str) {
+      // "2026-05-01" → Date object (begin van die dag)
+      if (!str) return null;
+      return new Date(str + 'T00:00:00');
+    }
+
+    function isVandaagVoor(d) {
+      const nu = new Date();
+      return nu < d;
+    }
+
+    function isVandaagNa(d) {
+      const nu = new Date();
+      // d moet EIND van de dag zijn
+      const eindDag = new Date(d);
+      eindDag.setHours(23, 59, 59, 999);
+      return nu > eindDag;
+    }
+
+    function formatteerTijdVerschil(msVerschil) {
+      // msVerschil is totaal aantal milliseconden tot doel-datum
+      if (msVerschil <= 0) return { d: 0, h: 0, m: 0, s: 0 };
+      const dagen   = Math.floor(msVerschil / (1000 * 60 * 60 * 24));
+      const uren    = Math.floor((msVerschil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minuten = Math.floor((msVerschil % (1000 * 60 * 60)) / (1000 * 60));
+      const seconden = Math.floor((msVerschil % (1000 * 60)) / 1000);
+      return { d: dagen, h: uren, m: minuten, s: seconden };
+    }
+
+    // ── Toestand 1: Proef nog niet gestart → aftelklok ──────────────────
+    function toonAftelklok(startDatum) {
+      card.innerHTML = `
+        <h2>🎉 Start van de proefmaand</h2>
+        <div class="subtitle">De Rekenbundel Generator gaat gratis open over</div>
+        <div class="aftelklok" id="aftelklok">
+          <div class="aftel-blok">
+            <div class="aftel-cijfer" id="aftel-dagen">—</div>
+            <div class="aftel-label">dagen</div>
+          </div>
+          <div class="aftel-blok">
+            <div class="aftel-cijfer" id="aftel-uren">—</div>
+            <div class="aftel-label">uren</div>
+          </div>
+          <div class="aftel-blok">
+            <div class="aftel-cijfer" id="aftel-minuten">—</div>
+            <div class="aftel-label">minuten</div>
+          </div>
+          <div class="aftel-blok">
+            <div class="aftel-cijfer" id="aftel-seconden">—</div>
+            <div class="aftel-label">seconden</div>
+          </div>
+        </div>
+        <div class="subtitle">Eén maand lang — 3 gratis bundels per bezoeker</div>
+        <div class="badge">Nog even geduld!</div>
+      `;
+
+      function update() {
+        const verschil = startDatum.getTime() - new Date().getTime();
+        const t = formatteerTijdVerschil(verschil);
+        const dE = document.getElementById('aftel-dagen');
+        const uE = document.getElementById('aftel-uren');
+        const mE = document.getElementById('aftel-minuten');
+        const sE = document.getElementById('aftel-seconden');
+        if (!dE) return; // card is al vervangen, stop interval
+        dE.textContent = t.d;
+        uE.textContent = String(t.h).padStart(2, '0');
+        mE.textContent = String(t.m).padStart(2, '0');
+        sE.textContent = String(t.s).padStart(2, '0');
+
+        // Als tijd 0 is: pagina automatisch herladen zodat de "Start de proef"
+        // knop verschijnt (mits Firebase 'actief' op dat moment true is)
+        if (verschil <= 0) {
+          clearInterval(interval);
+          setTimeout(() => location.reload(), 1000);
+        }
+      }
+      update();
+      const interval = setInterval(update, 1000);
+    }
+
+    // ── Toestand 2: Proef is ACTIEF → grote Start-knop ──────────────────
+    function toonStartKnop(eindDatum) {
+      // Maak korte datum-string "31 mei"
+      const maanden = ['januari','februari','maart','april','mei','juni',
+                       'juli','augustus','september','oktober','november','december'];
+      const eindTxt = `${eindDatum.getDate()} ${maanden[eindDatum.getMonth()]}`;
+
+      card.innerHTML = `
+        <div class="status-actief">Proef is nu live</div>
+        <h2>🎉 De proefmaand is geopend!</h2>
+        <div class="subtitle">Maak nu je 3 gratis oefenbundels.</div>
+        <a href="app.html" class="start-knop">Start de proef →</a>
+        <div class="extra-info">Nog geldig tot en met ${eindTxt} 2026</div>
+      `;
+    }
+
+    // ── Toestand 3: Proef afgelopen of uitgezet ─────────────────────────
+    function toonAfgelopen() {
+      card.innerHTML = `
+        <h2>📅 Proefmaand is afgelopen</h2>
+        <div class="subtitle">Bedankt om de Rekenbundel Generator te proberen!</div>
+        <div class="big-date" style="font-size:1.4rem;margin-top:14px;">Volgende proef in augustus 2026</div>
+        <div class="subtitle" style="margin-top:8px;">Wil je nu al aan de slag? Ontdek het volledige abonnement hieronder.</div>
+      `;
+    }
+
+    // ── Toestand 4: Fout (Firebase onbereikbaar) ────────────────────────
+    function toonFout() {
+      card.innerHTML = `
+        <h2>⏳ Start op 1 mei 2026</h2>
+        <div class="subtitle">De gratis proefmaand van de Rekenbundel Generator</div>
+        <div class="big-date">1 mei 2026</div>
+        <div class="subtitle">Eén maand lang — 3 gratis bundels per bezoeker</div>
+        <div class="badge">Kom zeker terug!</div>
+      `;
+    }
+
+    // ── Hoofdlogica ─────────────────────────────────────────────────────
+    db.collection('instellingen').doc('gratis_rekenbundel').get()
+      .then(doc => {
+        if (!doc.exists) { toonFout(); return; }
+        const d = doc.data();
+        const startDatum = parseerDatum(d.start_datum);
+        const eindDatum  = parseerDatum(d.eind_datum);
+        const actief     = d.actief === true;
+
+        if (!startDatum || !eindDatum) { toonFout(); return; }
+
+        if (isVandaagVoor(startDatum)) {
+          // Nog niet begonnen → aftelklok (ook al is actief=true)
+          toonAftelklok(startDatum);
+        } else if (isVandaagNa(eindDatum) || !actief) {
+          // Eind-datum voorbij of handmatig uitgezet
+          toonAfgelopen();
+        } else {
+          // Binnen de periode + actief = Start-knop
+          toonStartKnop(eindDatum);
+        }
+      })
+      .catch(err => {
+        console.error('Kon instellingen niet laden:', err);
+        toonFout();
+      });
+  })();
+  </script>
 
 </body>
 </html>
