@@ -2373,6 +2373,9 @@ function renderEmojiPicker(){
     });
     wrap.appendChild(btn);
   });
+  // Sync ook de grote emoji-knop zodat de gekozen emoji meteen zichtbaar is
+  const kbBtn = document.getElementById('kb-emoji-btn');
+  if(kbBtn) kbBtn.textContent = selectedEmoji;
 }
 
 function addCustomTask(){
@@ -2409,6 +2412,9 @@ function addCustomTask(){
   });
   saveState();
   input.value = '';
+  // Reset emoji-keuze naar ⭐ zodat de volgende taak weer fris begint
+  selectedEmoji = '⭐';
+  renderEmojiPicker();
   teacherSelectedTasks = new Set([...teacherSelectedTasks, state.customTasks[state.customTasks.length - 1].id]);
   // Render de juiste UI: nieuwe kindbord-wizard heeft voorrang als die actief is
   if(typeof kbRenderTaken === 'function' && document.getElementById('kb-paneel-taken')){
