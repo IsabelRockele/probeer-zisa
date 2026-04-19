@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graadsklas-weergave — Juf Zisa</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-klasbord.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --col-name:200px;
+  --col-task:100px;
+  --name-font:14px;
+  --pad:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Nunito','Segoe UI',sans-serif;background:#eef2ff;overflow:hidden;}
+
+.pro-header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:10px 20px;font-family:Nunito,sans-serif;position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;box-sizing:border-box;}
+.pro-header-left{display:flex;align-items:center;gap:10px;}
+.pro-back-btn{border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.pro-back-btn:hover{background:rgba(255,255,255,.3);}
+.pro-header-title{font-size:14px;font-weight:800;opacity:.9;}
+.pro-badge{background:rgba(255,255,255,.2);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800;letter-spacing:.05em;}
+
+#wrap{height:100vh;display:flex;flex-direction:column;padding-top:44px;}
+
+.graad-topbar{background:#fff;border-bottom:1px solid #e2e8f0;box-shadow:0 4px 14px rgba(0,0,0,.06);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;flex-wrap:wrap;}
+.graad-title{font-size:17px;font-weight:800;color:#1e1b4b;display:flex;align-items:center;gap:8px;}
+.graad-sub{font-size:12px;color:#64748b;font-weight:700;margin-top:2px;}
+.graad-btns{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.graad-btn{border:2px solid #e0e7ff;background:#f0f4ff;color:#6366f1;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.graad-btn:hover{background:#e0e7ff;}
+.graad-btn.danger{background:#fee2e2;color:#dc2626;border-color:#fecaca;}
+.graad-btn.danger:hover{background:#fecaca;}
+.graad-btn.pdf-1{background:#ffedd5;color:#9a3412;border-color:#fed7aa;}
+.graad-btn.pdf-1:hover{background:#fed7aa;}
+.graad-btn.pdf-2{background:#e0f2fe;color:#075985;border-color:#bae6fd;}
+.graad-btn.pdf-2:hover{background:#bae6fd;}
+
+#borden-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;overflow:hidden;min-height:0;min-width:0;}
+
+.graad-bord{background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,.06);display:flex;flex-direction:column;overflow:hidden;min-height:0;min-width:0;border:2.5px solid var(--bord-border);}
+
+.graad-bord.kleur-1{
+  --bord-bg:#fff7ed;--bord-bg-soft:#fffaf3;--bord-border:#fed7aa;--bord-accent:#f97316;
+  --bord-accent-bg:#ffedd5;--bord-name-bg:#fff7ed;--bord-name-bg-done:#dcfce7;
+  --bord-header-bg:linear-gradient(135deg,#fff7ed,#ffedd5);
+  --bord-label-bg:linear-gradient(135deg,#fb923c,#f97316);--bord-label-text:#fff;--bord-t-label:#9a3412;
+}
+.graad-bord.kleur-2{
+  --bord-bg:#f0f9ff;--bord-bg-soft:#f5fbff;--bord-border:#bae6fd;--bord-accent:#0ea5e9;
+  --bord-accent-bg:#e0f2fe;--bord-name-bg:#f0f9ff;--bord-name-bg-done:#dcfce7;
+  --bord-header-bg:linear-gradient(135deg,#f0f9ff,#e0f2fe);
+  --bord-label-bg:linear-gradient(135deg,#38bdf8,#0ea5e9);--bord-label-text:#fff;--bord-t-label:#075985;
+}
+
+.graad-bord-hdr{background:var(--bord-header-bg);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--bord-border);flex-shrink:0;gap:10px;}
+.graad-bord-label{display:flex;align-items:center;gap:8px;min-width:0;flex:1;}
+.graad-bord-klaslabel{background:var(--bord-label-bg);color:var(--bord-label-text);border-radius:10px;padding:5px 12px;font-size:15px;font-weight:800;flex-shrink:0;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.08);}
+.graad-bord-naam{font-size:13px;font-weight:700;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.graad-bord-hdr-acties{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.graad-bord-beheer{border:2px solid var(--bord-border);background:#fff;color:var(--bord-accent);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.graad-bord-beheer:hover{background:var(--bord-accent-bg);}
+.graad-bord-stats{font-size:12px;color:var(--bord-accent);font-weight:800;white-space:nowrap;}
+
+.graad-bord-body{position:relative;flex:1;min-height:0;min-width:0;display:flex;flex-direction:column;}
+.graad-bord-scroll{flex:1;overflow:auto;padding:0;min-height:0;min-width:0;background:var(--bord-bg-soft);-webkit-overflow-scrolling:touch;}
+.graad-bord-scroll::-webkit-scrollbar{width:10px;height:10px;}
+.graad-bord-scroll::-webkit-scrollbar-track{background:#f1f5f9;border-radius:5px;}
+.graad-bord-scroll::-webkit-scrollbar-thumb{background:var(--bord-border);border-radius:5px;}
+.graad-bord-scroll::-webkit-scrollbar-thumb:hover{background:var(--bord-accent);}
+
+.scroll-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;border:none;background:var(--bord-label-bg);color:#fff;font-size:26px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.22);font-family:inherit;transition:opacity .2s,transform .1s;padding:0;}
+.scroll-arrow:hover{transform:translateY(-50%) scale(1.08);}
+.scroll-arrow:active{transform:translateY(-50%) scale(.95);}
+.scroll-arrow.left{left:6px;}
+.scroll-arrow.right{right:6px;}
+.scroll-arrow.disabled{opacity:.25;cursor:default;pointer-events:none;}
+.scroll-arrow.touch-hidden{display:none!important;}
+
+.gb-table{border-collapse:separate;border-spacing:0;width:max-content;}
+.gb-table th,.gb-table td{padding:0;margin:0;vertical-align:middle;}
+
+.gb-table thead th{position:sticky;top:0;z-index:4;background:var(--bord-accent-bg);border-bottom:2px solid var(--bord-border);padding:6px 4px;text-align:center;}
+.gb-table thead th.gb-corner{position:sticky;top:0;left:0;z-index:6;background:var(--bord-accent-bg);width:var(--col-name);min-width:var(--col-name);text-align:left;padding:6px 10px;font-size:10px;font-weight:800;color:var(--bord-t-label);text-transform:uppercase;letter-spacing:.05em;box-shadow:2px 0 0 var(--bord-border);}
+.gb-t-icon{font-size:26px;display:block;margin:0 auto 2px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.12));}
+.gb-t-icon-custom{width:36px;height:36px;background-size:contain;background-repeat:no-repeat;background-position:center;margin:0 auto 2px;border-radius:6px;}
+.gb-t-label{font-size:11px;font-weight:800;color:var(--bord-t-label);line-height:1.1;max-width:var(--col-task);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gb-task-th{width:var(--col-task);min-width:var(--col-task);}
+
+.gb-row td{background:var(--bord-bg);border-bottom:1px solid var(--bord-border);}
+.gb-row.complete td{background:var(--bord-name-bg-done);}
+.gb-row:last-child td{border-bottom:none;}
+.gb-name-td{position:sticky;left:0;z-index:3;background:var(--bord-name-bg);width:var(--col-name);min-width:var(--col-name);padding:8px 10px;box-shadow:2px 0 0 var(--bord-border);}
+.gb-row.complete .gb-name-td{background:var(--bord-name-bg-done);}
+.gb-name-inner{display:flex;align-items:center;gap:8px;}
+.gb-name-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#c7d2fe;}
+.gb-name-dot.done{background:#16a34a;}
+.gb-name-dot.busy{background:#f59e0b;}
+.gb-name-photo{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.gb-name-text{overflow:hidden;flex:1;min-width:0;}
+.gb-name-voor{font-weight:800;font-size:var(--name-font);color:#1e1b4b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;}
+.gb-row.complete .gb-name-voor{color:#15803d;}
+
+/* ── 🔒 NOTES-KNOP per leerling (bevindingen) ── */
+.gb-notes-btn{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--bord-border);background:#fff;color:var(--bord-accent);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:inherit;padding:0;line-height:1;transition:all .12s;}
+.gb-notes-btn:hover{background:var(--bord-accent-bg);transform:scale(1.1);}
+.gb-notes-btn.has-notes{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#f59e0b;color:#92400e;}
+.gb-notes-btn.has-notes:hover{background:#fde68a;}
+body.smartboard .gb-notes-btn{display:none;}  /* Verberg in smartboardmodus */
+
+/* Notes modal */
+#notes-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px;}
+#notes-overlay.hidden{display:none;}
+.notes-modal{background:#fff;border-radius:18px;padding:24px 28px;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.notes-modal-title{font-size:18px;font-weight:800;color:#1e1b4b;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.notes-klas-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;}
+.notes-klas-badge.kleur-1{background:linear-gradient(135deg,#fb923c,#f97316);}
+.notes-klas-badge.kleur-2{background:linear-gradient(135deg,#38bdf8,#0ea5e9);}
+.notes-modal-sub{font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.6;}
+.notes-modal textarea{width:100%;min-height:140px;border:2px solid #e0e7ff;border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;resize:vertical;color:#374151;}
+.notes-modal textarea:focus{outline:none;border-color:#6366f1;}
+.notes-modal-btns{display:flex;gap:8px;margin-top:14px;}
+.notes-modal-btn{flex:1;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;}
+.notes-btn-ok{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;}
+.notes-btn-cancel{background:#f3f4f6;color:#6b7280;}
+
+.gb-task-td{width:var(--col-task);min-width:var(--col-task);text-align:center;padding:6px 0;}
+.gb-btn{width:46px;height:46px;border-radius:10px;border:2px dashed var(--bord-border);background:var(--bord-accent-bg);cursor:pointer;font-size:18px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;color:var(--bord-border);position:relative;transition:transform .1s;font-family:inherit;}
+.gb-btn::after{content:'○';position:absolute;font-size:20px;color:var(--bord-border);font-weight:400;}
+.gb-btn.status-1{background:#fef9c3;border:2px solid #f59e0b;color:#d97706;}
+.gb-btn.status-1::after,.gb-btn.status-2::after{display:none;}
+.gb-btn.status-2{background:#dcfce7;border:2px solid #16a34a;color:#15803d;}
+.gb-btn:hover{transform:scale(1.06);}
+.gb-btn.hidden-cell{visibility:hidden;}
+.gb-smiley{font-size:14px;line-height:1;margin-top:2px;display:block;}
+
+#loading,#error-screen{position:fixed;inset:0;z-index:999;background:linear-gradient(160deg,#f8fafc,#eef2ff);display:flex;align-items:center;justify-content:center;padding-top:44px;}
+#error-screen{display:none;background:linear-gradient(160deg,#fff5f5,#fef2f2);}
+#error-screen.show{display:flex;}
+.loading-card,.error-card{background:#fff;border-radius:20px;padding:28px 24px;max-width:420px;width:90%;box-shadow:0 10px 36px rgba(0,0,0,.08);text-align:center;}
+.loading-card .emoji,.error-card .emoji{font-size:38px;margin-bottom:8px;}
+.loading-card .title,.error-card .title{font-size:20px;font-weight:800;color:#1e1b4b;}
+.error-card .title{color:#991b1b;}
+.loading-card .sub,.error-card .sub{font-size:13px;color:#64748b;margin-top:6px;line-height:1.6;margin-bottom:14px;}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;}
+.overlay.hidden{display:none;}
+.modal{background:#fff;border-radius:18px;padding:24px 28px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.modal h3{font-size:18px;font-weight:800;color:#1e1b4b;margin-bottom:6px;}
+.modal p{font-size:13px;color:#4b5563;margin-bottom:14px;line-height:1.6;}
+.qr-box{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px;}
+.qr-url{font-size:10px;color:#6366f1;word-break:break-all;background:#eef2ff;border-radius:7px;padding:7px;margin-bottom:7px;font-family:monospace;line-height:1.5;flex:1;min-width:200px;}
+.qr-note{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:9px 11px;line-height:1.6;}
+.modal-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.modal-btn{flex:1;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;min-width:120px;}
+.modal-btn-ok{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;}
+.modal-btn-sec{background:#e0e7ff;color:#4338ca;}
+.modal-btn-ghost{background:#f3f4f6;color:#6b7280;}
+
+#timer-popup{display:none;position:fixed;z-index:8000;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.22);border:3px solid #e0e7ff;padding:14px 16px;user-select:none;top:100px;right:30px;min-width:200px;}
+.timer-preset{border:1.5px solid #e0e7ff;background:#f8f9ff;color:#4338ca;border-radius:7px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;}
+.timer-preset:hover{background:#e0e7ff;}
+
+@media(max-width:900px){
+  #borden-grid{grid-template-columns:1fr;overflow:auto;}
+  :root{--col-name:170px;--col-task:80px;}
+}
+
+@media print{body>*:not(#qr-print-area){display:none!important;}#qr-print-area{display:block!important;}}
+#qr-print-area{display:none;padding:30px;text-align:center;font-family:Nunito,sans-serif;}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SMARTBOARD-MODUS — alle beheer-knoppen verbergen, elementen vergroten
+   ══════════════════════════════════════════════════════════════════════ */
+body.smartboard{--col-name:260px;--col-task:140px;--name-font:18px;}
+body.smartboard .pro-header{display:none;}
+body.smartboard #wrap{padding-top:0;}
+body.smartboard .graad-bord-hdr-acties{display:none;}  /* Beheer-knoppen weg */
+body.smartboard #pdf-btn-1,
+body.smartboard #pdf-btn-2,
+body.smartboard .graad-btn.pdf-1,
+body.smartboard .graad-btn.pdf-2{display:none;}       /* PDF-knoppen weg */
+body.smartboard .graad-btn-qr,
+body.smartboard .graad-btn-sluiten{display:none;}      /* QR en Sluiten weg */
+body.smartboard .graad-btn-smartboard{display:none;}   /* Smartboard-knop zelf ook weg */
+body.smartboard .graad-bord-stats{font-size:16px;}
+body.smartboard .graad-bord-klaslabel{font-size:22px;padding:8px 18px;}
+body.smartboard .graad-bord-naam{font-size:16px;}
+body.smartboard .graad-title{font-size:22px;}
+body.smartboard .gb-t-icon{font-size:36px;}
+body.smartboard .gb-t-label{font-size:14px;}
+body.smartboard .gb-btn{width:66px;height:66px;font-size:26px;}
+body.smartboard .gb-btn::after{font-size:30px;}
+body.smartboard .gb-smiley{font-size:22px;}
+body.smartboard .gb-name-photo{width:44px;height:44px;}
+
+/* Slotje-knop in de topbar (verschijnt in smartboardmodus naast Timer) */
+.graad-btn-slot{display:none;background:rgba(30,27,75,.6);color:#fff;border:2px solid rgba(30,27,75,.35);}
+.graad-btn-slot:hover{background:rgba(30,27,75,.85);}
+body.smartboard .graad-btn-slot{display:inline-flex;}
+
+/* Smartboard-exit overlay */
+#smartboard-exit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9100;display:flex;align-items:center;justify-content:center;padding:20px;}
+#smartboard-exit-overlay.hidden{display:none;}
+#smartboard-exit-overlay .modal{max-width:420px;}
+#smartboard-exit-overlay .exit-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+#smartboard-exit-overlay .exit-btn{border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;}
+#smartboard-exit-overlay .exit-btn-prim{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;}
+#smartboard-exit-overlay .exit-btn-sec{background:#e0e7ff;color:#4338ca;}
+#smartboard-exit-overlay .exit-btn-ghost{background:#f3f4f6;color:#6b7280;}
+</style>
+</head>
+<body>
+
+<div class="pro-header">
+  <div class="pro-header-left">
+    <a href="welkomstbord.html" class="pro-back-btn">← Terug naar overzicht</a>
+    <span class="pro-header-title">📊 Graadsklas-weergave</span>
+  </div>
+  <span class="pro-badge">PRO</span>
+</div>
+
+<div id="loading">
+  <div class="loading-card">
+    <div class="emoji">📊</div>
+    <div class="title">Graadsklas laden…</div>
+    <div class="sub">Beide borden worden voorbereid.</div>
+  </div>
+</div>
+
+<div id="error-screen">
+  <div class="error-card">
+    <div class="emoji">⚠️</div>
+    <div class="title">Graadsklas niet gevonden</div>
+    <div class="sub" id="error-msg">De graadsklas-set kon niet geladen worden.</div>
+    <a href="index.html" class="graad-btn">← Terug naar keuze</a>
+  </div>
+</div>
+
+<div id="wrap" style="display:none;">
+
+  <div class="graad-topbar">
+    <div style="min-width:0;">
+      <div class="graad-title">📊 <span id="topbar-title">Graadsklas</span></div>
+      <div class="graad-sub" id="topbar-sub">Graadsklas-weergave</div>
+    </div>
+    <div class="graad-btns">
+      <button class="graad-btn pdf-1" id="pdf-btn-1" onclick="openPDF(1)" title="PDF-rapport van bord 1">📄 <span id="pdf-lbl-1">PDF</span></button>
+      <button class="graad-btn pdf-2" id="pdf-btn-2" onclick="openPDF(2)" title="PDF-rapport van bord 2">📄 <span id="pdf-lbl-2">PDF</span></button>
+      <button class="graad-btn graad-btn-qr" onclick="openQR()">📱 QR voor iPad</button>
+      <button class="graad-btn graad-btn-smartboard" onclick="startSmartboard()" title="Smartboardmodus — alle beheer verborgen">📺 Smartboard</button>
+      <button class="graad-btn" onclick="toggleTimer()">⏱️ Timer</button>
+      <button class="graad-btn graad-btn-slot" onclick="handleSmartboardExit()" title="Smartboardmodus verlaten">🔒</button>
+      <a href="welkomstbord.html" class="graad-btn danger graad-btn-sluiten">✕ Sluiten</a>
+    </div>
+  </div>
+
+  <div id="borden-grid">
+    <div class="graad-bord kleur-1">
+      <div class="graad-bord-hdr">
+        <div class="graad-bord-label">
+          <span class="graad-bord-klaslabel" id="klaslabel-1">–</span>
+          <span class="graad-bord-naam" id="bordnaam-1"></span>
+        </div>
+        <div class="graad-bord-hdr-acties">
+          <span class="graad-bord-stats" id="stats-1">0/0</span>
+          <a href="#" class="graad-bord-beheer" id="beheer-1" target="_blank" rel="noopener" title="Beheer dit bord (nieuw tabblad)">⚙️ Beheer</a>
+        </div>
+      </div>
+      <div class="graad-bord-body">
+        <div class="graad-bord-scroll" id="scroll-1">
+          <table class="gb-table" id="table-1"><thead></thead><tbody></tbody></table>
+        </div>
+        <button class="scroll-arrow left disabled"  id="arrow-left-1"  onclick="scrollBord(1,-1)" aria-label="Scroll naar links">‹</button>
+        <button class="scroll-arrow right"          id="arrow-right-1" onclick="scrollBord(1, 1)" aria-label="Scroll naar rechts">›</button>
+      </div>
+    </div>
+    <div class="graad-bord kleur-2">
+      <div class="graad-bord-hdr">
+        <div class="graad-bord-label">
+          <span class="graad-bord-klaslabel" id="klaslabel-2">–</span>
+          <span class="graad-bord-naam" id="bordnaam-2"></span>
+        </div>
+        <div class="graad-bord-hdr-acties">
+          <span class="graad-bord-stats" id="stats-2">0/0</span>
+          <a href="#" class="graad-bord-beheer" id="beheer-2" target="_blank" rel="noopener" title="Beheer dit bord (nieuw tabblad)">⚙️ Beheer</a>
+        </div>
+      </div>
+      <div class="graad-bord-body">
+        <div class="graad-bord-scroll" id="scroll-2">
+          <table class="gb-table" id="table-2"><thead></thead><tbody></tbody></table>
+        </div>
+        <button class="scroll-arrow left disabled"  id="arrow-left-2"  onclick="scrollBord(2,-1)" aria-label="Scroll naar links">‹</button>
+        <button class="scroll-arrow right"          id="arrow-right-2" onclick="scrollBord(2, 1)" aria-label="Scroll naar rechts">›</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- QR MODAL -->
+<div class="overlay hidden" id="qr-modal">
+  <div class="modal">
+    <h3>📱 QR-code voor iPad</h3>
+    <p>Laat de kinderen deze QR scannen. Ze kiezen eerst zelf hun klas <strong id="qr-klas-1">–</strong> of <strong id="qr-klas-2">–</strong>, en zien dan enkel hun eigen bord.</p>
+    <div class="qr-box">
+      <div id="qr-canvas" style="flex-shrink:0;border-radius:10px;border:3px solid #e0e7ff;padding:6px;background:#fff;"></div>
+      <div style="flex:1;min-width:200px;">
+        <div class="qr-url" id="qr-url-tekst"></div>
+        <div class="qr-note">💡 Tip: print de QR-code uit en hang hem bij de iPad-hoek. Zo kunnen kinderen altijd hun bord openen zonder jouw hulp.</div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-ok" onclick="kopieerQR()">📋 Link kopiëren</button>
+      <button class="modal-btn modal-btn-sec" onclick="printQR()">🖨️ Printen</button>
+      <button class="modal-btn modal-btn-ghost" onclick="sluitQR()">Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<div id="qr-print-area">
+  <h2 id="qr-print-titel" style="font-size:22px;color:#1e1b4b;margin-bottom:20px;">Scan om je klas te kiezen</h2>
+  <div id="qr-print-canvas" style="display:flex;justify-content:center;margin-bottom:18px;"></div>
+  <div id="qr-print-url" style="font-size:11px;color:#6b7280;word-break:break-all;"></div>
+</div>
+
+<!-- NOTES (BEVINDINGEN) MODAL -->
+<div id="notes-overlay" class="hidden" onclick="if(event.target===this)closeNotesModal()">
+  <div class="notes-modal">
+    <div class="notes-modal-title">
+      <span>🔒 Bevindingen:</span>
+      <span class="notes-klas-badge" id="notes-klas-badge">3A</span>
+      <span id="notes-pupil-name">Naam</span>
+    </div>
+    <p class="notes-modal-sub">Deze notities zijn <strong>alleen voor jou</strong> — nooit zichtbaar op het smartboard of bij de kinderen. Ze worden opgeslagen en komen in het PDF-rapport van dat klasbord.</p>
+    <textarea id="notes-input" placeholder="bv. Had veel hulp nodig · Werkte vlot en zelfstandig · Verstoorde de rust · Meer uitdaging nodig…"></textarea>
+    <div class="notes-modal-btns">
+      <button class="notes-modal-btn notes-btn-cancel" onclick="closeNotesModal()">Annuleren</button>
+      <button class="notes-modal-btn notes-btn-ok" onclick="saveNotes()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIMER POPUP -->
+<div id="timer-popup">
+  <div id="timer-drag-handle" style="cursor:move;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px;user-select:none;">
+    <span style="font-weight:800;font-size:13px;color:#6366f1;">⏱️ Werktimer</span>
+    <button onclick="toggleTimer()" style="border:none;background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 7px;cursor:pointer;font-size:13px;">✕</button>
+  </div>
+  <div id="timer-setup" style="text-align:center;">
+    <div style="font-size:11px;font-weight:700;color:#6b7280;margin-bottom:6px;">Stel de werktijd in</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
+      <button onclick="adjustTime(-5)" style="border:none;background:#e0e7ff;color:#4338ca;border-radius:8px;width:28px;height:28px;font-size:16px;cursor:pointer;font-weight:800;line-height:1;">−</button>
+      <span id="timer-set-display" style="font-size:24px;font-weight:800;color:#1e1b4b;min-width:60px;text-align:center;">15:00</span>
+      <button onclick="adjustTime(5)" style="border:none;background:#e0e7ff;color:#4338ca;border-radius:8px;width:28px;height:28px;font-size:16px;cursor:pointer;font-weight:800;line-height:1;">+</button>
+    </div>
+    <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+      <button onclick="setTimerPreset(5)"  class="timer-preset">5'</button>
+      <button onclick="setTimerPreset(10)" class="timer-preset">10'</button>
+      <button onclick="setTimerPreset(15)" class="timer-preset">15'</button>
+      <button onclick="setTimerPreset(20)" class="timer-preset">20'</button>
+      <button onclick="setTimerPreset(30)" class="timer-preset">30'</button>
+    </div>
+    <button onclick="startTimer()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:9px 0;font-size:15px;font-weight:800;cursor:pointer;width:100%;">▶ Starten</button>
+  </div>
+  <div id="timer-running" style="display:none;text-align:center;">
+    <div id="timer-digital" style="font-size:36px;font-weight:800;color:#1e1b4b;letter-spacing:1px;line-height:1;margin-bottom:8px;">15:00</div>
+    <div style="background:#e0e7ff;border-radius:5px;height:7px;width:140px;margin:0 auto 10px;overflow:hidden;">
+      <div id="timer-progress" style="height:100%;background:linear-gradient(90deg,#6366f1,#22c55e);border-radius:5px;width:100%;transition:width .5s;"></div>
+    </div>
+    <div style="display:flex;gap:5px;justify-content:center;">
+      <button onclick="pauseResumeTimer()" id="timer-pause-btn" style="background:#fef3c7;color:#92400e;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer;">⏸ Pauze</button>
+      <button onclick="resetTimer()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer;">↺ Stop</button>
+    </div>
+  </div>
+  <div id="timer-done" style="display:none;text-align:center;">
+    <div style="font-size:40px;margin-bottom:6px;">🔔</div>
+    <div style="font-size:18px;font-weight:800;color:#16a34a;margin-bottom:10px;">Tijd is om!</div>
+    <button onclick="resetTimer()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:9px 0;font-size:14px;font-weight:800;cursor:pointer;width:100%;">Nieuwe timer</button>
+  </div>
+</div>
+
+<!-- Exit-overlay (voor smartboardmodus verlaten) -->
+<div id="smartboard-exit-overlay" class="hidden" onclick="if(event.target===this)sluitSmartboardExit()">
+  <div class="modal">
+    <h3>🔒 Smartboardmodus verlaten</h3>
+    <p>Wat wil je doen?</p>
+    <div class="exit-btns">
+      <button class="exit-btn exit-btn-prim" onclick="exitSmartboard('bord')">↩️ Terug naar normale weergave</button>
+      <button class="exit-btn exit-btn-sec" onclick="exitSmartboard('welkom')">🏠 Terug naar overzicht</button>
+      <button class="exit-btn exit-btn-ghost" onclick="sluitSmartboardExit()">Annuleren</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEMO: geen login, geen Firebase. demo-config-graad.js laadt de dummy-data -->
+<script src="demo-config-graad.js"></script>
+<script src="klasbord_graad.js"></script>
+
+<!-- ─── Bezoekers-teller voor probeer-zisa statistieken ─── -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../../teller.js" data-pagina="demo-graadsklas"></script>
+</body>
+</html>
