@@ -2410,7 +2410,12 @@ function addCustomTask(){
   saveState();
   input.value = '';
   teacherSelectedTasks = new Set([...teacherSelectedTasks, state.customTasks[state.customTasks.length - 1].id]);
-  renderTeacherModal();
+  // Render de juiste UI: nieuwe kindbord-wizard heeft voorrang als die actief is
+  if(typeof kbRenderTaken === 'function' && document.getElementById('kb-paneel-taken')){
+    kbRenderTaken();
+  } else {
+    renderTeacherModal();
+  }
 }
 
 function selectAllPupils(){
