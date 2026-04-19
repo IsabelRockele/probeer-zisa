@@ -2376,7 +2376,21 @@ function renderEmojiPicker(){
 }
 
 function addCustomTask(){
-  const input = document.getElementById('customTaskInput');
+  // Zoek het zichtbare invoerveld (er zijn twee mogelijke id's door UI-herontwerp)
+  const candidates = ['newTaskInput', 'customTaskInput'];
+  let input = null;
+  for(const id of candidates){
+    const el = document.getElementById(id);
+    if(el && el.offsetParent !== null){ input = el; break; }
+  }
+  // Fallback: als geen van beide zichtbaar is, pak gewoon de eerste die bestaat
+  if(!input){
+    for(const id of candidates){
+      const el = document.getElementById(id);
+      if(el){ input = el; break; }
+    }
+  }
+  if(!input) return;
   const label = input.value.trim();
   if(!label){
     alert('Typ eerst een taaknaam.');
