@@ -1,0 +1,78 @@
+/* ══════════════════════════════════════════════════════════════
+   REKENTAAL — CSS snippets
+   Voeg toe in de <style> sectie van index.html
+   (of in style.css als je dat prefereert)
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Invulhokje in preview en afgedrukte zinnen ────────────── */
+.rt-invulhokje {
+  display: inline-block;
+  min-width: 26px;
+  height: 14px;
+  border: 1.5px solid #1A3A5C;
+  border-radius: 3px;
+  background: #f0f6ff;
+  margin: 0 3px;
+  vertical-align: middle;
+}
+
+/* ── Oefeningen-lijst in de preview ────────────────────────── */
+.rt-oefeningen-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px 0;
+}
+
+.rt-oef-rij {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fbff;
+  border: 1px solid #d0e2f5;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.rt-oef-zin {
+  flex: 1;
+  min-width: 160px;
+  color: #1e2d40;
+  line-height: 1.6;
+}
+
+.rt-oef-zin strong {
+  color: #1A3A5C;
+  font-weight: 700;
+}
+
+.rt-oef-bew {
+  white-space: nowrap;
+  color: #667;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rt-oef-lijn {
+  display: inline-block;
+  width: 80px;
+  border-bottom: 1.5px solid #8899bb;
+}
+
+/* ── Categorie-header knop actief ──────────────────────────── */
+.rt-cat-btn.geselecteerd {
+  background: #1A3A5C !important;
+  color: #fff !important;
+  border-color: #1A3A5C !important;
+}
+
+/* ── Tab kleur voor het rekentaal tabblad ──────────────────── */
+.tab-rekentaal.active,
+.tab-rekentaal:hover {
+  background: #1A3A5C;
+  color: #fff;
+}
