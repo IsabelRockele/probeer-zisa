@@ -1,0 +1,2930 @@
+/* ══════════════════════════════════════════════════════════════
+   style.css — Rekenbundel Generator
+   Verantwoordelijkheid: ENKEL visuele opmaak
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── RESET & BASIS ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; }
+
+:root {
+  --blauw:      #1A3A5C;
+  --lichtblauw: #4A90D9;
+  --accent:     #c4c22c;
+  --groen:      #27AE60;
+  --rood:       #E74C3C;
+  --bg:         #F4F6FB;
+  --wit:        #FFFFFF;
+  --border:     #D8E2F0;
+  --tekst:      #2C3E50;
+  --muted:      #7F8C9A;
+  --sidebar-w:  380px;
+  --header-h:   64px;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--tekst);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ────────────────────────────────────────────────── */
+header {
+  height: var(--header-h);
+  background: #f4deee;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+}
+
+header .logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a3a5c;
+  letter-spacing: -.5px;
+}
+
+header .logo span {
+  color: var(--accent);
+}
+
+header .subtitle {
+  font-size: 13px;
+  color: rgba(18, 45, 73, 0.7);
+  margin-left: 4px;
+}
+
+header .spacer {
+  flex: 1;
+}
+
+header .badge {
+  background: #1a3a5c;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+
+/* ── MAIN LAYOUT ───────────────────────────────────────────── */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ───────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--wit);
+  border-right: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sidebar-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-bottom: 2px solid var(--border);
+  background: #ffffff;
+  scrollbar-gutter: stable;
+}
+
+.sidebar-tabs::-webkit-scrollbar {
+  height: 14px;
+}
+
+.sidebar-tabs::-webkit-scrollbar-track {
+  background: #eaf2fb;
+}
+
+.sidebar-tabs::-webkit-scrollbar-thumb {
+  background: #be66b5;
+  border-radius: 999px;
+}
+
+.sidebar-tabs::-webkit-scrollbar-thumb:hover {
+  background: #be66b5;
+}
+
+.sidebar-tab {
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding: 12px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all .2s;
+  white-space: normal;
+}
+.sidebar-tab.active {
+  color: var(--lichtblauw);
+  border-bottom-color: var(--lichtblauw);
+  background: var(--wit);
+}
+.tabs-scroll-btn{
+  margin-left:8px;
+  padding:2px 8px;
+  border:none;
+  background:#be66b5;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.tabs-scroll-btn:hover{
+  background:#be66b5;
+}
+/* --- NIEUWE STIJL VOOR DE TABBLADEN --- */
+
+/* Basis instelling voor alle tabs zodat de transitie vloeiend is */
+.sidebar-tab {
+  transition: all 0.2s ease;
+  border-bottom: 4px solid transparent;
+  opacity: 1 !important;
+  font-size: 13px;
+  padding: 14px 8px;
+}
+
+/* 1. Optellen (Blauw) */
+.sidebar-tab.tab-optellen { background-color: #A2D2FF; color: #1A3A5C; }
+.sidebar-tab.tab-optellen:hover { background-color: #8ECAFF; }
+.sidebar-tab.tab-optellen.active { 
+  background-color: #96c3f3 !important; 
+  color: #ffffff;
+  border-bottom-color: #1A3A5C !important;
+  font-weight: 800;
+}
+
+/* 2. Aftrekken (Rood/Roze) */
+.sidebar-tab.tab-aftrekken { background-color: #FFB3B3; color: #1A3A5C; }
+.sidebar-tab.tab-aftrekken:hover { background-color: #FF9999; }
+.sidebar-tab.tab-aftrekken.active { 
+  background-color: #E74C3C !important; 
+  color: #ffffff;
+  border-bottom-color: #B71C1C !important;
+  font-weight: 800;
+}
+
+/* 3. Herken Brug (Geel/Oranje) */
+.sidebar-tab.tab-gemengd { background-color: #FFD0A0; color: #1A3A5C; }
+.sidebar-tab.tab-gemengd:hover { background-color: #FFC080; }
+.sidebar-tab.tab-gemengd.active {
+  background-color: #FF8C00;
+  color: #fff;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.15);
+}
+
+.sidebar-tab.tab-komma { background-color: #d4edda; color: #1A3A5C; }
+.sidebar-tab.tab-komma:hover { background-color: #b8dfc2; }
+.sidebar-tab.tab-komma.active {
+  background-color: #28a745;
+  color: #fff;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,.15);
+}
+
+.sidebar-tab.tab-brug { background-color: #ffe595; color: #1A3A5C; }
+.sidebar-tab.tab-brug:hover { background-color: #fcde7e; }
+.sidebar-tab.tab-brug.active { 
+  background-color: #ecdc5f !important; 
+  color: #ffffff;
+  border-bottom-color: #E67E22 !important;
+  font-weight: 800;
+}
+
+/* 4. Splitsen (Groen) */
+.sidebar-tab.tab-splits { background-color: #A5D6A7; color: #1A3A5C; }
+.sidebar-tab.tab-splits:hover { background-color: #60b064; }
+.sidebar-tab.tab-splits.active { 
+  background-color: #27AE60 !important; 
+  color: #ffffff;
+  border-bottom-color: #1B5E20 !important;
+  font-weight: 800;
+}
+.sidebar-tab.tab-tafels { background-color: #E1BEE7; color: #1A3A5C; }
+.sidebar-tab.tab-tafels:hover { background-color: #CE93D8; }
+.sidebar-tab.tab-tafels.active { 
+  background-color: #9733b3 !important; 
+  color: #ffffff;
+  border-bottom-color: #4A148C !important;
+  font-weight: 800;
+}
+.tab-cijferen {
+  background: #f4e8fb;
+  color: #1A3A5C;
+}
+
+.tab-cijferen:hover {
+  background: #ead7f6;
+  color: #fcfcf8;
+  font-weight: 800;
+}
+
+.tab-cijferen.active {
+  background: #8e44ad;
+  color: #ffffff;
+  border-bottom-color: #8e44ad;
+}
+.sidebar-content { flex: 1; overflow-y: auto; padding: 20px; }
+
+/* ── BUNDEL INFO ───────────────────────────────────────────── */
+.bundel-info {
+  background: linear-gradient(135deg, #EBF3FB 0%, #F8FAFD 100%);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.bundel-info label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+.bundel-info input {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--tekst);
+  background: var(--wit);
+  outline: none;
+  transition: border-color .2s;
+  margin-bottom: 12px;
+}
+.bundel-info input:focus { border-color: var(--lichtblauw); }
+.bundel-info input:last-child { margin-bottom: 0; }
+
+/* ── SECTIETITEL ───────────────────────────────────────────── */
+.sectie-titel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── CONFIGURATIE KAART ────────────────────────────────────── */
+.config-kaart {
+  background: var(--wit);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.config-kaart .kaart-titel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blauw);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.config-kaart .kaart-titel .icon {
+  width: 28px; height: 28px;
+  background: var(--blauw);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ── FORM ELEMENTEN ────────────────────────────────────────── */
+.form-rij { margin-bottom: 12px; }
+.form-rij label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 5px;
+}
+.form-rij select,
+.form-rij input[type="number"],
+.form-rij input[type="text"] {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--tekst);
+  background: var(--wit);
+  outline: none;
+  transition: border-color .2s;
+  appearance: none;
+}
+.form-rij select:focus,
+.form-rij input:focus { border-color: var(--lichtblauw); }
+
+/* Checkbox chips */
+.checkbox-groep { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+.checkbox-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: #ffffff;
+  transition: all .2s;
+  user-select: none;
+}
+.checkbox-chip input { display: none; }
+.checkbox-chip.geselecteerd { border-color: var(--lichtblauw); background: #EBF3FB; color: var(--lichtblauw); }
+
+/* Vink chips (voor oefeningstypes) */
+.vink-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: #ffffff;
+  transition: all .2s;
+  user-select: none;
+}
+.vink-chip.geselecteerd {
+  border-color: var(--lichtblauw);
+  background: #EBF3FB;
+  color: var(--blauw);
+}
+.vink-box {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--wit);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--lichtblauw);
+  flex-shrink: 0;
+  transition: all .2s;
+}
+.vink-chip.geselecteerd .vink-box {
+  border-color: var(--lichtblauw);
+  background: var(--lichtblauw);
+  color: var(--wit);
+}
+
+/* Radio chips */
+.radio-groep { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 4px; }
+.radio-chip {
+  padding: 5px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: #ffffff;
+  transition: all .2s;
+  user-select: none;
+}
+.radio-chip input { display: none; }
+.radio-chip.geselecteerd { border-color: var(--lichtblauw); background: #EBF3FB; color: var(--lichtblauw); }
+.radio-chip.radio-chip-binnenkort {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+/* ── KNOPPEN ───────────────────────────────────────────────── */
+.btn-toevoegen {
+  width: 100%;
+  padding: 12px;
+  background: var(--lichtblauw);
+  color: var(--wit);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all .2s;
+  margin-top: 4px;
+}
+.btn-toevoegen:hover { background: var(--blauw); transform: translateY(-1px); }
+
+.btn-genereer {
+  padding: 9px 20px;
+  background: var(--groen);
+  color: var(--wit);
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .2s;
+}
+.btn-genereer:hover { background: #219A52; }
+.btn-genereer:disabled { opacity: .4; cursor: not-allowed; }
+
+.btn-pdf {
+  padding: 9px 20px;
+  background: var(--rood);
+  color: var(--wit);
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .2s;
+}
+.btn-pdf:hover { background: #C0392B; }
+.btn-pdf:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── PREVIEW ZONE ──────────────────────────────────────────── */
+.preview-zone { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  background: var(--wit);
+  border-bottom: 2px solid var(--border);
+  gap: 12px;
+  flex-shrink: 0;
+}
+.preview-toolbar .toolbar-titel { font-size: 14px; font-weight: 700; color: var(--blauw); flex: 1; }
+.preview-toolbar .bundel-teller {
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--bg);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.preview-inhoud { flex: 1; overflow-y: scroll; padding: 24px; min-height: 0; display: block; }
+.preview-blok { margin-bottom: 16px; }
+
+/* Herken-brug oefening */
+.oefening-herken {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 6px 10px 12px;
+  gap: 6px;
+}
+.lamp-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.lamp-kader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--blauw);
+  border-radius: 6px;
+  padding: 4px;
+  background: var(--wit);
+}
+
+/* Ingekleurd bij oplossing: brugoefening */
+.lamp-brug-oplossing {
+  background: #c6efce !important;
+  border-color: #27ae60 !important;
+}
+
+/* Getallenlijn zelf: boogjes verborgen tot oplossing getoond - opacity via JS */
+.gl-boog-oplossing {
+  /* opacity geregeld via setAttribute in toggle */
+}
+.zisa-lamp {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.9;
+}
+.oefening-herken .oef-tekst {
+  width: 100%;
+  text-align: center;
+}
+.oefening-herken .antwoord-vak {
+  width: 44px;
+  align-self: center;
+}
+
+/* ── LEGE STATE ────────────────────────────────────────────── */
+.leeg-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--muted);
+  text-align: center;
+  padding: 60px 40px;
+  min-height: 300px;
+}
+.leeg-state .leeg-icon { font-size: 56px; opacity: .3; }
+.leeg-state .leeg-titel { font-size: 18px; font-weight: 700; color: var(--blauw); opacity: .4; }
+.leeg-state .leeg-tekst { font-size: 14px; max-width: 300px; line-height: 1.6; }
+
+/* ── PREVIEW BLOK KAART ────────────────────────────────────── */
+.preview-blok {
+  background: var(--wit);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+.preview-blok-header {
+  background: linear-gradient(135deg, var(--blauw) 0%, #2A5298 100%);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.preview-blok-header .blok-type-badge {
+  background: rgba(255,255,255,.2);
+  color: var(--wit);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  letter-spacing: .4px;
+}
+.preview-blok-header .blok-niveau { color: var(--accent); font-size: 12px; font-weight: 700; }
+.preview-blok-header .spacer { flex: 1; }
+.preview-blok-header .blok-acties { display: flex; gap: 6px; }
+
+.btn-blok-actie {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.btn-blok-actie.verwijder { background: rgba(231,76,60,.8); color: var(--wit); }
+.btn-blok-actie.verwijder:hover { background: var(--rood); }
+
+.preview-blok-body { padding: 16px; }
+
+.opdrachtzin-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.opdrachtzin-tekst { font-size: 14px; font-weight: 600; color: var(--blauw); flex: 1; }
+.opdrachtzin-input {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blauw);
+  border: 1.5px solid var(--lichtblauw);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: inherit;
+  outline: none;
+}
+.btn-bewerk-zin {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--muted);
+  transition: color .15s;
+  padding: 2px;
+}
+.btn-bewerk-zin:hover { color: var(--lichtblauw); }
+
+/* Oefeningen grid */
+.oefeningen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.oefeningen-grid.aanvullen-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.oefeningen-grid.aanvullen-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.oefening-item {
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 10px 10px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tekst);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  position: relative;
+  min-height: 52px;
+}
+/* Som-inhoud links bijeenhouden, delete-knop rechts */
+.oefening-item .som-inhoud {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+.oefening-item .antwoord-vak {
+  display: inline-block;
+  width: 44px;
+  height: 28px;
+  border: 1.5px solid var(--blauw);
+  border-radius: 8px;
+  background: var(--wit);
+  margin-left: 1px;
+  flex-shrink: 0;
+}
+.oefening-item .btn-del-oef {
+  opacity: 0;
+  background: var(--rood);
+  color: var(--wit);
+  border: none;
+  border-radius: 4px;
+  width: 18px; height: 18px;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .15s;
+  flex-shrink: 0;
+}
+.oefening-item:hover .btn-del-oef { opacity: 1; }
+
+.preview-blok-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FAFBFD;
+}
+.footer-info { font-size: 12px; color: var(--muted); }
+.btn-add-oef {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lichtblauw);
+  background: #EBF3FB;
+  border: 1px solid #C3DAFA;
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-add-oef:hover { background: var(--lichtblauw); color: var(--wit); }
+
+/* ── SCROLLBAR ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #B0C4D8; }
+
+/* ── TOAST ─────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--blauw);
+  color: var(--wit);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  transition: transform .3s ease;
+  z-index: 999;
+  white-space: nowrap;
+}
+.toast.zichtbaar { transform: translateX(-50%) translateY(0); }
+
+/* ── Hulpmiddelen layout ─────────────────────────────────────── */
+.oefeningen-grid.hulp-grid {
+  grid-template-columns: repeat(2, minmax(0, 280px));
+  gap: 12px;
+}
+.oefening-hulp {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding: 10px 10px 18px 10px;
+  background: #ffffff;
+  position: relative;
+  min-height: 128px;
+  /* Kader past zich automatisch aan schrijflijnen aan */
+  height: auto;
+}
+
+/* Groter kader bij 3 schrijflijnen */
+.oefening-hulp .hulp-schrijflijnen:has(.schrijflijn:nth-child(3)) {
+  margin-bottom: 6px;
+}
+.oefening-hulp.aftrektal-hulp { padding-left: 30px; }
+.oefening-hulp.aftrektal-hulp.aftrektal-hulp-groot { padding-left: 54px; }
+
+.hulp-som-rij {
+  display: flex; align-items: center; white-space: nowrap;
+  position: relative;
+}
+.hulp-rechts { display: none; }  /* antwoordvak nu inline in som-rij */
+.hulp-splits-rij {
+  padding-top: 2px;
+  position: relative;
+}
+.splitsbeen-anker {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.splitsbeen-boom {
+  width: 48px; height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='16'%3E%3Cpolyline points='4,16 24,2 44,16' fill='none' stroke='%231a3a5c' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 48px 16px;
+}
+.splitsbeen-boom.splitsbeen-3 {
+  width: 72px; height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='16'%3E%3Cline x1='36' y1='2' x2='6' y2='16' stroke='%231a3a5c' stroke-width='2'/%3E%3Cline x1='36' y1='2' x2='36' y2='16' stroke='%231a3a5c' stroke-width='2'/%3E%3Cline x1='36' y1='2' x2='66' y2='16' stroke='%231a3a5c' stroke-width='2'/%3E%3C/svg%3E");
+  background-size: 72px 16px;
+}
+.splitsbeen-vakjes { display: flex; gap: 8px; margin-top: 4px; }
+.splits-vak {
+  width: 26px; height: 22px;
+  border: 1.5px solid var(--blauw);
+  border-radius: 4px; background: white;
+}
+/* Bredere vakjes voor getallen tot 10.000 */
+.splits-vak-groot {
+  width: 30px; height: 22px;
+  border: 1.5px solid var(--blauw);
+  border-radius: 4px; background: white;
+}
+.splitsbeen-boom-groot {
+  width: 72px; height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='16'%3E%3Cpolyline points='4,16 36,2 68,16' fill='none' stroke='%231a3a5c' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 72px 16px;
+}
+.hulp-schrijflijnen {
+  position: absolute;
+  left: 128px;
+  right: 14px;
+  top: 54px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+}
+
+/* Bij 3 schrijflijnen: kader moet groter */
+.oefening-hulp:has(.schrijflijn:nth-child(3)) {
+  min-height: 168px !important;
+  padding-bottom: 24px !important;
+}
+.oefening-hulp.niveau-10000 .hulp-schrijflijnen {
+  left: 158px;
+}
+
+.hulp-schrijflijnen .schrijflijn {
+  height: 0;
+  width: 100%;
+  border-bottom: 1.5px solid #B0C4D8;
+  margin-bottom: 12px;
+}
+.oefening-hulp .btn-del-oef {
+  position: absolute !important;
+  top: 6px; right: 6px;
+}
+.splits-doel { display: inline; }
+.hulp-schrijflijnen-inline { display: none; }
+
+/* ── Aanvullen algemeen ───────────────────────────────────── */
+.oefening-aanvullen {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 28px 12px 10px;
+  min-height: 80px;
+}
+.aanvullen-rij {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.invulhokje {
+  display: inline-block;
+  width: 36px;
+  height: 26px;
+  border: 1.5px solid var(--blauw);
+  border-radius: 6px;
+  background: white;
+  flex-shrink: 0;
+}
+
+/* ── Aanvullen zonder schema ──────────────────────────────── */
+.aanvullen-zonder .aanvullen-rij + .aanvullen-rij {
+  margin-top: 4px;
+}
+
+/* ── Aanvullen met schema ─────────────────────────────────── */
+.aanvullen-schema {
+  align-items: center;
+}
+.aanvullen-tabel {
+  display: flex;
+  flex-direction: column;
+  width: 120px;
+  border: 1.5px solid var(--blauw);
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 700;
+}
+.aanvullen-groot {
+  background: #D6EAF8;
+  text-align: center;
+  padding: 5px 0;
+  border-bottom: 1.5px solid var(--blauw);
+}
+.aanvullen-rij-onder {
+  display: flex;
+}
+.aanvullen-klein {
+  flex: 3;
+  background: #D5F5E3;
+  text-align: center;
+  padding: 5px 0;
+  border-right: 1.5px solid var(--blauw);
+}
+.aanvullen-vraag {
+  flex: 1;
+  background: #FDFEFE;
+  text-align: center;
+  padding: 5px 0;
+  color: #999;
+}
+
+/* ── Aanvullen met schijfjes ──────────────────────────────── */
+.aanvullen-schijfjes { gap: 6px; }
+.aanvullen-sommen { display: flex; flex-direction: column; gap: 6px; }
+
+/* Tabel: T-kolom | E-kolom met gekleurde headers */
+.schijfjes-tabel {
+  display: flex;
+  border: 1.5px solid #aaa;
+  border-radius: 6px;
+  overflow: hidden;
+  width: fit-content;
+}
+.schijfjes-kolom {
+  display: flex;
+  flex-direction: column;
+  min-width: 72px;
+}
+.schijfjes-kolom-d {
+  min-width: 60px;
+}
+.schijfjes-kolom + .schijfjes-kolom {
+  border-left: 1.5px solid #aaa;
+}
+.schijfjes-kop {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 3px 0;
+  border-bottom: 1.5px solid #aaa;
+}
+.schijfjes-kop-d {
+  background: #E74C3C;
+  color: #fff;
+}
+.schijfjes-kop-h {
+  background: #85C1E9;
+  color: #1A3A6B;
+}
+.schijfjes-kop-t {
+  background: #52BE80;
+  color: #0B5A2A;
+}
+.schijfjes-kop-e {
+  background: #F9CA3F;
+  color: #6B4F00;
+}
+.schijfjes-rij {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 6px 5px;
+}
+.schijfje {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+}
+.schijfje-d {
+  background: #E74C3C;
+  border: 1.5px solid #922B21;
+  color: #fff;
+}
+.schijfje-h {
+  background: #5DADE2;
+  border: 1.5px solid #1A5276;
+  color: #0A2A5C;
+}
+.schijfje-t {
+  background: #27AE60;
+  border: 1.5px solid #0B5A2A;
+  color: #072A13;
+}
+.schijfje-e {
+  background: #F4D03F;
+  border: 1.5px solid #9A7D0A;
+  color: #6B4F00;
+}
+.schijfje-leeg {
+  background: white;
+  border: 1.5px dashed #BDC3C7;
+}
+
+/* Extra lege schijfjes onderaan voor aanvullen inkleuren */
+.schijfje-aanvul {
+  background: #fafcff;
+  border: 1.5px dashed #d8e4ef;
+  opacity: 0.55;
+}
+
+/* ══════════════════════════════════════════════════════
+   COMPENSEREN
+   ══════════════════════════════════════════════════════ */
+
+.oefeningen-grid.comp-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* Oefening: flex row — comp-grid links, schrijflijnen rechts */
+.oefening-comp {
+  display: flex !important;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px 28px 14px 10px;
+  position: relative;
+}
+.oefening-comp.comp-voorbeeld {
+  background: #FFF3CD !important;
+  border-color: #F0A500 !important;
+}
+
+/* Hoofdgrid: 4 kolommen × 3 rijen
+   kol1=prefix  kol2=kring  kol3=suffix  kol4=antwoordvak
+   rij1: som tekst
+   rij2: leeg   pijl        leeg         leeg
+   rij3: blokje (span kol1-3)            leeg             */
+.comp-grid {
+  display: inline-grid;
+  grid-template-columns: auto auto auto auto;
+  grid-template-rows: auto auto auto;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  row-gap: 2px;
+  column-gap: 0;
+  align-items: center;
+}
+
+/* Rij 1 */
+.cg-pre  { grid-column: 1; grid-row: 1; }
+.cg-k    { grid-column: 2; grid-row: 1; display: flex; align-items: center; }
+.cg-suf  { grid-column: 3; grid-row: 1; }
+.cg-av   { grid-column: 4; grid-row: 1; padding-left: 6px; display: flex; align-items: center; }
+
+/* Rij 2: pijl — grid-column 2 = altijd exact onder kring */
+.cg-pijl {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--tekst);
+}
+
+/* Rij 3: blokje — kol 1-3, links uitgelijnd */
+.cg-blok {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+}
+
+.comp-kring {
+  display: inline-block;
+  border: 2px solid var(--tekst);
+  border-radius: 50%;
+  padding: 0 4px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.comp-blokje {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 2px solid var(--primair);
+  border-radius: 6px;
+  padding: 2px 8px;
+  background: #EAF4FB;
+  white-space: nowrap;
+}
+.comp-blokje-teken { font-size: 12px; font-weight: 700; color: var(--primair); }
+.comp-blokje-getal { font-size: 12px; font-weight: 700; color: var(--tekst); }
+.comp-blokje-hokje {
+  display: inline-block; width: 20px; height: 16px;
+  border: 1.5px solid var(--primair); border-radius: 3px; background: white;
+}
+.comp-blokje-hokje-breed { width: 34px; }
+
+/* Schrijflijnen rechts */
+.comp-schrijf {
+  display: flex; flex-direction: column; flex: 1;
+  padding-top: 40px; min-width: 70px;
+}
+.comp-schrijflijn {
+  display: flex; flex-direction: column; justify-content: flex-end;
+  height: 26px; border-bottom: 1.5px solid #B0C4D8; margin-bottom: 8px;
+}
+.comp-schrijf-tekst { font-size: 11px; color: #444; padding-bottom: 2px; }
+
+.antwoord-ingevuld {
+  background: #F0A500 !important; color: white !important;
+  border-color: #cc8800 !important; display: inline-flex !important;
+  align-items: center !important; justify-content: center !important;
+  font-weight: 700 !important;
+}
+.oefening-comp .btn-del-oef { position: absolute !important; top: 6px; right: 6px; }
+/* ══════════════════════════════════════════════════════════
+   SPLITSINGEN — preview stijlen
+══════════════════════════════════════════════════════════ */
+
+/* Grid: 4 per rij voor klein splitshuis */
+.splits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 10px;
+  align-items: start;
+}
+
+/* Basis override */
+.oefening-splits {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 8px 28px;
+  min-height: 90px;
+}
+
+/* ─────────────────────────────────────────
+   KLEIN SPLITSHUIS
+   Visueel huisje: driehoekig dak + 2 kamers
+───────────────────────────────────────── */
+.splitshuis-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* DAK: driehoek via clip-path + inhoud gecentreerd */
+.sh-dak {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sh-dak-driehoek {
+  width: 0;
+  height: 0;
+  border-left: 44px solid transparent;
+  border-right: 44px solid transparent;
+  border-bottom: 34px solid #4A90D9;
+  position: relative;
+}
+
+.sh-dak-driehoek::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: -38px;
+  width: 0;
+  height: 0;
+  border-left: 38px solid transparent;
+  border-right: 38px solid transparent;
+  border-bottom: 28px solid #EAF4FB;
+}
+
+.sh-dak-inhoud {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -20%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* MUUR: rechthoek met 2 kamers en scheidingswand */
+.sh-muur {
+  width: 88px;
+  border: 2px solid #4A90D9;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  background: white;
+  display: flex;
+  align-items: stretch;
+  min-height: 38px;
+}
+
+.sh-kamer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+}
+
+.sh-scheidingswand {
+  width: 2px;
+  background: #4A90D9;
+  flex-shrink: 0;
+}
+
+/* Getallen in het huis */
+.sh-dak-getal {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1A3A5C;
+  line-height: 1;
+}
+
+.sh-kamer-getal {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A3A5C;
+  line-height: 1;
+}
+
+/* Invulvakjes */
+.sh-vakje {
+  display: inline-block;
+  border: 1.5px solid #1A3A5C;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.sh-vakje-dak {
+  width: 28px;
+  height: 20px;
+}
+
+.sh-vakje-kamer {
+  width: 28px;
+  height: 22px;
+}
+
+/* ─────────────────────────────────────────
+   SPLITSBEEN — omgekeerde V
+───────────────────────────────────────── */
+.oefening-splitsbeen {
+  padding: 6px 8px 28px;
+}
+
+.splitsbeen-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+}
+
+/* Bovenaan: getal of vakje */
+.sb-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+/* De V-vorm via SVG */
+.sb-v-svg {
+  width: 64px;
+  height: 22px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Onderaan: twee vakjes naast elkaar */
+.sb-onder {
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.sb-cel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+}
+
+/* Gedeelde stijlen getal / vakje */
+/* Alle getallen in een hokje — gegeven getallen én invulhokjes */
+.sb-hokje {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 26px;
+  border: 1.2px solid #1A3A5C;
+  border-radius: 3px;
+  background: white;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1A3A5C;
+}
+
+/* ─────────────────────────────────────────
+   GROOT SPLITSHUIS
+───────────────────────────────────────── */
+/* Grid: 4 per rij, align top zodat verschillende hoogtes niet overlappen */
+.splits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 10px;
+  align-items: start;  /* crucciaal: elk huis start bovenaan, geen overlap */
+}
+
+.oefening-grootsplitshuis {
+  padding: 6px 8px 28px;
+}
+
+/* Muur met meerdere verdiepen */
+.sh-muur-groot {
+  display: flex;
+  flex-direction: column;
+  width: 88px;
+}
+
+.sh-muur-rij {
+  display: flex;
+  align-items: stretch;
+  min-height: 30px;
+  border-bottom: 1px solid #B0C8E8;
+}
+
+.sh-muur-rij:last-child {
+  border-bottom: none;
+}
+
+/* ─────────────────────────────────────────
+   SPLITSBEEN + BEWERKINGEN
+───────────────────────────────────────── */
+/* Grid: 3 per rij voor dit type */
+.splits-grid:has(.oefening-sbw) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.oefening-sbw {
+  padding: 4px 6px 28px;
+}
+
+/* Kader rond de hele oefening */
+.sbw-kader {
+  border: 2px solid #4A90D9;
+  border-radius: 8px;
+  padding: 10px 10px 8px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Splitsbeen iets compacter in kader */
+.sbw-been {
+  padding-bottom: 0;
+}
+
+/* Bewerkingen sectie */
+.sbw-bewerkingen {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid #D0E4F5;
+}
+
+.sbw-bewerking {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  justify-content: center;
+}
+
+.sbw-vak {
+  display: inline-block;
+  width: 28px;
+  height: 20px;
+  border-bottom: 1.5px solid #1A3A5C;
+  flex-shrink: 0;
+}
+
+.sbw-op, .sbw-is {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A3A5C;
+  flex-shrink: 0;
+  padding-bottom: 1px;
+}
+
+/* ─────────────────────────────────────────
+   PUNTOEFENING
+───────────────────────────────────────── */
+/* Grid: 4 per rij */
+.splits-grid:has(.oefening-punt),
+.punt-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.oefening-punt {
+  padding: 8px 6px 12px;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #1A3A5C;
+  border-radius: 6px;
+  min-height: 48px;
+}
+
+.punt-rij {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+}
+
+.punt-getal {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A3A5C;
+  padding-bottom: 2px;
+}
+
+.punt-teken {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A3A5C;
+  padding-bottom: 2px;
+}
+
+.punt-lijn {
+  display: inline-block;
+  width: 30px;
+  border-bottom: 1.5px solid #1A3A5C;
+  margin-bottom: 3px;
+}
+
+/* ── Tafels grid ────────────────────────────────────────────── */
+.tafels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 12px;
+  padding: 8px 0;
+}
+
+.tafel-oef {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  border-radius: 6px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  min-height: 38px;
+}
+
+.tafel-oef:hover { background: #eef2f7; }
+
+.tafel-som {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A3A5C;
+}
+
+.tafel-term {
+  min-width: 18px;
+  text-align: center;
+}
+
+.tafel-op {
+  color: #E67E22;
+  font-size: 16px;
+}
+
+.tafel-is {
+  color: #666;
+}
+
+.tafel-vak {
+  display: inline-block;
+  width: 32px;
+  height: 28px;
+  border: 2px solid #1A3A5C;
+  border-radius: 4px;
+  background: #fff;
+  vertical-align: middle;
+}
+
+/* ── Tafels inzicht tab ──────────────────────────────────────── */
+.sidebar-tab.tab-tafels-inzicht { background-color: #FFCCBC; color: #1A3A5C; }
+.sidebar-tab.tab-tafels-inzicht:hover { background-color: #FFAB91; }
+.sidebar-tab.tab-tafels-inzicht.active {
+  background-color: #ed7551 !important;
+  color: #ffffff;
+  border-bottom-color: #BF360C !important;
+  font-weight: 800;
+}
+
+.sidebar-tab.tab-tafels-getallenlijn { background-color: #B2EBF2; color: #1A3A5C; }
+.sidebar-tab.tab-tafels-getallenlijn:hover { background-color: #80DEEA; }
+.sidebar-tab.tab-tafels-getallenlijn.active {
+  background-color: #00838F !important;
+  color: #ffffff;
+  border-bottom-color: #006064 !important;
+  font-weight: 800;
+}
+
+/* ── Inzicht grid: 1 oefening per rij ────────────────────────── */
+.inzicht-grid,
+.inzicht-grid-1 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.inzicht-oef {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+}
+.inzicht-oef:hover { border-color: #E64A19; }
+
+/* Links/rechts binnen oefening */
+.inzicht-inner {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+  align-items: center;
+}
+
+.inzicht-links {
+  flex: 0 0 35%;
+  border-right: 1px solid #eee;
+  padding-right: 12px;
+}
+
+.inzicht-rechts {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Groepjes */
+.inzicht-groepjes-wrap { display: flex; flex-direction: column; gap: 5px; }
+.inzicht-groepjes-rij  { display: flex; flex-direction: row; gap: 5px; }
+
+.inzicht-vakje {
+  border: 2px solid #E64A19;
+  border-radius: 7px;
+  padding: 4px;
+  display: grid;
+  gap: 2px;
+  background: #ffffff;
+}
+/* Aantal kolommen gezet via inline style door JS */
+
+.inzicht-emoji { font-size: 20px; line-height: 1; }
+.inzicht-emoji-rijbreak { display: none; } /* niet nodig meer met grid */
+
+/* Formule-rijen */
+.inzicht-optel-rij {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  gap: 2px;
+}
+
+.inzicht-tekst-rij {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  flex-wrap: nowrap;
+}
+
+/* Invullijntjes */
+.inzicht-lijn {
+  display: inline-block;
+  border-bottom: 1px solid #555;
+  width: 26px;
+  margin-bottom: 2px;
+  flex-shrink: 0;
+}
+.inzicht-lijn.smal  { width: 22px; }
+.inzicht-lijn.breed { width: 32px; }
+
+.inzicht-plus, .inzicht-op {
+  font-size: 15px;
+  font-weight: 700;
+  color: #E64A19;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.inzicht-is {
+  font-size: 15px;
+  font-weight: 700;
+  color: #444;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.inzicht-tekst {
+  font-size: 14px;
+  font-style: italic;
+  color: #555;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-bottom: 2px;
+}
+
+/* Ingevuld getal bij delen-aftrekking (groepGrootte) */
+.inzicht-ingevuld {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1565C0;
+  min-width: 18px;
+  text-align: center;
+  padding-bottom: 2px;
+  flex-shrink: 0;
+}
+
+/* Nul bij het einde van de aftrekrij */
+.inzicht-nul {
+  font-size: 15px;
+  font-weight: 700;
+  color: #444;
+  padding-bottom: 2px;
+  flex-shrink: 0;
+}
+
+/* Min-teken bij herhaalde aftrekking */
+.inzicht-min {
+  font-size: 15px;
+  font-weight: 700;
+  color: #E64A19;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── Getallenlijn preview ──────────────────────────────────────── */
+.gl-oefening {
+  background: #fff;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  padding: 14px 16px 12px 16px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+}
+
+.gl-svg-wrapper {
+  overflow-x: auto;
+  margin-bottom: 8px;
+}
+
+.gl-formules {
+  margin-top: 4px;
+}
+
+.gl-zin {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 14px;
+  line-height: 1;
+  flex-wrap: wrap;
+}
+
+.gl-formule-rij {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  margin-bottom: 7px;
+  flex-wrap: wrap;
+}
+
+.gl-lijn {
+  display: inline-block;
+  min-width: 16px;
+  width: 16px;
+  border-bottom: 1.5px solid #777;
+  height: 16px;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 14px;
+  vertical-align: bottom;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.gl-lijn.kort {
+  min-width: 18px;
+  width: 18px;
+}
+
+.gl-lijn.breed {
+  min-width: 22px;
+  width: auto;
+  padding: 0 3px;
+}
+
+.gl-plus,
+.gl-maal,
+.gl-eq {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.gl-getal-vast {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  padding-bottom: 2px;
+  line-height: 1;
+}
+
+/* oude niet-meer-gebruikte opbouw mag blijven bestaan, maar stoort niet */
+.gl-lijn-wrapper,
+.gl-bogen-laag,
+.gl-boog,
+.gl-boog-getal,
+.gl-boog-svg,
+.gl-vakjes-rij,
+.gl-vakje,
+.gl-pijl,
+.gl-grid {
+  all: unset;
+}
+.menu-knop{
+  background:#1a3a5c;
+  color:white;
+  text-decoration:none;
+  padding:8px 14px;
+  border-radius:8px;
+  font-size:14px;
+  margin-right:15px;
+}
+.help-knop{
+  background:#51ad77;
+  color:white;
+  border:none;
+  padding:8px 16px;
+  border-radius:20px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+  transition:.2s;
+}
+
+.help-knop:hover{
+  background:#3ab06b;
+  transform:translateY(-1px);
+}
+
+.help-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.help-content{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  width:420px;
+  max-width:90%;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.help-content p{
+  margin-bottom:14px;
+}
+.help-content h2{
+  margin-top:0;
+  margin-bottom:16px;
+}
+.sluit-knop{
+  margin-top:20px;
+  background:#27AE60;
+  color:white;
+  border:none;
+  padding:8px 16px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CIJFEREN — preview stijlen
+   ══════════════════════════════════════════════════════════════ */
+
+.cijferen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 18px;
+}
+
+.cijferen-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 18px;
+}
+
+.cij-oefening {
+  border: 1.5px solid #ccc;
+  border-radius: 10px;
+  padding: 8px 10px 10px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.cij-vraag {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+/* Schatting: eigen afgerond grijs vak */
+.cij-schatting-vak {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 8px 5px 8px;
+  box-sizing: border-box;
+  margin-bottom: 2px;
+}
+.cij-schat-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+  white-space: nowrap;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+.cij-schat-lijn {
+  flex: 1;
+  border-bottom: 1.5px solid #aaa;
+  display: inline-block;
+  min-width: 40px;
+  margin-bottom: 1px;
+}
+
+.cij-schema-wrap {
+  position: relative;
+  margin-left: 26px;
+  margin-top: 18px;   /* ruimte voor de pijl die boven de header uitsteekt */
+}
+
+/* Operator naast de g2-rij (direct boven de dikke oplossings-lijn).
+   Rij 0=header(34) + rij1=onthoud(34) + rij2=g1(34) = 102px, dan midden g2-rij = +17px */
+.cij-operator {
+  position: absolute;
+  left: -22px;
+  font-size: 18px;
+  font-weight: bold;
+  top: calc(3 * 34px + 17px);
+  transform: translateY(-50%);
+}
+
+.cij-schema {
+  border-collapse: collapse;
+}
+
+.cij-schema td {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #999;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  vertical-align: bottom;
+  padding-bottom: 3px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.cij-header {
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  vertical-align: middle !important;
+  padding-bottom: 0 !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cij-duizend { background-color: #e74c3c; color: #fff !important; }
+.cij-honderd { background-color: #2980b9; }
+.cij-tien    { background-color: #27ae60; }
+.cij-een     { background-color: #f1c40f; color: #333 !important; }
+
+.cij-onthoud { vertical-align: middle !important; padding: 4px 2px !important; line-height: 1.3 !important; font-size: 12px; font-weight: bold; text-align: center; }
+.cij-onthoud.cij-duizend { background-color: #f1948a; }
+.cij-onthoud.cij-honderd { background-color: #a9cce3; }
+.cij-onthoud.cij-tien    { background-color: #a3e4d7; }
+.cij-onthoud.cij-een     { background-color: #f9e79f; }
+
+.cij-getal    { background-color: #fdfdfd; }
+
+/* Doorgestreept origineel getal bij aftrekken met lenen */
+/* Doorstreep bij aftrekken met lenen */
+.cij-getal.cij-heeft-doorstreep {
+  text-decoration: line-through;
+  text-decoration-color: #c0392b;
+  text-decoration-thickness: 2px;
+  color: #c0392b !important;
+}
+
+/* Gestapelde onthoud-getallen (twee bruggen) */
+.cij-onth-boven, .cij-onth-onder {
+  display: none;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.3;
+  color: #006100;
+  text-align: center;
+}
+.cij-onth-boven {
+  font-size: 9px;
+  border-bottom: 1px solid #888;
+}
+.cij-oplossing {
+  background-color: #fff;
+  border-top: 3px solid #000 !important;
+}
+
+/* ── Startpijl: driehoek + kort staaltje ── */
+.cij-startpijl {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  pointer-events: none;
+}
+
+/* staaltje boven de punt — kort */
+.cij-startpijl::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 5px;
+  background-color: #f1c40f;
+  border-radius: 1px 1px 0 0;
+}
+
+/* pijlpunt (driehoek naar beneden) */
+.cij-startpijl::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 9px solid #f1c40f;
+}
+
+@media (max-width: 900px) {
+  .cijferen-grid   { grid-template-columns: repeat(3, 1fr); }
+  .cijferen-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+/* Deler-cel: geen border, tekst rechts van header */
+.deel-deler-cel {
+  border: none !important;
+  background: transparent !important;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  padding-left: 6px;
+  vertical-align: middle;
+  width: auto !important;
+  white-space: nowrap;
+}
+
+.deel-hdr {
+  color: #fff;
+  font-weight: bold;
+  vertical-align: middle !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.deel-T { background-color: #27ae60; }
+.deel-E { background-color: #f1c40f; color: #333 !important; }
+.deel-H { background-color: #2980b9; color: #fff; }
+
+.deel-cel {
+  background-color: #fdfdfd;
+}
+.deel-leeg {
+  background-color: #fdfdfd;
+}
+
+/* Aftrek-rijen: minteken links, dunne bovenlijn */
+.deel-aftrek-rij td {
+  border-top: 2px solid #333 !important;
+}
+.deel-aftrek {
+  position: relative;
+}
+.deel-aftrek::before {
+  content: '−';
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Quotiënt-cellen rood */
+.deel-quot {
+  color: #e74c3c !important;
+  font-size: 15px;
+}
+
+/* Quotiënt-tabel: plakt aan de onderkant van deel-rechts */
+.deel-quot-tabel {
+  margin-left: 4px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STAARTDELING SCHEMA
+   ══════════════════════════════════════════════════════════════ */
+
+.deel-oefening {
+  border: 1.5px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 12px 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+.deel-vraag {
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Schrijflijnen in de vraag (voor deler en antwoord) */
+.deel-lijn-deler,
+.deel-lijn-antw {
+  display: inline-block;
+  border-bottom: 2px solid #333;
+  min-width: 36px;
+  vertical-align: bottom;
+}
+
+/* Schema-wrap: links + rechts naast elkaar, geen gap */
+.deel-schema-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* Linkerschema */
+.deel-links {
+  position: relative;
+}
+
+/* Verticale dikke lijn rechts van linkerschema */
+.deel-links::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #222;
+  z-index: 2;
+}
+
+/* Rechterschema: margin-top = 1 rij (na header only)
+   Schrijflijn staat op hoogte van rij 1 = deeltal, zodat deler naast deeltal geschreven wordt */
+.deel-rechts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: calc(1 * 34px);
+  margin-left: 2px;
+}
+
+/* Schrijflijn = 1 cel hoog, lijn onderaan, deler-waarde rechts uitlijnen */
+.deel-schrijflijn {
+  width: calc(2 * 34px);
+  height: 34px;
+  border-bottom: 1.5px solid #999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-bottom: 2px;
+  padding-right: 4px;
+  box-sizing: border-box;
+}
+
+.deel-deler-val {
+  font-size: 14px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Gedeelde tabelstijl */
+.deel-tabel {
+  border-collapse: collapse;
+}
+
+.deel-tabel td {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #bbb;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  vertical-align: middle;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+/* Gekleurde headers */
+.deel-hdr {
+  color: #fff;
+  font-weight: bold;
+  vertical-align: middle !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.deel-T { background-color: #27ae60 !important; }
+.deel-E { background-color: #f1c40f !important; color: #333 !important; }
+.deel-H { background-color: #2980b9 !important; color: #fff !important; }
+
+/* Gewone invulcellen */
+.deel-cel {
+  background-color: #fff;
+  position: relative;
+}
+
+/* Aftrekrijen met dikke bovenlijn (oude styling, behouden voor andere usages) */
+.deel-aftrek-rij td {
+  border-top: 3px solid #222 !important;
+}
+
+/* Nieuwe aftrek-rij: dikke lijn ONDER de rij met het aftrek-getal */
+.deel-aftrek-onder td {
+  border-bottom: 3px solid #222 !important;
+}
+
+/* Dikke bovenlijn per cel (voor compatibiliteit met oudere HTE-rendering) */
+.deel-dikboven {
+  border-top: 3px solid #222 !important;
+}
+
+/* Dalend cijfer: verticale stippellijn boven de cel, blauwgroen.
+   Alleen zichtbaar als de body de klasse .toont-oplossingen heeft
+   (anders moet de leerling zelf de cijfers naar beneden halen). */
+.deel-dalend::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 12px;
+  border-left: 2px dotted #1abc9c;
+  pointer-events: none;
+  z-index: 2;
+  display: none;
+}
+body.toont-oplossingen .deel-dalend::before {
+  display: block;
+}
+
+/* Boogje boven H+T (alleen bij HTE:E scenario B: H < deler) */
+.deel-links {
+  position: relative;
+}
+.deel-boog {
+  position: absolute;
+  top: -8px;
+  height: 6px;
+  border: 2px solid #1abc9c;
+  border-bottom: none;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  pointer-events: none;
+  z-index: 3;
+  display: none;
+}
+body.toont-oplossingen .deel-boog {
+  display: block;
+}
+/* Boogje over H + T (kolom 0 en 1 van 3) — centreer over de eerste twee cellen.
+   Stel in dat cellen ~32px breed zijn (deel-cel heeft typically die breedte).
+   We positioneren de boog boven kolom 0 (links) met breedte = 2 kolommen. */
+.deel-boog-HT {
+  left: 1px;
+  width: calc(2 * var(--deel-cel-w, 32px) - 6px);
+  top: 32px;  /* ongeveer onder de headerrij, boven rij 1 */
+}
+
+/* Minteken: verschijnt net BOVEN de dikke lijn van de aftrekrij */
+.deel-min {
+  position: relative;
+}
+.deel-min::before {
+  content: '−';
+  position: absolute;
+  left: -15px;
+  top: -10px;   /* boven de dikke bovenlijn */
+  font-size: 15px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Quotiëntcellen rood */
+.deel-rechts .deel-cel {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   KOMMASCHEMA (E,t cijferen)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Smalle kommakolom (grijs) */
+.komma-kolom {
+  width: 10px !important;
+  min-width: 10px !important;
+  max-width: 10px !important;
+  background-color: #e0e0e0 !important;
+  border-color: #bbb !important;
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0 !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Kommakolom header */
+.komma-hdr {
+  background-color: #bbb !important;
+  color: #fff !important;
+}
+
+/* Komma-dot in datarijen */
+.komma-dot {
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+}
+
+/* t-kolom header (lichtgeel, iets donkerder dan E) */
+.komma-tien {
+  background-color: #e8b400 !important;
+  color: #fff !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Pijltje boven kommaschema */
+.komma-schema thead {
+  position: relative;
+}
+
+/* Onthoud-rij in kommaschema: lichtgrijs, kleiner */
+.komma-onthoud {
+  padding: 4px 2px !important;
+  line-height: 1.3 !important;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #e8e8e8 !important;
+  border-color: #ccc !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+/* ══════════════════════════════════════════════════════════════
+   REKENTAAL — stijlen
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Tab kleur: warm paars/aubergine ─────────────────────────── */
+.tab-rekentaal {
+  background: #f3eeff;
+  color: #5b2d8e;
+  border-bottom: 3px solid transparent;
+}
+.tab-rekentaal:hover {
+  background: #e4d4ff;
+  color: #3d1d6e;
+}
+.tab-rekentaal.active {
+  background: #7c3aed !important;
+  color: #fff !important;
+  border-bottom-color: #5b21b6 !important;
+}
+
+/* ── Invulhokje in de preview (op plaats van {?}) ────────────── */
+.rt-invulhokje {
+  display: inline-block;
+  min-width: 26px;
+  height: 14px;
+  border: 1.5px solid #7c3aed;
+  border-radius: 3px;
+  background: #f5f0ff;
+  margin: 0 3px;
+  vertical-align: middle;
+}
+
+/* ── Oefeningen-lijst in de bundel-preview ───────────────────── */
+.rt-oefeningen-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px 2px;
+}
+
+.rt-oefeningen-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 2px;
+}
+
+.rt-oef-rij {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  padding: 4px 2px;
+  font-size: 13px;
+  border-bottom: 1px dotted #ddd;
+}
+
+.rt-oef-rij:last-child {
+  border-bottom: none;
+}
+
+.rt-oef-zin {
+  flex: 0 0 auto;
+  color: #1e2d40;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.rt-oef-zin strong {
+  color: #111;
+  font-weight: 700;
+}
+
+.rt-pijl {
+  flex: 0 0 auto;
+  color: #999;
+  font-size: 11px;
+  letter-spacing: -1px;
+}
+
+.rt-oef-lijn {
+  flex: 1;
+  border-bottom: 1.5px solid #333;
+  min-width: 60px;
+  margin: 0 4px;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+/* ── Categorie-knop ─────────────────────────────────────────── */
+.rt-cat-btn {
+  transition: background 0.15s, color 0.15s;
+}
+.rt-cat-btn.geselecteerd {
+  background: #7c3aed !important;
+  color: #fff !important;
+  border-color: #5b21b6 !important;
+}
+
+/* ── Vink-chip in rekentaal sidebar ─────────────────────────── */
+#tab-rekentaal .vink-chip.geselecteerd {
+  background: #ede9fe;
+  border-color: #7c3aed;
+  color: #3d1d6e;
+}
+
+/* ── Voeg-toe knop in rekentaal ─────────────────────────────── */
+.voeg-toe-knop {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: #7c3aed;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+.voeg-toe-knop:hover {
+  background: #5b21b6;
+}
+
+/* ══════════════════════════════════════════════════════════
+   TRANSFORMEREN (optellingswip) — preview stijlen
+   Volgt exact hetzelfde patroon als compenseren
+══════════════════════════════════════════════════════════ */
+
+.oefeningen-grid.trans-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* Oefening: flex row — trans-layout links, schrijflijnen rechts */
+.oefening-trans {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 10px 28px 12px 10px;
+  position: relative;
+}
+.oefening-trans.trans-voorbeeld {
+  background: #FFF3CD !important;
+  border-color: #F0A500 !important;
+}
+
+/* ── Schema-balkjes boven de som ── */
+.trans-balk-rij {
+  display: flex;
+  width: 100%;
+  height: 28px;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+.trans-balk-b {
+  background: #b5d4f4;
+  border-radius: 4px;
+  position: relative;
+  flex-shrink: 0;
+  min-width: 20px;
+}
+.trans-balk-g {
+  background: #fde68a;
+  border-radius: 4px;
+  position: relative;
+  flex-shrink: 0;
+  min-width: 10px;
+}
+.trans-balk-num {
+  position: absolute;
+  top: 3px; left: 0; right: 0;
+  text-align: center;
+  font-size: 11px; font-weight: 600; color: #1e3a8a;
+  overflow: hidden;
+}
+.trans-balk-num-g {
+  position: absolute;
+  top: 3px; left: 0; right: 0;
+  text-align: center;
+  font-size: 11px; font-weight: 600; color: #78350f;
+  overflow: hidden;
+}
+.trans-balk-schrijf {
+  position: absolute;
+  bottom: 4px; left: 5px; right: 5px;
+  border-bottom: 1px solid rgba(30,58,138,0.3);
+}
+.trans-balk-schrijf-g {
+  position: absolute;
+  bottom: 4px; left: 5px; right: 5px;
+  border-bottom: 1px solid rgba(120,53,15,0.3);
+}
+.trans-balk-inv {
+  position: absolute;
+  bottom: 3px; left: 0; right: 0;
+  text-align: center;
+  font-size: 11px; font-weight: 700; color: #1e3a8a;
+}
+.trans-balk-inv-g {
+  position: absolute;
+  bottom: 3px; left: 0; right: 0;
+  text-align: center;
+  font-size: 11px; font-weight: 700; color: #78350f;
+}
+
+/* ── Som-tabel (pijlen + rijen) ──
+   Exact als comp-grid maar dan een tabel-layout
+   kol1=tg(30%)  kol2=+(8%)  kol3=ag(30%)  kol4==(8%)  kol5=antw
+*/
+.trans-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tekst);
+}
+.trans-tabel td { padding: 0; }
+.trans-td-getal-l {
+  width: 30%; text-align: right;
+  padding-right: 4px; vertical-align: bottom;
+}
+.trans-td-teken {
+  width: 8%; text-align: center;
+  vertical-align: bottom;
+}
+.trans-td-getal-r {
+  width: 30%; text-align: left;
+  padding-left: 4px; vertical-align: bottom;
+}
+.trans-td-is {
+  width: 8%; text-align: center;
+  vertical-align: bottom;
+}
+.trans-td-antw { vertical-align: bottom; }
+
+/* Pijl-rij */
+.trans-td-pijl-l {
+  width: 30%; text-align: right;
+  padding-right: 4px; vertical-align: top;
+  padding-top: 3px;
+}
+.trans-td-pijl-r {
+  width: 30%; text-align: left;
+  padding-left: 4px; vertical-align: top;
+  padding-top: 3px;
+}
+.trans-pijl-cel-l {
+  display: flex; align-items: flex-start;
+  justify-content: flex-end; gap: 3px;
+}
+.trans-pijl-cel-r {
+  display: flex; align-items: flex-start;
+  justify-content: flex-start; gap: 3px;
+}
+.trans-pijl-svg { color: var(--tekst); display: block; }
+
+/* Schrijflijn naast pijl */
+.trans-schrijflijn-pijl {
+  display: inline-block;
+  min-width: 26px;
+  border-bottom: 1.5px solid #B0C4D8;
+  margin-top: 10px;
+  vertical-align: bottom;
+}
+/* Ingevulde waarde naast pijl (voorbeeld) */
+.trans-pijl-waarde {
+  display: inline-block;
+  min-width: 26px;
+  border-bottom: 1.5px solid currentColor;
+  margin-top: 10px;
+  vertical-align: bottom;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+.trans-pijl-waarde.blauw { color: #1d4ed8; }
+.trans-pijl-waarde.geel  { color: #b45309; }
+
+/* Onderste rij: schrijflijnen of ingevuld */
+.trans-tr-onder td { padding-top: 10px; vertical-align: bottom; font-weight: 400; color: var(--muted); }
+.trans-schrijflijn {
+  display: inline-block;
+  min-width: 44px;
+  border-bottom: 1.5px solid #B0C4D8;
+  vertical-align: bottom;
+  padding-top: 8px;
+}
+.trans-ingevuld {
+  display: inline-block;
+  min-width: 44px;
+  border-bottom: 1.5px solid #B0C4D8;
+  vertical-align: bottom;
+  padding-top: 8px;
+  font-weight: 600;
+  color: var(--tekst);
+}
+
+/* Kaal variant */
+.oefening-trans-kaal {
+  padding: 8px 28px 8px 10px;
+}
+.trans-kaal-som {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  font-size: 15px; font-weight: 600;
+  color: var(--tekst);
+}
+.trans-kaal-getal {
+  min-width: 36px; text-align: right;
+  padding-bottom: 3px;
+}
+.trans-kaal-teken { margin: 0 5px; padding-bottom: 3px; }
+.trans-kaal-lijn {
+  display: inline-block;
+  flex: 1;
+  min-width: 120px;
+  border-bottom: 1.5px solid #B0C4D8;
+}
+.trans-kaal-vb {
+  font-size: 14px; font-weight: 600;
+  color: var(--blauw); line-height: 2;
+  padding: 4px 2px;
+}
+.trans-kaal-stap { color: #1d4ed8; }
+
+/* ══════════════════════════════════════════════════════════════
+   SCHATTEN — preview stijlen
+   ══════════════════════════════════════════════════════════════ */
+
+/* Tab kleur: warm oranje */
+.tab-schatten { background-color: #ffe0b2; color: #1A3A5C; }
+.tab-schatten:hover { background-color: #ffcc80; }
+.tab-schatten.active {
+  background-color: #e8780a !important;
+  color: #ffffff;
+  border-bottom-color: #b35a00 !important;
+  font-weight: 800;
+}
+
+/* Schrijflijn generiek */
+.scht-lijn {
+  display: inline-block;
+  border-bottom: 1.5px solid #555;
+  min-width: 44px;
+  height: 18px;
+  margin: 0 2px;
+  vertical-align: bottom;
+  flex-shrink: 0;
+}
+.scht-lijn.smal  { min-width: 32px; }
+.scht-lijn.breed { min-width: 90px; flex: 1; }
+
+/* Bewerkingsteken (+ of -) in schrijfformules */
+.scht-teken { font-size: 14px; font-weight: 700; color: #e8780a; flex-shrink: 0; }
+
+/* Voorbeeld-klassen */
+.scht-vb-blauw  { font-size: 14px; font-weight: 700; color: #2980b9; }
+.scht-vb-oranje { font-size: 15px; font-weight: 800; color: #e8780a; }
+.scht-vb { background: #fff8e8 !important; border-color: #f0a500 !important; }
+
+/* ── Type 1: Afronden ────────────────────────────────────── */
+.schatten-afronden-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.scht-afronden {
+  flex-direction: column !important; align-items: flex-start !important;
+  padding: 10px 28px 10px 10px; gap: 8px; min-height: 80px;
+}
+.scht-af-getal {
+  font-size: 18px; font-weight: 800; color: #1a3a5c;
+  text-align: center; width: 100%; padding-bottom: 5px;
+  border-bottom: 1px solid #dce8f0;
+}
+.scht-af-rijen { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.scht-af-rij   { display: flex; align-items: flex-end; gap: 6px; }
+.scht-af-label { font-size: 13px; color: #555; white-space: nowrap; flex-shrink: 0; padding-bottom: 2px; }
+
+/* ── Type 2: Schatting tabel ─────────────────────────────── */
+.schatten-tabel-grid {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1.5px solid #b0c4d8; border-radius: 8px; overflow: hidden;
+}
+
+/* Header rij boven tabel */
+.scht-tabel-header {
+  display: grid;
+  grid-template-columns: 140px 150px 1fr 80px;
+  background: #c5d8ec;
+  border-bottom: 2px solid #90aac8;
+}
+.scht-hdr-cel {
+  padding: 7px 8px;
+  font-size: 12px; font-weight: 700; color: #1a3a5c;
+  border-right: 1px solid #90aac8;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 2px;
+}
+.scht-hdr-cel:last-child { border-right: none; justify-content: center; }
+
+/* Data rijen */
+.scht-tabel-rij {
+  display: grid !important;
+  grid-template-columns: 140px 150px 1fr 80px;
+  gap: 0; align-items: center;
+  padding: 0 !important; border: none !important;
+  border-bottom: 1px solid #dce8f5 !important;
+  border-radius: 0 !important; min-height: 40px;
+  position: relative;
+}
+.scht-tabel-rij:last-child { border-bottom: none !important; }
+.scht-tabel-rij > div {
+  padding: 8px 8px; border-right: 1px solid #dce8f5;
+  font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 4px; min-height: 40px;
+  overflow: hidden;
+}
+.scht-tabel-rij > div:last-child { border-right: none; }
+.scht-t-som  { color: #1a3a5c; font-weight: 700; white-space: nowrap; }
+.scht-t-col4 { justify-content: center; }
+/* Verwijder-knop in tabel */
+.scht-tabel-rij .btn-del-oef { position: absolute !important; top: 4px; right: 4px; }
+
+/* ── Type 3: Schatting compact ───────────────────────────── */
+.schatten-compact-grid {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1.5px solid #a8d5a8; border-radius: 8px; overflow: hidden;
+}
+
+/* Header balk boven compact lijst */
+.scht-compact-header {
+  background: #c8e8c8;
+  padding: 7px 12px;
+  font-size: 12px; font-weight: 700; color: #1a5c1a;
+  border-bottom: 2px solid #88c488;
+  text-align: center;
+}
+
+.scht-compact {
+  display: flex !important; flex-direction: row; align-items: center;
+  gap: 12px; padding: 11px 34px 11px 12px !important;
+  border: none !important; border-bottom: 1px solid #c8e8c8 !important;
+  border-radius: 0 !important; min-height: 44px;
+}
+.scht-compact:last-child { border-bottom: none !important; }
+.scht-comp-som   { font-size: 14px; font-weight: 700; color: #1a3a5c; white-space: nowrap; flex-shrink: 0; min-width: 140px; }
+.scht-pijl       { font-size: 15px; color: #666; flex-shrink: 0; }
+.scht-comp-inhoud { display: flex; align-items: center; gap: 4px; flex: 1; flex-wrap: nowrap; }
+
+/* ── Type 4: Mogelijk/niet mogelijk ─────────────────────── */
+.schatten-mogelijk-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+/* Hogere specificiteit via .oefeningen-grid zodat !important van .oefening-item niet wint */
+.schatten-mogelijk-grid .oefening-item.scht-mogelijk {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding: 14px 32px 18px 14px !important;
+  gap: 0 !important;
+  border: 2px solid #e8a040 !important;
+  border-radius: 8px !important;
+  min-height: 210px !important;
+  box-sizing: border-box;
+  font-size: 16px !important;
+}
+
+/* Geel vraagkadertje */
+.schatten-mogelijk-grid .scht-mog-vraag {
+  background: #fff8e8 !important;
+  border: 1.5px solid #f0c050 !important;
+  border-radius: 6px !important;
+  padding: 12px 14px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  line-height: 1.7 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  color: #333 !important;
+}
+
+/* Ik schat rij */
+.schatten-mogelijk-grid .scht-mog-schat {
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 6px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  margin-top: 20px !important;
+  margin-bottom: 14px !important;
+}
+.schatten-mogelijk-grid .scht-mog-label {
+  font-size: 13px !important;
+  font-style: italic !important;
+  color: #666 !important;
+  flex-shrink: 0 !important;
+  padding-bottom: 2px !important;
+}
+
+/* Aankruisvakjes */
+.schatten-mogelijk-grid .scht-mog-keuze {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+.schatten-mogelijk-grid .scht-checkbox {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #222 !important;
+  cursor: pointer !important;
+}
+.schatten-mogelijk-grid .scht-checkbox input[type="checkbox"] {
+  width: 17px !important;
+  height: 17px !important;
+  flex-shrink: 0 !important;
+}
+
+/* ── Toggle oplossingen knop ─────────────────────────────── */
+.btn-toggle-oplossingen {
+  padding: 9px 20px;
+  background: #f0f0f0;
+  color: #333;
+  border: 1.5px solid #ccc;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .2s;
+}
+.btn-toggle-oplossingen:hover { background: #e0e0e0; }
+.btn-toggle-oplossingen:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Antwoord-vak in preview — leeg of ingevuld */
+.antwoord-vak {
+  display: inline-block;
+  min-width: 28px;
+  height: 20px;
+  border: 1.5px solid #1a3a5c;
+  border-radius: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  transition: background .2s, color .2s;
+}
+
+/* ── Maak eerst 10: schrijflijn en onderstreping ───────────── */
+.eerst10-schrijflijn {
+  display: inline-block;
+  min-width: 120px;
+  height: 20px;
+  border-bottom: 1.5px solid #1a3a5c;
+  margin-left: 4px;
+  padding: 0 4px;
+  vertical-align: middle;
+  line-height: 20px;
+}
+.eerst10-schrijflijn.eerst10-ingevuld {
+  color: #006100;
+  font-weight: 700;
+  border-bottom-color: #00a650;
+}
+.eerst10-onderstreep {
+  display: inline-block;
+  padding-bottom: 1px;
+  transition: border-bottom .15s, color .15s;
+}
+
+/* ── Oplossingssleutel download knop ─────────────────────── */
+.btn-sleutel {
+  padding: 9px 20px;
+  background: #27AE60;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .2s;
+}
+.btn-sleutel:hover { background: #1e8449; }
+.btn-sleutel:disabled { opacity: .4; cursor: not-allowed; }
