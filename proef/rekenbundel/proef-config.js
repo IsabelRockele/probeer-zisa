@@ -32,7 +32,7 @@
   };
 
   // ── Webshop-link (voor "Bekijk aanbod" knoppen) ────────────────────────
-  const WEBSHOP_URL = 'https://www.jufzisa.be/spelgenerator-app';
+  const WEBSHOP_URL = '../../#zg-prijzen';
 
   // ── State die we onderweg invullen ─────────────────────────────────────
   let _app, _auth, _db, _uid;
@@ -107,7 +107,7 @@
   // BLOKKADE-SCHERMEN — vervangen de hele app als iets niet mag
   // ══════════════════════════════════════════════════════════════════════
 
-  function _toonBlokkade(titel, tekst, knopTekst) {
+  function _toonBlokkade(titel, tekst, knopTekst, knopUrl) {
     _verbergLaadscherm();
     // Verberg de echte app — we willen niet dat er per ongeluk iets zichtbaar wordt
     document.documentElement.style.overflow = 'hidden';
@@ -157,8 +157,8 @@
         <div class="icon">🎁</div>
         <h1>${titel}</h1>
         <p>${tekst}</p>
-        <a href="${WEBSHOP_URL}" target="_blank" class="knop-primair">${knopTekst} →</a>
-        <div><a href="../../" class="knop-secundair">← Terug naar overzicht</a></div>
+        <a href="${knopUrl || WEBSHOP_URL}" class="knop-primair">${knopTekst} →</a>
+        <div><a href="../../#zg-probeer" class="knop-secundair">← Andere tools proberen</a></div>
       </div>`;
     document.documentElement.appendChild(blok);
   }
@@ -187,7 +187,8 @@
     _toonBlokkade(
       'Er liep iets mis',
       `${boodschap}<br><br>Probeer de pagina te herladen. Als het probleem blijft: mail naar <a href="mailto:info@jufzisa.be" style="color:#2a2a2a;font-weight:700;">info@jufzisa.be</a>.`,
-      'Terug naar overzicht'
+      'Andere tools proberen',
+      '../../#zg-probeer'
     );
   }
 
@@ -232,7 +233,7 @@
             : `Je hebt nog <strong>${overMaking}</strong> van 3 gratis bundels over`
         }
       </span>
-      <a href="${WEBSHOP_URL}" target="_blank">Bekijk aanbod →</a>`;
+      <a href="${WEBSHOP_URL}">Bekijk het aanbod →</a>`;
     // Plaats de banner helemaal bovenaan <body>, dus VOOR de bestaande header
     document.body.insertBefore(banner, document.body.firstChild);
   }
@@ -293,7 +294,7 @@
         <h2>${titel}</h2>
         <p>${tekst}</p>
         ${primaireKnop
-          ? `<a href="${WEBSHOP_URL}" target="_blank" class="knop">${primaireKnop} →</a>`
+          ? `<a href="${WEBSHOP_URL}" class="knop">${primaireKnop} →</a>`
           : ''}
         <button class="knop-sluit" onclick="document.getElementById('proef-popup-overlay').remove()">Sluiten</button>
       </div>`;
