@@ -120,8 +120,8 @@
         '<span class="demo-banner-text">' +
           '<strong>Dit is een demo met een fictieve voorbeeldklas</strong> — wijzigingen worden niet bewaard.' +
         '</span>' +
-        '<a href="https://www.jufzisa.be/spelgenerator-app" target="_blank" class="demo-banner-btn">' +
-          'Ontdek de Spelgenerator →' +
+        '<a href="../../" class="demo-banner-btn">' +
+          'Bekijk alle tools en prijzen →' +
         '</a>' +
       '</div>';
     document.body.insertBefore(banner, document.body.firstChild);
@@ -143,8 +143,8 @@
           '<div class="demo-popup-icon">' + emoji + '</div>' +
           '<div class="demo-popup-title">' + titel + '</div>' +
           '<div class="demo-popup-text">' + tekst + '</div>' +
-          '<a href="https://www.jufzisa.be/spelgenerator-app" target="_blank" class="demo-popup-btn-primary">' +
-            'Ontdek de Spelgenerator →' +
+          '<a href="../../" class="demo-popup-btn-primary">' +
+            'Bekijk alle tools en prijzen →' +
           '</a>' +
           '<button class="demo-popup-btn-secondary" onclick="sluitDemoPopup()">' +
             'Terug naar de demo' +
