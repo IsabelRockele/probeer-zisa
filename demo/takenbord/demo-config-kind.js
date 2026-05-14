@@ -158,8 +158,8 @@
         '<span class="demo-banner-text">' +
           '<strong>Dit is een demo met een fictieve voorbeeldklas</strong> — wijzigingen worden niet bewaard.' +
         '</span>' +
-        '<a href="https://www.jufzisa.be/spelgenerator-app" target="_blank" class="demo-banner-btn">' +
-          'Ontdek de Spelgenerator →' +
+        '<a href="../../" class="demo-banner-btn">' +
+          'Meer over Spelgenerator →' +
         '</a>' +
       '</div>';
     document.body.insertBefore(banner, document.body.firstChild);
@@ -329,8 +329,8 @@
           '<div class="demo-popup-icon">' + emoji + '</div>' +
           '<div class="demo-popup-title">' + titel + '</div>' +
           '<div class="demo-popup-text">' + tekst + '</div>' +
-          '<a href="https://www.jufzisa.be/spelgenerator-app" target="_blank" class="demo-popup-btn-primary">' +
-            'Ontdek de Spelgenerator →' +
+          '<a href="../../" class="demo-popup-btn-primary">' +
+            'Meer over Spelgenerator →' +
           '</a>' +
           '<button class="demo-popup-btn-secondary" onclick="sluitDemoPopup()">' +
             'Terug naar de demo' +
@@ -377,8 +377,8 @@
     if (proHeader && !proHeader.querySelector('.demo-alle-knop')) {
       var extraBtn = document.createElement('a');
       extraBtn.className = 'demo-alle-knop';
-      extraBtn.href = '../../';
-      extraBtn.textContent = '🦓 Alle probeer-tools';
+      extraBtn.href = '../../#zg-probeer';
+      extraBtn.textContent = '🦓 Andere tools proberen';
       extraBtn.style.cssText =
         'background:#ffcf56;' +
         'color:#2a2a2a;' +
@@ -451,7 +451,7 @@
               '← Terug naar takenbord' +
             '</button>' +
             '<a href="./" style="display:block;background:transparent;color:#64748b;text-decoration:underline;padding:8px;font-size:13px;font-family:inherit;">' +
-              'Terug naar keuze' +
+              'Andere bord-demo proberen' +
             '</a>' +
           '</div>';
         document.body.appendChild(overlay);
