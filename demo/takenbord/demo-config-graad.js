@@ -232,11 +232,11 @@
           '<strong>Graadsklas-demo</strong> — wijzigingen worden niet bewaard. ' +
           'In de volledige Spelgenerator werkt alles realtime en bewaart alles automatisch.' +
         '</span>' +
-        '<a href="https://www.jufzisa.be/spelgenerator-app" target="_blank" class="demo-banner-btn">' +
-          '👉 Bekijk Spelgenerator' +
+        '<a href="../../" class="demo-banner-btn">' +
+          'Meer over Spelgenerator →' +
         '</a>' +
         '<a href="./" class="demo-banner-btn" style="background:#e0e7ff;color:#4338ca;margin-left:8px;">' +
-          '← Andere demo\'s' +
+          '← Andere bord-demo proberen' +
         '</a>' +
       '</div>';
     document.body.insertBefore(banner, document.body.firstChild);
@@ -393,8 +393,8 @@
         '<div class="demo-popup-icon">' + (icon || '✨') + '</div>' +
         '<div class="demo-popup-title">' + titel + '</div>' +
         '<div class="demo-popup-text">' + tekst + '</div>' +
-        '<a href="https://www.jufzisa.be/spelgenerator-app" target="_blank" class="demo-popup-btn-primary">' +
-          '🎯 Ontdek Spelgenerator' +
+        '<a href="../../" class="demo-popup-btn-primary">' +
+          'Meer over Spelgenerator →' +
         '</a>' +
         '<button class="demo-popup-btn-secondary" onclick="document.getElementById(\'demo-popup\').remove()">' +
           'Terug naar demo' +
