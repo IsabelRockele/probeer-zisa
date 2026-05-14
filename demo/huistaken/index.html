@@ -24,6 +24,28 @@
     position: sticky;
     top: 0;
     z-index: 200;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .pro-header:hover {
+    background: linear-gradient(90deg, #0a2750 0%, #154c8a 100%);
+  }
+  .pro-header-center {
+    flex-grow: 1;
+    text-align: center;
+  }
+  .pro-header-back {
+    background: rgba(255,255,255,0.15);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    transition: background 0.2s;
+  }
+  .pro-header:hover .pro-header-back {
+    background: rgba(255,255,255,0.28);
+  }
+  @media (max-width: 600px) {
+    .pro-header-center { display: none; }
   }
 
   .pro-header span:first-child {
@@ -50,13 +72,13 @@
 
 <div class="pro-header">
   <span>🦓 DEMO</span>
-  <span>Opvolging huistaken — voorbeeldklas</span>
+  <span class="pro-header-center">Opvolging huistaken — voorbeeldklas</span>
 </div>
 
 <div class="app-shell">
  <aside class="sidebar">
   <div class="top-left-controls">
-    <button class="keuzemenu-btn" id="keuzemenuBtn" type="button" onclick="window.location.href='../../'">← Terug naar overzicht</button>
+    <button class="keuzemenu-btn" id="keuzemenuBtn" type="button" onclick="window.location.href='../../#zg-probeer'">← Andere tools proberen</button>
 
     <div class="schooljaar-box">
       <span class="schooljaar-label">Schooljaar</span>
