@@ -38,10 +38,17 @@
       overflow: hidden;
     }
 
-    .hero-back {
+    .hero-back-group {
       position: absolute;
       top: 16px;
       left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 2;
+    }
+
+    .hero-back {
       background: rgba(42, 42, 42, 0.85);
       color: var(--gold);
       padding: 8px 16px;
@@ -51,7 +58,6 @@
       font-family: 'Nunito', sans-serif;
       font-size: 0.85rem;
       transition: background 0.2s;
-      z-index: 2;
     }
 
     .hero-back:hover { background: var(--dark); }
@@ -409,7 +415,10 @@
 <body>
 
   <div class="hero">
-    <a href="../../" class="hero-back">← Alle demo's</a>
+    <div class="hero-back-group">
+      <a href="../../" class="hero-back">← Meer over Spelgenerator</a>
+      <a href="../../#zg-probeer" class="hero-back">← Andere tools proberen</a>
+    </div>
     <div class="hero-content">
       <img src="../../zisa.png" alt="Juf Zisa logo" class="hero-logo">
       <div>
@@ -471,10 +480,10 @@
         <h3>Wil je nu al aan de slag?</h3>
         <p>De volledige Rekenbundel zit nu al in de Spelgenerator.</p>
       </div>
-      <a href="https://www.jufzisa.be/spelgenerator-app" target="_blank">Bekijk het volledige aanbod →</a>
+      <a href="../../">Bekijk alle tools en prijzen →</a>
     </div>
 
-    <a href="../../" class="back-link">← Terug naar overzicht</a>
+    <a href="../../" class="back-link">← Meer over Spelgenerator</a>
 
   </div>
 
