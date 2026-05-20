@@ -1448,11 +1448,19 @@ function getBeschikbareDagen() {
   return huidigeWeekVariant === 'huistaak' ? weekdagenAlle : weekdagenSchool;
 }
 
-// State per dag: { actief, type, config, configUitgeklapt, datum }
+// State per dag: { actief, type, config, configUitgeklapt, datum, vorm }
+// vorm: 'oefeningen' (op papier) of 'invulblad' (lege lijntjes voor flits-modus)
 function maakLegeWeekState(dagen) {
   const s = {};
   dagen.forEach(d => {
-    s[d.id] = { actief: true, type: 'maaltafels', config: null, configUitgeklapt: false, datum: '' };
+    s[d.id] = {
+      actief: true,
+      type: 'maaltafels',
+      config: null,
+      configUitgeklapt: false,
+      datum: '',
+      vorm: 'oefeningen'
+    };
   });
   return s;
 }
@@ -1532,7 +1540,6 @@ function isPro() {
 function openWeekbladDialoog(variant) {
   // variant: 'weekblad' (school, 5 dagen) of 'huistaak' (thuis, max 7 dagen)
   huidigeWeekVariant = variant === 'huistaak' ? 'huistaak' : 'weekblad';
-  window.huidigeWeekVariant = huidigeWeekVariant; // voor proef-config.js
 
   // Initialiseer: standaard gebruikt het actieve tab-type
   getBeschikbareDagen().forEach(d => {
@@ -1560,18 +1567,10 @@ function openWeekbladDialoog(variant) {
         <input type="text" id="week-van-input" class="week-van-input" placeholder="bv. 5 mei 2026" value="${weekState.weekVan || ''}">
       </div>
 
-      <div class="config-groep">
-        <label style="font-weight:700;display:block;margin-bottom:6px;">Soort blad</label>
-        <div class="radio-groep" id="week-modus-groep">
-          <label class="radio-knop">
-            <input type="radio" name="week-modus" value="oefeningen" ${(weekState.modus || 'oefeningen') === 'oefeningen' ? 'checked' : ''}>
-            <span>📄 Met oefeningen (op papier)</span>
-          </label>
-          <label class="radio-knop">
-            <input type="radio" name="week-modus" value="invulblad" ${weekState.modus === 'invulblad' ? 'checked' : ''}>
-            <span>📝 Invulblad (leeg, bij flitsen op smartbord)</span>
-          </label>
-        </div>
+      <div class="config-groep week-vorm-uitleg-blok">
+        <p class="week-vorm-uitleg">
+          <strong>💡 Tip:</strong> Per dag kun je hieronder kiezen: <strong>📄 met oefeningen</strong> (op papier) of <strong>📝 invulblad</strong> (lege lijntjes, voor flitsen op smartbord). Zo kun je afwisselen — bv. ma/di/do met oefeningen, wo/vr als flitstoets.
+        </p>
       </div>
 
       <div class="config-groep week-volgorde-toggle">
@@ -1598,17 +1597,6 @@ function openWeekbladDialoog(variant) {
   // Input events
   overlay.querySelector('#week-van-input').addEventListener('input', (e) => {
     weekState.weekVan = e.target.value;
-  });
-  overlay.querySelectorAll('input[name="week-modus"]').forEach(r => {
-    r.addEventListener('change', (e) => {
-      weekState.modus = e.target.value;
-      const btn = overlay.querySelector('#week-genereer');
-      if (e.target.value === 'invulblad') {
-        btn.textContent = '📝 Invulblad maken';
-      } else {
-        btn.textContent = isHuistaak ? '🏠 Huistaakblad maken' : '📄 Weekblad maken';
-      }
-    });
   });
 
   // Vrije-volgorde toggle (alleen PRO)
@@ -1696,6 +1684,13 @@ function renderWeekDagen() {
             <label class="week-dag-datum-label">Datum (optioneel):</label>
             <input type="text" class="week-dag-datum-input" data-dag-datum="${dagId}" placeholder="bv. 12/5" value="${st.datum || ''}">
           </div>
+          <div class="week-dag-vorm-rij">
+            <label class="week-dag-vorm-label">Vorm:</label>
+            <select class="week-dag-vorm" data-dag-vorm="${dagId}">
+              <option value="oefeningen" ${(st.vorm || 'oefeningen') === 'oefeningen' ? 'selected' : ''}>📄 Met oefeningen (op papier)</option>
+              <option value="invulblad" ${st.vorm === 'invulblad' ? 'selected' : ''}>📝 Invulblad (flits op smartbord)</option>
+            </select>
+          </div>
           <div class="week-dag-type-rij">
             <label class="week-dag-type-label">Oefeningtype:</label>
             <select class="week-dag-type" data-dag-type="${dagId}">
@@ -1759,6 +1754,13 @@ function renderWeekDagen() {
             <label class="week-dag-datum-label">Datum (optioneel):</label>
             <input type="text" class="week-dag-datum-input" data-dag-datum="${d.id}" placeholder="bv. 12/5" value="${st.datum || ''}">
           </div>
+          <div class="week-dag-vorm-rij">
+            <label class="week-dag-vorm-label">Vorm:</label>
+            <select class="week-dag-vorm" data-dag-vorm="${d.id}">
+              <option value="oefeningen" ${(st.vorm || 'oefeningen') === 'oefeningen' ? 'selected' : ''}>📄 Met oefeningen (op papier)</option>
+              <option value="invulblad" ${st.vorm === 'invulblad' ? 'selected' : ''}>📝 Invulblad (flits op smartbord)</option>
+            </select>
+          </div>
           <div class="week-dag-type-rij">
             <label class="week-dag-type-label">Oefeningtype:</label>
             <select class="week-dag-type" data-dag-type="${d.id}">
@@ -1816,6 +1818,14 @@ function renderWeekDagen() {
       }
       st.type = nieuwType;
       renderWeekDagen();
+    });
+  });
+  c.querySelectorAll('[data-dag-vorm]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      const dag = sel.dataset.dagVorm;
+      weekState[dag].vorm = sel.value;
+      // Geen re-render nodig: select-waarde is al up-to-date in de DOM,
+      // en niets in de UI hangt af van de vorm-keuze (nog).
     });
   });
   c.querySelectorAll('[data-dag-aanpas]').forEach(btn => {
@@ -1995,7 +2005,7 @@ function renderDagConfigHTML(dagId, type, conf) {
 
   else if (type === 'getalbeelden') {
     html += `<div class="dag-config-info">
-      💡 Getalbeelden werken enkel in invulblad-modus (flits) — instellingen via hoofdscherm.
+      💡 Getalbeelden werken niet op papier. Zet de <strong>Vorm</strong> van deze dag op <strong>📝 Invulblad (flits)</strong> — dan flits je de getalbeelden op het smartbord en vullen de kinderen het antwoord in op hun blad. Instellingen voor de getalbeelden zelf staan op het hoofdscherm.
     </div>`;
   }
 
@@ -2106,48 +2116,56 @@ function maakWeekbladPdf() {
     return false;
   }
 
-  const modus = weekState.modus || 'oefeningen';
-
   const getConfigVoorDag = (dagId) => {
     const st = weekState[dagId];
     return st.config || state.config[st.type];
   };
 
-  // Validatie per slot
-  if (modus === 'oefeningen') {
-    for (const slot of slots) {
-      const type = weekState[slot.stateKey].type;
-      const conf = getConfigVoorDag(slot.stateKey);
-      const bron = weekState[slot.stateKey].config
-        ? `aangepaste instellingen van ${slot.label}`
-        : 'hoofdscherm';
+  const getVormVoorDag = (dagId) => {
+    return weekState[dagId].vorm || 'oefeningen';
+  };
 
-      if ((type === 'maaltafels' || type === 'deeltafels') && conf.tafels.length === 0) {
-        alert(`Voor ${slot.label} (${type}): kies eerst minstens één tafel (in ${bron}).`);
-        return false;
-      }
-      if (type === 'gemengd-maal-deel' && (conf.tafelsKeer.length === 0 || conf.tafelsDeel.length === 0)) {
-        alert(`Voor ${slot.label} (gemengd × en :): kies eerst minstens één maal- en deeltafel (in ${bron}).`);
-        return false;
-      }
-      if (type === 'getalbeelden') {
-        alert(`Getalbeelden werken niet op papier — gebruik 'Invulblad (bij flitsen)' voor ${slot.label} of kies een ander oefeningtype.`);
-        return false;
-      }
+  // Validatie per slot: enkel slots met vorm 'oefeningen' hebben echte oefeningen nodig.
+  // Slots met vorm 'invulblad' (flits) mogen ook getalbeelden zijn — die werken juist
+  // perfect bij flits-modus op het smartbord.
+  for (const slot of slots) {
+    const vorm = getVormVoorDag(slot.stateKey);
+    if (vorm !== 'oefeningen') continue;
+
+    const type = weekState[slot.stateKey].type;
+    const conf = getConfigVoorDag(slot.stateKey);
+    const bron = weekState[slot.stateKey].config
+      ? `aangepaste instellingen van ${slot.label}`
+      : 'hoofdscherm';
+
+    if ((type === 'maaltafels' || type === 'deeltafels') && conf.tafels.length === 0) {
+      alert(`Voor ${slot.label} (${type}): kies eerst minstens één tafel (in ${bron}).`);
+      return false;
+    }
+    if (type === 'gemengd-maal-deel' && (conf.tafelsKeer.length === 0 || conf.tafelsDeel.length === 0)) {
+      alert(`Voor ${slot.label} (gemengd × en :): kies eerst minstens één maal- en deeltafel (in ${bron}).`);
+      return false;
+    }
+    if (type === 'getalbeelden') {
+      alert(`Getalbeelden werken niet op papier — zet de vorm van ${slot.label} op '📝 Invulblad (flits op smartbord)' of kies een ander oefeningtype.`);
+      return false;
     }
   }
 
-  // Genereer oefeningen + voeg datum toe
+  // Genereer oefeningen + voeg datum + vorm toe.
+  // Per dag: bij vorm 'invulblad' geen oefeningen genereren (gewoon lege lijntjes op het blad).
   const dagenMetOef = slots.map(slot => {
     const st = weekState[slot.stateKey];
     const type = st.type;
+    const vorm = getVormVoorDag(slot.stateKey);
     return {
       id: slot.id,
       label: slot.label,
       kort: slot.kort,
       datum: st.datum || '',
       type,
-      oefeningen: modus === 'invulblad'
+      vorm,
+      oefeningen: vorm === 'invulblad'
         ? null
         : window.TempotoetsenGen.genereerToets(type, getConfigVoorDag(slot.stateKey), 10)
     };
@@ -2157,7 +2175,7 @@ function maakWeekbladPdf() {
   // 1–5 dagen → 1 blad. 6 dagen → 4+2. 7 dagen → 4+3.
   const groepen = splitsInBladen(dagenMetOef);
 
-  genereerWeekbladPdf(groepen, modus, weekState.weekVan || '', isHuistaak);
+  genereerWeekbladPdf(groepen, weekState.weekVan || '', isHuistaak);
   return true;
 }
 
@@ -2170,14 +2188,21 @@ function splitsInBladen(dagen) {
   return [dagen.slice(0, 5), dagen.slice(5)];
 }
 
-function genereerWeekbladPdf(groepen, modus, weekVan, isHuistaak) {
+function genereerWeekbladPdf(groepen, weekVan, isHuistaak) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
   const breedte = 297;
   const hoogte = 210;
   const marge = 10;
 
-  const isInvulblad = modus === 'invulblad';
+  // Bepaal globaal (over alle dagen heen): zijn alle dagen invulblad, alle oefeningen, of gemengd?
+  // Dit beïnvloedt enkel de hoofdtitel en het bestandsnaam-suffix.
+  const alleDagen = groepen.flat();
+  const aantalInvul = alleDagen.filter(d => d.vorm === 'invulblad').length;
+  const allesInvulblad = aantalInvul === alleDagen.length;
+  const allesOefeningen = aantalInvul === 0;
+  // 'gemengd' = niet alles hetzelfde
+
   const aantalBladen = groepen.length;
   const totaalKolommen = groepen.reduce((s, g) => s + g.length, 0);
 
@@ -2192,9 +2217,11 @@ function genereerWeekbladPdf(groepen, modus, weekVan, isHuistaak) {
 
     let hoofdtitel;
     if (isHuistaak) {
-      hoofdtitel = isInvulblad ? 'Mijn tempo-huistaak (invulblad)' : 'Mijn tempo-huistaak';
+      if (allesInvulblad) hoofdtitel = 'Mijn tempo-huistaak (invulblad)';
+      else hoofdtitel = 'Mijn tempo-huistaak';
     } else {
-      hoofdtitel = isInvulblad ? 'Tempotoets — Weekblad (invulblad)' : 'Tempotoets — Weekblad';
+      if (allesInvulblad) hoofdtitel = 'Tempotoets — Weekblad (invulblad)';
+      else hoofdtitel = 'Tempotoets — Weekblad';
     }
     doc.text(hoofdtitel, marge, 15);
 
@@ -2369,7 +2396,10 @@ function genereerWeekbladPdf(groepen, modus, weekVan, isHuistaak) {
 
       doc.setTextColor(45, 42, 38);
 
-      if (isInvulblad) {
+      // Bepaal per dag of dit een invulblad-kolom of oefeningen-kolom is
+      const dagIsInvulblad = d.vorm === 'invulblad';
+
+      if (dagIsInvulblad) {
         for (let i = 0; i < 10; i++) {
           const y = oefStartY + i * oefHoogte + 6;
           doc.setFontSize(10);
@@ -2478,6 +2508,20 @@ function genereerWeekbladPdf(groepen, modus, weekVan, isHuistaak) {
       const titelTxt = d.datum && d.datum.trim() ? `${d.label} (${d.datum})` : d.label;
       doc.text(titelTxt, x + kolomBreedte / 2, antStartY + 5.5, { align: 'center' });
 
+      // Bij een invulblad-dag is er geen lijst van oefeningen om te corrigeren —
+      // de juf flitst dan zelf en weet de antwoorden. Toon een korte melding.
+      if (d.vorm === 'invulblad' || !d.oefeningen) {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(140, 140, 140);
+        doc.text('Flits-dag', x + kolomBreedte / 2, antStartY + 22, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text('(geen correctie nodig —', x + kolomBreedte / 2, antStartY + 30, { align: 'center' });
+        doc.text('antwoorden via smartbord)', x + kolomBreedte / 2, antStartY + 35, { align: 'center' });
+        return;
+      }
+
       d.oefeningen.forEach((o, i) => {
         const y = antStartY + 14 + i * antOefHoogte + 4;
         let vraagText;
@@ -2514,23 +2558,23 @@ function genereerWeekbladPdf(groepen, modus, weekVan, isHuistaak) {
     tekenPagina(dagenOpBlad, bladIdx);
   });
 
-  // === Antwoordenbladen (alleen bij oefeningen-modus) ===
-  if (!isInvulblad) {
-    groepen.forEach((dagenOpBlad, bladIdx) => {
-      doc.addPage('a4', 'landscape');
-      tekenAntwoordPagina(dagenOpBlad, bladIdx);
-    });
-  }
+  // === Antwoordenbladen — per blad, alleen als er minstens één oefeningen-dag op staat.
+  // (Een blad met enkel invulblad-dagen heeft niets te corrigeren.)
+  groepen.forEach((dagenOpBlad, bladIdx) => {
+    const heeftOefeningen = dagenOpBlad.some(d => d.vorm !== 'invulblad' && d.oefeningen);
+    if (!heeftOefeningen) return;
+    doc.addPage('a4', 'landscape');
+    tekenAntwoordPagina(dagenOpBlad, bladIdx);
+  });
 
   // Bestandsnaam
   let naam;
   if (isHuistaak) {
-    naam = isInvulblad ? 'Tempotoets-Huistaak-invulblad.pdf' : 'Tempotoets-Huistaak.pdf';
+    naam = allesInvulblad ? 'Tempotoets-Huistaak-invulblad.pdf' : 'Tempotoets-Huistaak.pdf';
   } else {
-    naam = isInvulblad ? 'Tempotoets-Weekblad-invulblad.pdf' : 'Tempotoets-Weekblad.pdf';
+    naam = allesInvulblad ? 'Tempotoets-Weekblad-invulblad.pdf' : 'Tempotoets-Weekblad.pdf';
   }
   doc.save(naam);
-  return true; // voor: overlay.remove() in dialoog + telling in proef-config.js
 }
 
 // ============================================
@@ -2634,19 +2678,21 @@ const uitlegStappen = [
       <p>Per dag kun je:</p>
       <ul>
         <li>De dag <strong>aan- of uitvinken</strong> (bv. woensdag weglaten bij een brugdag)</li>
+        <li>Een <strong>vorm</strong> kiezen: 📄 met oefeningen op papier, of 📝 invulblad voor flitsen op het smartbord</li>
         <li>Een <strong>oefeningtype</strong> kiezen (elke dag kan anders)</li>
         <li>Op <strong>⚙ Aanpassen</strong> klikken om die dag eigen tafels/opties te geven</li>
       </ul>
       <p>Standaard erft elke dag de instellingen van het hoofdscherm. Zodra je iets aanpast, verschijnt een paarse <strong>AANGEPAST</strong> badge naast de dagnaam.</p>`
   },
   {
-    titel: 'Stap 5 — Weekblad: oefeningen of invulblad?',
+    titel: 'Stap 5 — Afwisselen binnen één week',
     illustratie: 'weekmodus',
-    tekst: `<p>In de weekblad-dialoog kies je <strong>Soort blad</strong>:</p>
+    tekst: `<p>Je kunt binnen <em>hetzelfde</em> weekblad afwisselen tussen vormen — heel handig om variatie te brengen in de week:</p>
       <ul>
-        <li><strong>📄 Met oefeningen (op papier)</strong> — elke dag staan de 10 oefeningen klaar, kinderen timen zelf</li>
-        <li><strong>📝 Invulblad (leeg, bij flitsen op smartbord)</strong> — enkel genummerde lijnen, kinderen vullen antwoorden in terwijl jij flitst</li>
+        <li><strong>📄 Met oefeningen (op papier)</strong> — die dag staan de 10 oefeningen klaar, kinderen timen zelf</li>
+        <li><strong>📝 Invulblad (flits op smartbord)</strong> — die dag enkel genummerde lijnen; je flitst zelf op het smartbord en kinderen vullen het antwoord in</li>
       </ul>
+      <p>Voorbeeld: maandag, dinsdag en donderdag op papier — woensdag en vrijdag als flitstoets. Zo krijgt de klas variatie en kun je op flitsdagen ook getalbeelden gebruiken.</p>
       <p>Bij <strong>Week van</strong> kun je de datum alvast invullen (bv. <em>5 mei 2026</em>). Laat je dit leeg, dan staat er een invullijn op de PDF.</p>
       <p>Elke dag krijgt een wit <strong>___/10</strong> score-vakje rechts in de paarse balk om punten te noteren.</p>`
   },
@@ -3032,12 +3078,6 @@ function renderUitlegStap() {
     ? '✓ Aan de slag!'
     : 'Volgende →';
 }
-
-// ============================================
-// Voor proef-config.js — expose op window
-// ============================================
-window.maakWeekbladPdf = maakWeekbladPdf;
-window.huidigeWeekVariant = huidigeWeekVariant;
 
 // ============================================
 // Init
