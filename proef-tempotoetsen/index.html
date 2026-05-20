@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tempotoetsen Generator — juf Zisa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<!-- Proef-systeem (laden vóór alle andere scripts!) -->
+<script src="proef-config.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="hero">
+    <a href="../index.html#zg-probeer" class="terug-link">← Andere tools proberen</a>
+    <div class="hero-content">
+      <div>
+        <h1>⚡ Tempotoetsen Generator</h1>
+        <p>Elke dag een frisse tempotoets — flitsen, invullen of op papier.</p>
+      </div>
+      <button class="uitleg-knop" id="uitleg-knop">❓ Hoe werkt dit?</button>
+    </div>
+  </header>
+
+  <!-- Tabbladen -->
+  <div id="tabs" class="tabs"></div>
+
+  <!-- Configuratie -->
+  <section id="config-paneel" class="config-kaart"></section>
+
+  <!-- Preview -->
+  <section id="preview" class="preview-wrap"></section>
+
+  <!-- Modi -->
+  <h2 style="margin:28px 0 12px;color:var(--paars);">Hoe wil je de toets gebruiken?</h2>
+  <div id="modi" class="modus-grid"></div>
+
+</div>
+
+<!-- jsPDF voor PDF-export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Vlag voor gratis/PRO -->
+<script>window.ISPRO = false;</script>
+
+<!-- Alles in 1 bestand -->
+<script src="app.js"></script>
+
+</body>
+</html>
