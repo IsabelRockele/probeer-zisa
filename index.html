@@ -448,6 +448,17 @@
   font-size: 0.82rem;
   white-space: nowrap;
 }
+.zg-upcoming-badge {
+  display: inline-flex;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #fff0d9;
+  color: #9a5b00;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
 .zg-cat-note {
   margin-top: 16px;
   padding: 14px 18px;
@@ -1176,7 +1187,7 @@ section[id], #zg-prijzen {
           <summary>
             <span class="zg-cat-icon">🅰️</span>
             <span class="zg-cat-name">Taal en letters</span>
-            <span class="zg-cat-count">9 tools</span>
+            <span class="zg-cat-count">9 tools + 1 binnenkort</span>
             <span class="zg-cat-arrow">+</span>
           </summary>
           <div class="zg-cat-body">
@@ -1190,6 +1201,7 @@ section[id], #zg-prijzen {
               <div class="zg-tool"><span class="zg-tool-emoji">📖</span>Lezen</div>
               <div class="zg-tool"><span class="zg-tool-emoji">🃏</span>Leeskaartjes per AVI</div>
               <div class="zg-tool"><span class="zg-tool-emoji">✍️</span>Handschrift</div>
+              <div class="zg-tool" data-tool-name="Spelling"><span class="zg-tool-emoji">🔤</span>Spelling <span class="zg-upcoming-badge">Binnenkort</span></div>
             </div>
           </div>
         </details>
@@ -1542,7 +1554,7 @@ section[id], #zg-prijzen {
       'Rekenrooster':'rekenrooster','Rekendriehoek':'rekendriehoek','Rekencirkel':'rekencirkel','Bundel bewerkingen':'bundel-bewerkingen',
       'Bundel getalinzicht':'bundel-getalinzicht','Werkblad cijferen':'werkblad-cijferen','Bundel geld':'bundel-geld','Bundel meetkunde':'bundel-meetkunde',
       'Verliefde harten':'verliefde-harten','Tempotoetsen':'tempotoetsen','Loopspel':'loopspel','Rekenspellen':'rekenspellen','MAB en schema':'mab-en-schema',
-      'Leeskaartjes per AVI':'leeskaartjes-per-avi','Lezen':'lezen','Handschrift':'handschrift','Woordzoeker':'woordzoeker',
+      'Leeskaartjes per AVI':'leeskaartjes-per-avi','Lezen':'lezen','Handschrift':'handschrift','Spelling':'spelling','Woordzoeker':'woordzoeker',
       'Kruiswoordpuzzel':'kruiswoordpuzzel','Geheime boodschap':'geheime-boodschap','Lettercode':'lettercode','Lettertetris':'lettertetris','Galgje':'galgje',
       'Sudoku':'sudoku','Zoek de verschillen':'zoek-de-verschillen','Doolhof':'doolhof','Slangendoolhof':'slangendoolhof','Hexagonaal raster':'hexagonaal-raster','Schaduw':'schaduw',
       'Punttekening':'punttekening','Pixelart':'pixelart','Bouwplaten':'bouwplaten','Coderen':'coderen','Blokkenbouwsels':'blokkenbouwsels','Plattegrond':'plattegrond',
@@ -1552,7 +1564,7 @@ section[id], #zg-prijzen {
     };
     document.querySelectorAll('.zg-tool').forEach(tool => {
       const emoji = tool.querySelector('.zg-tool-emoji')?.textContent || '';
-      const naam = tool.textContent.replace(emoji, '').trim();
+      const naam = tool.dataset.toolName || tool.textContent.replace(emoji, '').trim();
       const slug = voorbeeldLinks[naam];
       if (!slug) return;
       const link = document.createElement('a');
