@@ -27,10 +27,15 @@ const Tafels = (() => {
     const wilRedeneren = oefeningstypes.includes('Redeneren');
     const wilKoppel    = oefeningstypes.includes('Koppel');
 
-    const pool = [];
+    // Aparte sub-pools per type → eerlijke verdeling bij 'Gemengd'
+    const poolVerm = [];
+    const poolDeel = [];
+    const poolFactor = [];
+    const poolRedeneren = [];
+    const poolKoppel = [];
 
     for (const tafel of tafels) {
-  for (let multiplier = 0; multiplier <= tafelMax; multiplier++) {
+      for (let multiplier = 0; multiplier <= tafelMax; multiplier++) {
         const product = tafel * multiplier;
 
         // Bepaal welke volgorden we genereren
@@ -42,68 +47,122 @@ const Tafels = (() => {
 
         if (wilVerm) {
           if (voegVooraan) {
-            pool.push({ type: 'vermenigvuldigen', a: tafel, b: multiplier, antwoord: product,
+            poolVerm.push({ type: 'vermenigvuldigen', a: tafel, b: multiplier, antwoord: product,
               sleutel: `v-${tafel}-${multiplier}` });
           }
           if (voegAchteraan && tafel !== multiplier) {
-            pool.push({ type: 'vermenigvuldigen', a: multiplier, b: tafel, antwoord: product,
+            poolVerm.push({ type: 'vermenigvuldigen', a: multiplier, b: tafel, antwoord: product,
               sleutel: `v-${multiplier}-${tafel}` });
           }
         }
-        
+
         if (wilDeel && product > 0) {
-  // Altijd enkel de gekozen tafel als deler
-  pool.push({
-    type: 'gedeeld',
-    a: product,
-    b: tafel,
-    antwoord: multiplier,
-    sleutel: `d-${product}-${tafel}`
-  });
-}
+          // Altijd enkel de gekozen tafel als deler
+          poolDeel.push({
+            type: 'gedeeld',
+            a: product,
+            b: tafel,
+            antwoord: multiplier,
+            sleutel: `d-${product}-${tafel}`
+          });
+        }
+
         if (wilFactor) {
           // Ontbrekende factor: altijd beide posities (links én rechts) aanbieden,
           // ongeacht tafelPositie — zodat het invulvakje afwisselend 1e of 2e factor is.
           // ___ × multiplier = product  (tafel is de ontbrekende 1e factor)
-          pool.push({ type: 'ontbrekende-factor', positie: 'links', a: null, b: multiplier, antwoord: tafel,
+          poolFactor.push({ type: 'ontbrekende-factor', positie: 'links', a: null, b: multiplier, antwoord: tafel,
             product, sleutel: `f-l-${tafel}-${multiplier}` });
           // tafel × ___ = product  (multiplier is de ontbrekende 2e factor)
-          pool.push({ type: 'ontbrekende-factor', positie: 'rechts', a: tafel, b: null, antwoord: multiplier,
+          poolFactor.push({ type: 'ontbrekende-factor', positie: 'rechts', a: tafel, b: null, antwoord: multiplier,
             product, sleutel: `f-r-${tafel}-${multiplier}` });
         }
 
         if (wilRedeneren && product > 0) {
           // deeltal : deler = ___ , want ___ × deler = deeltal
           // Alleen de geselecteerde tafel als deler — niet multiplier
-          pool.push({ type: 'redeneren', deeltal: product, deler: tafel, quotient: multiplier,
+          poolRedeneren.push({ type: 'redeneren', deeltal: product, deler: tafel, quotient: multiplier,
             sleutel: `red-${product}-${tafel}` });
         }
 
         if (wilKoppel) {
           // factor1 × factor2 = ___ , dus ___ : factor2 = ___
           if (voegVooraan) {
-            pool.push({ type: 'koppel', factor1: tafel, factor2: multiplier, product,
+            poolKoppel.push({ type: 'koppel', factor1: tafel, factor2: multiplier, product,
               sleutel: `kop-${tafel}-${multiplier}` });
           }
           if (voegAchteraan && tafel !== multiplier) {
-            pool.push({ type: 'koppel', factor1: multiplier, factor2: tafel, product,
+            poolKoppel.push({ type: 'koppel', factor1: multiplier, factor2: tafel, product,
               sleutel: `kop-${multiplier}-${tafel}` });
           }
         }
       }
     }
 
-    if (pool.length === 0) return [];
+    // Helper: trek n unieke oefeningen uit een sub-pool
+    function _trekUit(subPool, n, gebruikt) {
+      const resultaat = [];
+      const gemengd = _shuffle(subPool);
+      for (const oef of gemengd) {
+        if (gebruikt.has(oef.sleutel)) continue;
+        gebruikt.add(oef.sleutel);
+        resultaat.push(oef);
+        if (resultaat.length >= n) break;
+      }
+      return resultaat;
+    }
 
-    // Meng en kies zonder herhaling
-    const gemengd = _shuffle(pool);
-    const gekozen = [];
     const gebruikt = new Set();
-    for (const oef of gemengd) {
-      if (gebruikt.has(oef.sleutel)) continue;
-      gebruikt.add(oef.sleutel);
-      gekozen.push(oef);
-      if (gekozen.length >= aantalOefeningen) break;
+    let gekozen = [];
+
+    if (isGemengd) {
+      // Eerlijke verdeling over de 3 hoofdtypes (vermenigvuldigen, deling, ontbrekende factor).
+      // Verdeel quota zo gelijk mogelijk; rest wordt random over types verdeeld.
+      const actief = [];
+      if (wilVerm)   actief.push({ key: 'verm',   pool: poolVerm });
+      if (wilDeel)   actief.push({ key: 'deel',   pool: poolDeel });
+      if (wilFactor) actief.push({ key: 'factor', pool: poolFactor });
+
+      const basisQuota = Math.floor(aantalOefeningen / actief.length);
+      let rest = aantalOefeningen - basisQuota * actief.length;
+      // Rest verdelen over willekeurige types
+      const restVolgorde = _shuffle(actief.map((_, i) => i));
+      const quota = actief.map(() => basisQuota);
+      for (let i = 0; i < rest; i++) quota[restVolgorde[i]]++;
+
+      // Trek per type
+      const tekorten = [];
+      actief.forEach((entry, i) => {
+        const getrokken = _trekUit(entry.pool, quota[i], gebruikt);
+        gekozen.push(...getrokken);
+        const tekort = quota[i] - getrokken.length;
+        if (tekort > 0) tekorten.push(tekort);
+      });
+
+      // Eventuele tekorten (bv. te kleine sub-pool) opvullen vanuit andere types
+      const totaalTekort = tekorten.reduce((s, x) => s + x, 0);
+      if (totaalTekort > 0) {
+        const restPool = [
+          ...(wilVerm ? poolVerm : []),
+          ...(wilDeel ? poolDeel : []),
+          ...(wilFactor ? poolFactor : [])
+        ];
+        const aanvulling = _trekUit(restPool, totaalTekort, gebruikt);
+        gekozen.push(...aanvulling);
+      }
+
+      // Eindshuffle zodat de oefeningen niet per type gegroepeerd staan
+      gekozen = _shuffle(gekozen);
+    } else {
+      // Niet-gemengd: combineer alle actieve sub-pools en trek random
+      const samen = [
+        ...(wilVerm ? poolVerm : []),
+        ...(wilDeel ? poolDeel : []),
+        ...(wilFactor ? poolFactor : []),
+        ...(wilRedeneren ? poolRedeneren : []),
+        ...(wilKoppel ? poolKoppel : [])
+      ];
+      gekozen = _trekUit(samen, aantalOefeningen, gebruikt);
     }
 
     return gekozen;

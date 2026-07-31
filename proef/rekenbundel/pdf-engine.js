@@ -672,11 +672,6 @@ const somTekst = (delen.length >= 3)
     }
 
     // Teken schijfjes per kolom
-    // Totaal aan te kleuren schijfjes = groot - klein (het antwoord)
-    // Dit wordt ALTIJD bij de eenheden gestart. Bij brug loopt het over naar
-    // de aanvulrij onder E, en desnoods naar T-kolom (bij aanvullen > 10).
-    const totaalBlauw = Math.max(0, groot - klein);
-
     kolommen.forEach((kol, ki) => {
       const kolX = ox + marge + ki * kolW;
       // Bepaal of deze kolom een lege aanvulrij krijgt
@@ -684,27 +679,24 @@ const somTekst = (delen.length >= 3)
                            (kol.label === 'T' && metLegeRijT) ||
                            (kol.label === 'H' && metLegeRijH);
 
-      // Bereken hoeveel blauwe schijfjes in DEZE kolom bij oplossingen.
-      // Alle schijfjes gaan bij de E-kolom (dat is wat het kind moet doen:
-      // eenheden aanvullen tot het antwoord bereikt is). T-kolom krijgt
-      // alleen blauw als er overloop is uit de E-aanvulrij (aantal > 10 eenheden).
-      let blauwInKolom10  = 0; // hoeveel schijfjes in de 10-schijfjes rij blauw
-      let blauwInAanvulrij = 0; // hoeveel in de lege aanvulrij blauw
+      // Bereken hoeveel schijfjes aangevuld moeten worden (voor oplossing)
+      // Werkt per kolom: kolGroot - kolKlein. Bij brug kan dit negatief zijn;
+      // dan geldt (10 - kolKlein) + kolGroot, en de volgende hogere kolom krijgt +1.
+      // Voor de visuele inkleuring in DEZE kolom tellen we hoe veel schijfjes
+      // over blijven: eerst de resterende lege schijfjes in de 10-schijfjes-kolom,
+      // vervolgens (indien brug) extra schijfjes in de lege aanvulrij.
+      let aantalAanvullen = 0;
       if (_metAntwoorden) {
-        if (kol.label === 'E') {
-          // E-kolom: vul eerst de lege posities in de 10-kolom,
-          // overloop gaat naar de E-aanvulrij, daarna naar T-aanvulrij.
-          const ruimteInKolom10 = TOTAAL - kol.aantalVoor;
-          blauwInKolom10   = Math.min(totaalBlauw, ruimteInKolom10);
-          const overE      = Math.max(0, totaalBlauw - ruimteInKolom10);
-          blauwInAanvulrij = Math.min(overE, LEGE_RIJ);
-        } else if (kol.label === 'T') {
-          // T-aanvulrij krijgt alleen overloop uit E > 10 + 5 = 15 eenheden
-          // (zeer zeldzaam). We laten de 10-kolom hier ongemoeid.
-          const ruimteEKolom10  = TOTAAL - (kolommen.find(k => k.label === 'E')?.aantalVoor || 0);
-          const overE           = Math.max(0, totaalBlauw - ruimteEKolom10);
-          const overEAanvulrij  = Math.max(0, overE - LEGE_RIJ);
-          blauwInAanvulrij      = Math.min(overEAanvulrij, LEGE_RIJ);
+        const kolGroot = kol.label === 'E' ? eGroot :
+                         kol.label === 'T' ? tGroot :
+                         kol.label === 'H' ? hGroot :
+                         kol.label === 'D' ? dGroot : 0;
+        const verschil = kolGroot - kol.aantalVoor;
+        if (verschil >= 0) {
+          aantalAanvullen = verschil;
+        } else {
+          // brug: we vullen aan tot 10 in deze kolom
+          aantalAanvullen = 10 - kol.aantalVoor;
         }
       }
 
@@ -715,10 +707,10 @@ const somTekst = (delen.length >= 3)
         const sx = kolX + gap + posInRij * (schijfD + gap) + schijfD / 2;
         const sy = schY + kopH + gap + rijNr * rijH + schijfD / 2;
         const isVoor = i < kol.aantalVoor;
-        // Bij oplossingen: alleen E-kolom krijgt blauw in 10-kolom rij
+        // Bij oplossingen: kleur schijfjes na aantalVoor blauw tot we genoeg hebben
         const isAanTeVullen = _metAntwoorden && !isVoor &&
                               i >= kol.aantalVoor &&
-                              i < kol.aantalVoor + blauwInKolom10;
+                              i < kol.aantalVoor + aantalAanvullen;
         if (isVoor) {
           doc.setFillColor(...kol.kleur);
           doc.setDrawColor(kol.kleur[0]-40, kol.kleur[1]-40, kol.kleur[2]-40);
@@ -742,10 +734,13 @@ const somTekst = (delen.length >= 3)
       // Teken extra lege rij voor aanvullen inkleuren
       if (heeftLegeRij) {
         const legeRijNr = Math.ceil(TOTAAL / rijGrootte);
+        // Overflow in aanvulrij = hoeveel aangevuld moet worden maar niet
+        // meer in de 10-schijfjes-kolom paste
+        const overflowNaarAanvulrij = Math.max(0, kol.aantalVoor + aantalAanvullen - TOTAAL);
         for (let i = 0; i < LEGE_RIJ; i++) {
           const sx = kolX + gap + i * (schijfD + gap) + schijfD / 2;
           const sy = schY + kopH + gap + legeRijNr * rijH + schijfD / 2;
-          const isAanTeVullen = _metAntwoorden && i < blauwInAanvulrij;
+          const isAanTeVullen = _metAntwoorden && i < overflowNaarAanvulrij;
           if (isAanTeVullen) {
             doc.setFillColor(74, 144, 217);   // blauw
             doc.setDrawColor(40, 100, 180);
@@ -2010,6 +2005,8 @@ const onthoudH = c;
   }
 
  async function _tekenBlok(blok) {
+  if (blok.bewerking === 'breuken')                                  { _tekenBreukenBlok(blok); return; }
+  if (blok.bewerking === 'percentages')                              { _tekenPercentageBlok(blok); return; }
   if (blok.bewerking === 'schatten')                                          { _tekenSchattenBlok(blok); return; }
   if (blok.bewerking === 'vraagstukken')                              { _tekenVraagstukBlok(blok); return; }
   if (blok.bewerking === 'rekentaal')                                  { _tekenRekentaalBlok(blok); return; }
@@ -2074,6 +2071,367 @@ const onthoudH = c;
   y += NABLOK;
   lijn(ML, y - 4, ML + CW, y - 4, [210,220,230], 0.4);
 }
+
+  function _pdfBreuk(cx, cy, n, d, leeg = false, vakW = 8) {
+    const w = vakW;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(35,35,35);
+    if (leeg) {
+      doc.setDrawColor(165,175,185); doc.setLineWidth(.4);
+      doc.roundedRect(cx-w/2,cy-8,w,7,1,1,'S'); doc.roundedRect(cx-w/2,cy+1,w,7,1,1,'S');
+      // Duidelijke breukstreep tussen het teller- en noemervak.
+      doc.setDrawColor(45,45,45); doc.setLineWidth(.55); doc.line(cx-w/2-1,cy,cx+w/2+1,cy);
+      if (_metAntwoorden) {
+        doc.setTextColor(0,130,0); doc.setFont('helvetica','bold');
+        doc.text(String(n),cx,cy-2.3,{align:'center'}); doc.text(String(d),cx,cy+5.7,{align:'center'});
+        doc.setTextColor(35,35,35); doc.setFont('helvetica','normal');
+      }
+    } else {
+      doc.text(String(n), cx, cy - 2.3, { align:'center' });
+      doc.setDrawColor(35,35,35); doc.setLineWidth(0.4); doc.line(cx-w/2,cy,cx+w/2,cy);
+      doc.text(String(d), cx, cy + 5, { align:'center' });
+    }
+  }
+
+  function _tekenBreukSom(oef, x, top, w, schema, keten = false) {
+    const cy = top + 11;
+    if (keten) {
+      const sx=x+w/2-32, step=8;
+      _pdfBreuk(sx,cy,oef.n1,oef.d1); doc.setFontSize(10); doc.text(oef.op,sx+step,cy+2); _pdfBreuk(sx+2*step,cy,oef.n2,oef.d2);
+      doc.text('=',sx+3*step,cy+2); _pdfBreuk(sx+4*step,cy,oef.g1,oef.doel,true); doc.text(oef.op,sx+5*step,cy+2);
+      _pdfBreuk(sx+6*step,cy,oef.g2,oef.doel,true); doc.text('=',sx+7*step,cy+2); _pdfBreuk(sx+8*step,cy,oef.teller,oef.doel,true);
+      return;
+    }
+    if (!schema) {
+      const p1=x+15, p2=x+w*.50, p3=x+w-15;
+      _pdfBreuk(p1,cy,oef.n1,oef.d1); doc.setFontSize(12); doc.text(oef.op,(p1+p2)/2,cy+2,{align:'center'});
+      _pdfBreuk(p2,cy,oef.n2,oef.d2); doc.text('=',(p2+p3)/2,cy+2,{align:'center'}); _pdfBreuk(p3,cy,oef.teller,oef.doel,true); return;
+    }
+    // Compacte ketting: ook het laatste antwoordvak blijft binnen het kader.
+    const sx=x+w/2-32, step=8;
+    _pdfBreuk(sx,cy,oef.n1,oef.d1); doc.setFontSize(10); doc.text(oef.op,sx+step,cy+2); _pdfBreuk(sx+2*step,cy,oef.n2,oef.d2);
+    doc.text('=',sx+3*step,cy+2); _pdfBreuk(sx+4*step,cy,oef.g1,oef.doel,true); doc.text(oef.op,sx+5*step,cy+2);
+    _pdfBreuk(sx+6*step,cy,oef.g2,oef.doel,true); doc.text('=',sx+7*step,cy+2); _pdfBreuk(sx+8*step,cy,oef.teller,oef.doel,true);
+    const conv=oef.factor1>1?[oef.n1,oef.d1,oef.g1,oef.factor1]:[oef.n2,oef.d2,oef.g2,oef.factor2];
+    const bx=x+w/2, sy=top+48; _pdfBreuk(bx-19,sy,conv[0],conv[1]); doc.text('=',bx,sy+2); _pdfBreuk(bx+19,sy,conv[2],oef.doel,true);
+    doc.setDrawColor(35,35,35); doc.setLineWidth(.45);
+    // Bogen lopen van rechts naast de bron naar links naast het antwoordvak.
+    doc.lines([[7,-7,19,-7,27,0]],bx-13,sy-7,[1,1],'S');
+    doc.lines([[7,7,19,7,27,0]],bx-13,sy+7,[1,1],'S');
+    doc.setFillColor(35,35,35);
+    doc.triangle(bx+14,sy-7,bx+11.1,sy-7.5,bx+13.1,sy-9.8,'F');
+    doc.triangle(bx+14,sy+7,bx+13.1,sy+9.8,bx+11.1,sy+7.5,'F');
+    doc.setFontSize(11); const factor=_metAntwoorden?String(conv[3]):'______';
+    doc.text(`× ${factor}`,bx-8,sy-17); doc.text(`× ${factor}`,bx-8,sy+22);
+  }
+
+  function _tekenBreukenBlok(blok) {
+    if (blok.config?.soort === 'vermenigvuldigen') { _tekenBreukVermenigvuldigBlok(blok); return; }
+    if (blok.config?.soort === 'gemengde-getallen') { _tekenGemengdeBreukenBlok(blok); return; }
+    const isOngelijk = blok.config?.soort === 'ongelijknamig';
+    const keten = isOngelijk && blok.config?.variant === 'kort';
+    const schema = isOngelijk && !keten;
+    const rijH = schema ? 80 : (keten ? 32 : 28), kolW = CW/2, rijen=Math.ceil(blok.oefeningen.length/2);
+    // Opdrachtzin en de volledige eerste rij blijven altijd samen.
+    checkRuimte(VOOR_ZIN + ZINRUIMTE + rijH + 4);
+    y += VOOR_ZIN; doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(26,58,92); doc.text(blok.opdrachtzin,ML,y); y += ZINRUIMTE;
+    for(let r=0;r<rijen;r++){
+      if(r>0) checkRuimte(rijH);
+      blok.oefeningen.slice(r*2,r*2+2).forEach((o,i)=>{
+        const x=ML+i*kolW+2,w=kolW-5;
+        doc.setFillColor(255,255,255); doc.setDrawColor(180,190,200); doc.setLineWidth(.45); doc.roundedRect(x,y,w,rijH-5,2,2,'FD');
+        _tekenBreukSom(o,x,y,w,schema,keten);
+      });
+      y += rijH;
+    }
+    y += NABLOK; lijn(ML,y-4,ML+CW,y-4,[210,220,230],.4);
+  }
+
+  function _tekenPercentageBlok(blok){
+    const stappen=blok.config?.variant==='stappen';
+    const kolommen=stappen?2:1,rijH=stappen?105:28,kolW=CW/kolommen;
+    checkRuimte(VOOR_ZIN+ZINRUIMTE+rijH+3);y+=VOOR_ZIN;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(26,58,92);doc.text(blok.opdrachtzin,ML,y);y+=ZINRUIMTE;
+    const antwoord=(tekst,x0,y0,w=20)=>{
+      doc.setDrawColor(130,170,185);doc.rect(x0,y0-9,w,12,'S');
+      if(_metAntwoorden){doc.setTextColor(0,125,180);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text(String(tekst),x0+w/2,y0,{align:'center'});}
+    };
+    for(let r=0;r<Math.ceil(blok.oefeningen.length/kolommen);r++){
+      if(r>0)checkRuimte(rijH);
+      blok.oefeningen.slice(r*kolommen,(r+1)*kolommen).forEach((o,i)=>{
+        const x=ML+i*kolW+2,w=kolW-5;
+        if(stappen){
+          doc.setFillColor(255,255,255);doc.setDrawColor(170,180,188);doc.roundedRect(x,y,w,rijH-5,3,3,'FD');
+          doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(35,35,35);doc.text(`Hoeveel is ${o.procent}% van ${o.geheel}?`,x+6,y+10);
+          const bx=x+w-45,by=y+17;
+          doc.setDrawColor(105,158,170);doc.setLineWidth(.7);doc.roundedRect(bx,by,40,23,4,4,'S');
+          doc.setTextColor(105,158,170);doc.setFont('helvetica','normal');doc.setFontSize(11.5);doc.text(`${o.procent}% =`,bx+5,by+14);
+          _pdfBreuk(bx+24,by+12,o.stapTeller,o.stapNoemer,true,11);
+          const pijlX=x+29,pijlY=y+18,pijlEind=bx-1.5;
+          doc.setDrawColor(105,158,170);doc.setFillColor(105,158,170);doc.setLineWidth(.8);
+          doc.line(pijlX,pijlY,pijlX,y+31);doc.line(pijlX,y+31,pijlEind,y+31);
+          doc.triangle(bx+1.5,y+31,bx-2.2,y+28.8,bx-2.2,y+33.2,'F');
+          const regels=o.stapNoemer===100
+            ? [{label:'100% ->',antwoord:String(o.geheel)},{label:'1% ->',antwoord:`${o.geheel} : 100 = ${o.eenProcent}`},{label:`${o.procent}% ->`,antwoord:`${o.procent} x ${o.eenProcent} = ${o.antwoord}`}]
+            : [{label:'geheel ->',antwoord:String(o.geheel)},{label:'1 breukdeel ->',antwoord:`${o.geheel} : ${o.stapNoemer} = ${o.eenBreukdeel}`},{label:`${o.stapTeller} breukdelen ->`,antwoord:`${o.stapTeller} x ${o.eenBreukdeel} = ${o.antwoord}`}];
+          doc.setFontSize(10.5);doc.setFont('helvetica','normal');
+          regels.forEach((regel,j)=>{
+            const ry=y+53+j*13,labelW=doc.getTextWidth(regel.label);
+            doc.setTextColor(35,35,35);doc.setFont('helvetica','normal');doc.text(regel.label,x+20,ry);
+            doc.setDrawColor(180,190,198);doc.line(x+22+labelW,ry+2,x+w-7,ry+2);
+            if(_metAntwoorden){doc.setTextColor(0,125,180);doc.setFont('helvetica','bold');doc.text(regel.antwoord,x+24+labelW,ry);doc.setFont('helvetica','normal');}
+          });
+          const slotTekst=`${o.procent}% van ${o.geheel} =`,slotX=x+20;
+          doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(35,35,35);doc.text(slotTekst,slotX,y+96);
+          antwoord(o.antwoord,slotX+doc.getTextWidth(slotTekst)+3,y+96,14);
+        }else{
+          doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(35,35,35);
+          const cy=y+13,lx=x+8,begin=`${o.procent}% van ${o.geheel} =`;
+          const punt=(waarde,px,py)=>{doc.setTextColor(_metAntwoorden?0:35,_metAntwoorden?125:35,_metAntwoorden?180:35);doc.setFont('helvetica',_metAntwoorden?'bold':'normal');doc.text(_metAntwoorden?String(waarde):'.',px,py,{align:'center'});};
+          doc.text(begin,lx,cy);
+          const eersteX=lx+doc.getTextWidth(begin)+8;
+          punt(o.stapTeller,eersteX,cy-4);doc.setDrawColor(35,35,35);doc.setLineWidth(.45);doc.line(eersteX-6,cy-1,eersteX+6,cy-1);punt(o.stapNoemer,eersteX,cy+7);
+          doc.setTextColor(35,35,35);doc.setFont('helvetica','normal');doc.text(`x ${o.geheel} =`,eersteX+10,cy);
+          const fx=eersteX+49;
+          if(_metAntwoorden){
+            const g=(a,b)=>b?g(b,a%b):a,deel=g(o.geheel,o.stapNoemer);
+            doc.setTextColor(0,125,180);doc.setFont('helvetica','normal');doc.setFontSize(11);
+            doc.text(String(o.stapTeller),fx-14,cy-5,{align:'center'});
+            doc.text('x',fx-2,cy-5,{align:'center'});
+            doc.text(String(o.geheel),fx+14,cy-5,{align:'center'});
+            doc.setDrawColor(35,35,35);doc.setLineWidth(.45);doc.line(fx-23,cy-2,fx+28,cy-2);
+            doc.text(String(o.stapNoemer),fx+2,cy+8,{align:'center'});
+            doc.setDrawColor(0,125,180);doc.setLineWidth(.7);
+            doc.line(fx+6,cy-1,fx+23,cy-11);
+            doc.line(fx-5,cy+10,fx+8,cy+1);
+            doc.setFontSize(7);
+            doc.text(String(o.geheel/deel),fx+25,cy-10);
+            doc.text(String(o.stapNoemer/deel),fx+10,cy+7);
+          }else{
+            punt(o.stapTeller*o.geheel,fx,cy-5);
+            doc.setDrawColor(35,35,35);doc.setLineWidth(.45);doc.line(fx-20,cy-2,fx+20,cy-2);
+            punt(o.stapNoemer,fx,cy+8);
+          }
+          doc.setFontSize(12);doc.setTextColor(35,35,35);doc.setFont('helvetica','normal');doc.text('=',fx+27,cy);
+          doc.setDrawColor(175,185,195);doc.line(fx+37,cy+1,fx+57,cy+1);
+          if(_metAntwoorden){doc.setTextColor(0,125,180);doc.setFont('helvetica','bold');doc.text(String(o.antwoord),fx+39,cy);}
+        }
+      });
+      y+=rijH;
+    }
+    y+=NABLOK;lijn(ML,y-4,ML+CW,y-4,[210,220,230],.4);
+  }
+
+  function _tekenBreukVermenigvuldigBlok(blok){
+    const uitgebreid=blok.config?.variant==='van-getal',verbinden=blok.config?.variant==='verbinden',gemengd=blok.config?.variant==='gemengd-vermenigvuldigen',vraagstukken=blok.config?.variant==='vraagstukken';
+    const kolommen=uitgebreid||verbinden||vraagstukken?1:2,rijH=vraagstukken?126:verbinden?150:uitgebreid?94:34,kolW=CW/kolommen;
+    checkRuimte(VOOR_ZIN+ZINRUIMTE+rijH+4);y+=VOOR_ZIN;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(26,58,92);doc.text(blok.opdrachtzin,ML,y);y+=ZINRUIMTE;
+    const schrijfAntwoord=(tekst,x0,y0,w=28)=>{doc.setDrawColor(170,180,190);doc.line(x0,y0,x0+w,y0);if(_metAntwoorden){doc.setTextColor(0,125,180);doc.setFont('helvetica','bold');doc.text(String(tekst),x0+2,y0-1);}};
+    for(let r=0;r<Math.ceil(blok.oefeningen.length/kolommen);r++){
+      if(r>0)checkRuimte(rijH);
+      if(gemengd){doc.setDrawColor(115,160,175);doc.setLineWidth(.45);doc.line(ML+CW/2,y,ML+CW/2,y+rijH);}
+      blok.oefeningen.slice(r*kolommen,(r+1)*kolommen).forEach((o,i)=>{
+        const x=ML+i*kolW+2,w=kolW-5,c=x+w/2;
+        if(!gemengd){doc.setFillColor(255,255,255);doc.setDrawColor(190,200,210);doc.roundedRect(x,y,w,rijH-5,2,2,'FD');}
+        if(o.vorm==='vraagstuk'){
+          doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(35,35,35);
+          doc.setDrawColor(165,175,185);doc.roundedRect(x+4,y+4,w-8,43,3,3,'S');
+          let ty=y+12;
+          o.regels.forEach(regel=>{doc.text(regel,x+9,ty);ty+=7;});
+          doc.setFont('helvetica','bold');doc.text(o.vraag,x+9,ty+1);
+          const vakY=y+57,vakW=(w-20)/2,vakH=42;
+          const raster=(rx,ry,rw,rh)=>{
+            doc.setDrawColor(205,220,226);doc.setLineWidth(.25);doc.rect(rx,ry,rw,rh,'S');
+            for(let gx=rx+6;gx<rx+rw;gx+=6)doc.line(gx,ry,gx,ry+rh);
+            for(let gy=ry+7;gy<ry+rh;gy+=7)doc.line(rx,gy,rx+rw,gy);
+          };
+          doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(105,155,168);
+          doc.text('Schema:',x+6,vakY-3);doc.text('Bewerking:',x+14+vakW,vakY-3);
+          raster(x+6,vakY,vakW,vakH);raster(x+14+vakW,vakY,vakW,vakH);
+          if(_metAntwoorden){
+            doc.setTextColor(0,125,180);doc.setFont('helvetica','bold');doc.setFontSize(9);
+            const regels=o.zoekGeheel
+              ? [`${o.n} breukdelen -> ${o.gegeven}`,`1 breukdeel -> ${o.gegeven} : ${o.n} = ${o.deelPerBreuk}`,`${o.d} breukdelen -> ${o.d} x ${o.deelPerBreuk} = ${o.antwoord}`]
+              : [`geheel -> ${o.gegeven}`,`1 breukdeel -> ${o.gegeven} : ${o.d} = ${o.deelPerBreuk}`,`${o.n} breukdelen -> ${o.n} x ${o.deelPerBreuk} = ${o.antwoord}`];
+            regels.forEach((regel,j)=>doc.text(regel,x+17+vakW,vakY+10+j*9));
+            doc.setFontSize(11);doc.text(o.zoekGeheel?'?':String(o.gegeven),x+6+vakW/2,vakY+10,{align:'center'});
+            doc.text(`${o.n}/${o.d}`,x+12,vakY+31);doc.text(String(o.gegeven),x+6+vakW*.58,vakY+31);
+          }
+          doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(105,155,168);doc.text('Antwoordzin:',x+6,y+112);
+          doc.setDrawColor(165,175,185);doc.line(x+31,y+113,x+w-7,y+113);
+          if(_metAntwoorden){doc.setTextColor(0,125,180);doc.setFont('helvetica','bold');doc.text(o.antwoordzin,x+32,y+111);}
+          return;
+        }
+        if(o.vorm==='verbinden'){
+          const links=o.items.filter(v=>v.kant==='links'),rechts=o.items.filter(v=>v.kant==='rechts');
+          o.doelen.forEach((d,j)=>{const cy=y+25+j*28;doc.setDrawColor(240,170,30);doc.circle(c,cy,8,'S');doc.setTextColor(35,35,35);doc.setFontSize(10);doc.text(d,c,cy+2,{align:'center'});});
+          [links,rechts].forEach((items,k)=>items.forEach((v,j)=>{const cy=y+25+j*28,bx=k===0?x+8:c+18;_pdfBreuk(bx,cy,v.n,v.d);doc.setTextColor(35,35,35);doc.setFontSize(10);doc.text(`x ${v.getal} =`,bx+8,cy+2);schrijfAntwoord(v.antwoord,bx+28,cy+3,25);}));
+          return;
+        }
+        if(uitgebreid){
+          const lx=x+25;
+          // Uitlegzin: breuk van getal = breuk × getal
+          _pdfBreuk(lx,y+15,o.n,o.d);
+          doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(35,35,35);
+          doc.text(`van ${o.getal} =`,lx+11,y+17);
+          _pdfBreuk(lx+39,y+15,o.n,o.d);
+          doc.text(`x ${o.getal}`,lx+50,y+17);
+          // Volledige bewerking met de lange breukstreep
+          _pdfBreuk(lx-2,y+37,o.n,o.d);doc.text(`x ${o.getal} =`,lx+9,y+39);
+          const fx=lx+46,fy=y+34;
+          doc.setFont('helvetica','bold');doc.text(String(o.n),fx-14,fy);
+          doc.setFont('helvetica','normal');doc.text('x',fx-3,fy);
+          doc.setFont('helvetica','bold');doc.text(String(o.getal),fx+9,fy);
+          doc.setDrawColor(35,35,35);doc.setLineWidth(.45);doc.line(fx-19,fy+4,fx+25,fy+4);
+          doc.text(String(o.d),fx+1,fy+14,{align:'center'});
+          doc.setFont('helvetica','normal');doc.text('=',fx+31,fy+7);
+          schrijfAntwoord(o.antwoord,fx+41,fy+8,34);
+          if(_metAntwoorden){
+            doc.setDrawColor(0,125,180);doc.setLineWidth(.7);
+            doc.line(fx-2,fy+16,fx+4,fy+8);doc.line(fx+7,fy+2,fx+23,fy-7);
+            doc.setTextColor(0,125,180);doc.setFontSize(7);
+            doc.text('1',fx+6,fy+14);doc.text(String(o.deel),fx+22,fy-5);
+          }
+          // Twee vrije werklijnen; alleen de oplossingssleutel vult ze in.
+          doc.setDrawColor(175,185,195);doc.setLineWidth(.35);
+          doc.line(lx+10,y+57,lx+88,y+57);doc.line(lx+10,y+72,lx+88,y+72);
+          if(_metAntwoorden){
+            doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(0,125,180);
+            doc.text(`${o.getal} : ${o.d} = ${o.deel}`,lx+11,y+55);
+            doc.text(`${o.n} x ${o.deel} = ${o.antwoord}`,lx+11,y+70);
+          }
+          // Slotzin links onderaan.
+          _pdfBreuk(lx+2,y+84,o.n,o.d);
+          doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(35,35,35);
+          doc.text(`van ${o.getal} =`,lx+13,y+86);
+          schrijfAntwoord(o.antwoord,lx+40,y+87,35);
+          return;
+        }
+        const sy=y+17;
+        if(o.vorm==='getal-maal-breuk'){doc.setFontSize(12);doc.setTextColor(35,35,35);doc.text(`${o.getal} x`,c-35,sy+2);_pdfBreuk(c-19,sy,o.n,o.d);}
+        else{_pdfBreuk(c-38,sy,o.n,o.d);doc.setFontSize(12);doc.setTextColor(35,35,35);doc.text(`${o.vorm==='van-getal'?'van':'x'} ${o.getal}`,c-28,sy+2);}
+        doc.text('=',c+2,sy+2);
+        if(_metAntwoorden&&o.vorm==='getal-maal-breuk'){
+          const heelRuw=Math.floor(o.product/o.d),restRuw=o.product%o.d;
+          doc.setTextColor(0,125,180);_pdfBreuk(c+11,sy,o.product,o.d);doc.setTextColor(0,125,180);doc.text('=',c+21,sy+2);
+          if(heelRuw){_pdfGemengdGetal(c+31,sy,heelRuw,restRuw,o.d);doc.setTextColor(0,125,180);doc.text('=',c+42,sy+2);doc.setFont('helvetica','bold');doc.text(o.antwoord,c+48,sy+2);}
+          else{doc.setFont('helvetica','bold');doc.text(o.antwoord,c+27,sy+2);}
+        }else schrijfAntwoord(o.antwoord,c+10,sy+3,30);
+        if(uitgebreid){
+          doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(35,35,35);
+          {
+            const fx=c-14,fy=y+37;doc.setTextColor(_metAntwoorden?0:35,_metAntwoorden?125:35,_metAntwoorden?180:35);doc.setFont('helvetica',_metAntwoorden?'bold':'normal');doc.text(String(o.n),fx-22,fy);doc.text('x',fx-10,fy);doc.text(String(o.getal),fx+1,fy);
+            doc.setDrawColor(35,35,35);doc.setLineWidth(.45);doc.line(fx-27,fy+3,fx+15,fy+3);doc.text(String(o.d),fx-10,fy+12);
+            if(_metAntwoorden){
+            doc.setDrawColor(0,125,180);doc.setLineWidth(.7);doc.line(fx-13,fy+14,fx-6,fy+6);doc.line(fx-1,fy+2,fx+12,fy-7);
+            doc.setFontSize(7);doc.text('1',fx-4,fy+12);doc.text(String(o.deel),fx+11,fy-5);
+            }
+          }
+          doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(35,35,35);
+          doc.text(`${o.getal} : ${o.d} =`,x+25,y+55);schrijfAntwoord(o.deel,x+53,y+56,25);
+          doc.text(`${o.n} x ${o.deel} =`,x+25,y+70);schrijfAntwoord(o.antwoord,x+53,y+71,25);
+          _pdfBreuk(x+w-60,y+80,o.n,o.d);doc.text(`van ${o.getal} =`,x+w-49,y+82);schrijfAntwoord(o.antwoord,x+w-25,y+83,20);
+        }
+      });
+      y+=rijH;
+    }
+    y+=NABLOK;lijn(ML,y-4,ML+CW,y-4,[210,220,230],.4);
+  }
+
+  function _pdfGemengdGetal(cx,cy,w,n,d,leeg=false) {
+    doc.setFontSize(11); doc.setFont('helvetica','normal'); doc.setTextColor(35,35,35);
+    if(w){
+      if(leeg){ doc.setDrawColor(165,175,185); doc.roundedRect(cx-8.5,cy-7,7,14,1,1,'S'); if(_metAntwoorden){doc.setTextColor(0,130,0);doc.setFont('helvetica','bold');doc.text(String(w),cx-5,cy+2,{align:'center'});} }
+      else doc.text(String(w),cx-5,cy+2,{align:'center'});
+    }
+    if(n!==0 || !w)_pdfBreuk(w?cx+4:cx-3,cy,n,d,leeg);
+  }
+
+  function _pdfMgStroken(x,sy,w,n,d,inkleuren,strookBreedte=13,strookHoogte=6,maxPerRij=99) {
+    const sw=strookBreedte,h=strookHoogte,g=1.8,totaal=w+((n>0||w===0)?1:0);
+    for(let s=0;s<totaal;s++){
+      const sx=x+(s%maxPerRij)*(sw+g), rijY=sy+Math.floor(s/maxPerRij)*(h+1.5), gevuld=s<w?d:n;
+      if(s<w){
+        if(inkleuren||_metAntwoorden){doc.setFillColor(121,169,207);doc.rect(sx,rijY,sw,h,'F');}
+        doc.setDrawColor(100,100,100);doc.setLineWidth(.25);doc.rect(sx,rijY,sw,h,'S');
+        continue;
+      }
+      for(let i=0;i<d;i++){
+        if((inkleuren||_metAntwoorden)&&i<gevuld){doc.setFillColor(121,169,207);doc.rect(sx+i*sw/d,rijY,sw/d,h,'F');}
+        doc.setDrawColor(100,100,100);doc.setLineWidth(.25);doc.rect(sx+i*sw/d,rijY,sw/d,h,'S');
+      }
+    }
+  }
+
+  function _pdfMgOmzet(o,x,oy,schrijf=false,vasteBronX=null) {
+    if(!o.ongelijknamig)return;
+    const v=o.factor1>1?[o.n1,o.d1,o.cn1,o.factor1]:[o.n2,o.d2,o.cn2,o.factor2];
+    doc.setDrawColor(6,150,215);doc.setFillColor(6,150,215);doc.setLineWidth(1);
+    if(!schrijf){
+      doc.line(x,oy,x,oy+15);doc.triangle(x,oy+19,x-3,oy+14,x+3,oy+14,'F');
+      _pdfBreuk(x,oy+31,v[2],o.doel,true);return;
+    }
+    const bx=vasteBronX??x+20, eindX=bx-7;
+    doc.line(x,oy,x,oy+24);doc.line(x,oy+24,eindX,oy+24);
+    if(eindX>=x)doc.triangle(eindX+3,oy+24,eindX-2,oy+21,eindX-2,oy+27,'F');
+    else doc.triangle(eindX-3,oy+24,eindX+2,oy+21,eindX+2,oy+27,'F');
+    const by=oy+40;_pdfBreuk(bx,by,v[0],v[1]);doc.setTextColor(35,35,35);doc.text('=',bx+11,by+2);_pdfBreuk(bx+23,by,v[2],o.doel,true);
+    doc.setDrawColor(35,35,35);doc.setFillColor(35,35,35);doc.setLineWidth(.45);
+    doc.lines([[4,-5,9,-5,13,0]],bx+3,by-7,[1,1],'S');doc.lines([[4,5,9,5,13,0]],bx+3,by+7,[1,1],'S');
+    doc.triangle(bx+17,by-7,bx+13.5,by-8.5,bx+14.5,by-4.5,'F');doc.triangle(bx+17,by+7,bx+14.5,by+4.5,bx+13.5,by+8.5,'F');
+    doc.setFontSize(9);doc.text(`× ${_metAntwoorden?v[3]:'____'}`,bx+8,by-14);doc.text(`× ${_metAntwoorden?v[3]:'____'}`,bx+8,by+19);
+  }
+
+  function _tekenGemengdeBreukenBlok(blok) {
+    const variant=blok.config?.variant||'inkleuren', heeftOngelijk=blok.oefeningen.some(o=>o.ongelijknamig);
+    const kolAantal=variant==='zonder'?2:1;
+    const rijH=variant==='zonder'?30:(variant==='afbeelding'?(heeftOngelijk?92:72):(heeftOngelijk?175:130)), kolW=CW/kolAantal, rijen=Math.ceil(blok.oefeningen.length/kolAantal);
+    checkRuimte(VOOR_ZIN+ZINRUIMTE+rijH+4); y+=VOOR_ZIN; doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(26,58,92);doc.text(blok.opdrachtzin,ML,y);y+=ZINRUIMTE;
+    for(let r=0;r<rijen;r++){
+      if(r>0)checkRuimte(rijH);
+      blok.oefeningen.slice(r*kolAantal,(r+1)*kolAantal).forEach((o,i)=>{
+        const x=ML+i*kolW+2,w=kolW-5,c=x+w/2;
+        doc.setFillColor(255,255,255);doc.setDrawColor(180,190,200);doc.roundedRect(x,y,w,rijH-5,2,2,'FD');
+        if(variant==='zonder'){
+          _pdfGemengdGetal(c-25,y+11,o.w1,o.n1,o.d1);doc.text(o.op,c-11,y+13);_pdfGemengdGetal(c+2,y+11,o.w2,o.n2,o.d2);doc.text('=',c+16,y+13);
+          doc.setDrawColor(130,140,150);doc.line(c+21,y+14,x+w-4,y+14);
+          if(_metAntwoorden){doc.setTextColor(0,130,0);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(o.antwoord,c+23,y+12);}
+        }else if(variant==='afbeelding'){
+          const links=x+8,rechts=x+w/2+5;
+          _pdfMgStroken(x+12,y+9,o.w1,o.n1,o.d1,true,o.w1?14:40,11);doc.setFontSize(12);doc.setTextColor(35,35,35);doc.text(o.op,x+w/2,y+17,{align:'center'});_pdfMgStroken(x+w/2+8,y+9,o.w2,o.n2,o.d2,true,o.w2?14:40,11);
+          const somY=y+35;
+          _pdfGemengdGetal(x+12,somY,o.w1,o.n1,o.d1,true);doc.text(o.op,x+25,somY+2);_pdfGemengdGetal(x+37,somY,o.w2,o.n2,o.d2,true);doc.text('=',x+49,somY+2);_pdfBreuk(x+60,somY,o.totaal,o.doel,true);doc.text('=',x+70,somY+2);_pdfGemengdGetal(x+82,somY,o.heel,o.rest,o.doel,true);
+          if(o.ongelijknamig){
+            const ax=o.factor1>1?x+12:x+37;doc.setDrawColor(6,150,215);doc.setFillColor(6,150,215);doc.setLineWidth(1);doc.line(ax,somY+9,ax,somY+28);doc.line(ax,somY+28,ax+7,somY+28);doc.triangle(ax+10,somY+28,ax+5,somY+25,ax+5,somY+31,'F');
+            _pdfBreuk(ax+20,somY+32,o.factor1>1?o.n1:o.n2,o.factor1>1?o.d1:o.d2,true);doc.setTextColor(35,35,35);doc.text('=',ax+30,somY+34);_pdfBreuk(ax+40,somY+32,o.factor1>1?o.cn1:o.cn2,o.doel,true);
+          }
+        }else{
+          const gevuld=false, linksW=w*.59, rechtsX=x+linksW+4, rechtsW=w-linksW-8;
+          doc.setFontSize(10);doc.setTextColor(35,35,35);
+          _pdfGemengdGetal(x+16,y+10,o.w1,o.n1,o.d1);doc.text(o.op,x+30,y+12);_pdfGemengdGetal(x+43,y+10,o.w2,o.n2,o.d2);doc.text('= ?',x+57,y+12);
+          const startY=y+32;
+          _pdfGemengdGetal(x+36,startY-14,o.w1,o.n1,o.d1);_pdfMgStroken(x+18,startY-5,o.w1,o.n1,o.d1,gevuld,o.w1?18:38,10,o.w1?2:1);
+          doc.text(o.op,x+58,startY+1);_pdfMgStroken(x+64,startY-5,o.w2,o.n2,o.d2,gevuld,o.w2?15:32,10,o.w2?2:1);
+          _pdfGemengdGetal(x+80,startY-14,o.w2,o.n2,o.d2);
+          if(o.ongelijknamig)_pdfMgOmzet(o,o.factor1>1?x+36:x+80,startY+15);
+          const werkY=o.ongelijknamig?startY+78:startY+34;
+          _pdfGemengdGetal(x+36,werkY-14,o.w1,o.cn1,o.doel,true);_pdfMgStroken(x+18,werkY-5,o.w1,o.cn1,o.doel,gevuld,o.w1?18:38,10,o.w1?2:1);
+          doc.text(o.op,x+58,werkY+1);_pdfMgStroken(x+64,werkY-5,o.w2,o.cn2,o.doel,gevuld,o.w2?15:32,10,o.w2?2:1);
+          _pdfGemengdGetal(x+80,werkY-14,o.w2,o.cn2,o.doel,true);
+          doc.setDrawColor(35,35,35);doc.setFillColor(35,35,35);doc.setLineWidth(.7);doc.line(x+55,werkY+7,x+55,werkY+22);doc.triangle(x+55,werkY+27,x+52.5,werkY+21,x+57.5,werkY+21,'F');
+          _pdfGemengdGetal(x+36,werkY+28,o.heel,o.rest,o.doel,true);_pdfMgStroken(x+18,werkY+37,o.heel,o.rest,o.doel,gevuld,o.heel<=1?28:18,10,o.heel>1?2:1);
+
+          doc.setFillColor(255,255,255);doc.setDrawColor(180,185,190);doc.setLineWidth(.5);doc.roundedRect(rechtsX,y+7,rechtsW,rijH-19,3,3,'FD');
+          doc.setFont('helvetica','italic');doc.setFontSize(11);doc.setTextColor(60,60,60);doc.text('Ik schrijf:',rechtsX+5,y+15);
+          doc.setFont('helvetica','normal');doc.setFontSize(10);
+          _pdfGemengdGetal(rechtsX+11,y+29,o.w1,o.n1,o.d1);doc.text(o.op,rechtsX+24,y+31);_pdfGemengdGetal(rechtsX+36,y+29,o.w2,o.n2,o.d2);doc.text('=',rechtsX+48,y+31);_pdfBreuk(rechtsX+58,y+29,o.totaal,o.doel,true);
+          if(o.ongelijknamig)_pdfMgOmzet(o,o.factor1>1?rechtsX+11:rechtsX+36,y+39,true,rechtsX+16);
+          const antY=o.ongelijknamig?y+142:y+92;doc.text('=',rechtsX+32,antY+2);_pdfGemengdGetal(rechtsX+49,antY,o.heel,o.rest,o.doel,true);
+        }
+      }); y+=rijH;
+    }
+    y+=NABLOK;lijn(ML,y-4,ML+CW,y-4,[210,220,230],.4);
+  }
 
   /* ── Maak eerst 10: 3-termen optellen/aftrekken ─────────── */
   // 3 kolommen (tekst is breder), optioneel geel voorbeeldkader
@@ -3984,7 +4342,11 @@ lijnKort(fx, formY);
 }
 
   /* ── Publieke API ────────────────────────────────────────── */
-  async function genereer(bundelData, titel, metAntw = false) {
+  async function genereer(bundelData, titel, metAntw = false, onProgress = null) {
+    const meldVoortgang = (procent, tekst) => {
+      if (typeof onProgress === 'function') onProgress(procent, tekst);
+    };
+    meldVoortgang(2, 'Document voorbereiden…');
     const { jsPDF } = window.jspdf;
     doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     _lampBase64Cache = null;
@@ -3994,21 +4356,78 @@ lijnKort(fx, formY);
 
     // Oplossingssleutel: andere koptekst
     if (metAntw) {
-      _tekenKoptekstSleutel(titel || 'Rekenbundel');
+      const heeftSplitsstappen = bundelData.some(b => b.bewerking === 'splitsingen' || b.hulpmiddelen?.includes('splitsbeen'));
+      _tekenKoptekstSleutel(titel || 'Rekenbundel', heeftSplitsstappen);
     } else {
       _tekenKoptekst(titel || 'Rekenbundel');
     }
 
-    for (const blok of bundelData) {
+    const alleenAfbeeldingsBlokken=bundelData.length>0&&bundelData.every(b=>b.config?.soort==='gemengde-getallen'||b.config?.soort==='kommagetallen');
+    const aantalPreviewKaarten=alleenAfbeeldingsBlokken?bundelData.reduce((som,blok)=>{const el=document.querySelector(`.preview-blok[data-id="${blok.id}"]`);return som+(el?.querySelectorAll(blok.config?.soort==='kommagetallen'?'.komma-oef':'.mg-oef').length||0);},0):0;
+    if(alleenAfbeeldingsBlokken&&window.html2canvas&&aantalPreviewKaarten>0){
+      const body=document.body,had=body.classList.contains('toont-oplossingen'),hadPdfOpname=body.classList.contains('pdf-opname');
+      const totaalKaarten=aantalPreviewKaarten;
+      let verwerkteKaarten=0;
+      body.classList.toggle('toont-oplossingen',metAntw);
+      try { for(const blok of bundelData){
+        const el=document.querySelector(`.preview-blok[data-id="${blok.id}"]`);
+        if(!el)continue;
+        const kaartSelector=blok.config?.soort==='kommagetallen'?'.komma-oef':'.mg-oef';
+        const kaarten=[];for(const kaart of el.querySelectorAll(kaartSelector)){
+          meldVoortgang(5+Math.round(82*verwerkteKaarten/totaalKaarten),`Oefening ${verwerkteKaarten+1} van ${totaalKaarten} verwerken…`);
+          kaarten.push(await window.html2canvas(kaart,{
+            scale:2,
+            backgroundColor:'#fff',
+            useCORS:true,
+            foreignObjectRendering:false,
+            ignoreElements:n=>n.classList?.contains('btn-del-oef')||n.classList?.contains('pdf-progress-overlay'),
+            onclone:gekloondDocument=>{
+              gekloondDocument.body.classList.add('pdf-opname');
+              gekloondDocument.body.classList.toggle('toont-oplossingen',metAntw);
+              const voortgang=gekloondDocument.getElementById('pdf-progress-overlay');
+              if(voortgang)voortgang.style.display='none';
+            }
+          }));
+          verwerkteKaarten++;
+          meldVoortgang(5+Math.round(82*verwerkteKaarten/totaalKaarten),`Oefening ${verwerkteKaarten} van ${totaalKaarten} verwerkt`);
+        }
+        const isRekenrooster=blok.config?.variant==='rooster'||blok.config?.variant==='aftrek-rooster'||blok.config?.variant==='rooster-honderdsten'||blok.config?.variant==='aftrek-rooster-honderdsten'||blok.config?.variant==='rooster-bewerkingen-gemengd';
+        const schrijfAlsHonderdsten=blok.config?.soort==='kommagetallen'&&['honderdsten','honderdsten-brug','aftrek-honderdsten','aftrek-honderdsten-brug'].includes(blok.config?.variant);
+        const gewoneTiendensom=blok.config?.soort==='kommagetallen'&&['kort','aftrek-kort','aftrek-brug-kort','aftrek-kort-honderdsten','aftrek-kort-honderdsten-brug','kort-honderdsten-gemengd','aftrek-kort-honderdsten-gemengd','kort-bewerkingen-gemengd','vermenigvuldigen-nulregel','delen-nulregel'].includes(blok.config?.variant);
+        const compact=(blok.config?.soort==='kommagetallen'&&!isRekenrooster&&!schrijfAlsHonderdsten)||blok.config?.variant==='afbeelding'||blok.config?.variant==='zonder';
+        const kolommenPerRij=compact?(gewoneTiendensom?3:2):1,doelW=(CW-(kolommenPerRij-1)*5)/kolommenPerRij;
+        const eersteAantal=Math.min(kolommenPerRij,kaarten.length),eersteH=Math.max(0,...kaarten.slice(0,eersteAantal).map(c=>doelW*c.height/c.width));
+        const opdrachtRegels=['vermenigvuldigen','delen'].includes(blok.config?.bewerking)
+          ? (blok.opdrachtzin.match(/[^.!?]+[.!?]?/g)||[blok.opdrachtzin]).map(regel=>regel.trim()).filter(Boolean)
+          : [blok.opdrachtzin];
+        const opdrachtHoogte=opdrachtRegels.length*6;
+        checkRuimte(opdrachtHoogte+eersteH+5);
+        doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(26,58,92);doc.text(opdrachtRegels,ML,y);y+=opdrachtHoogte;
+        let kol=0,rijMax=0;
+        for(const canvas of kaarten){const h=doelW*canvas.height/canvas.width;if(!compact){checkRuimte(h+5);doc.addImage(canvas.toDataURL('image/png'),'PNG',ML,y,doelW,h);y+=h+5;continue;}if(kol===0){checkRuimte(h+5);rijMax=0;}const px=ML+kol*(doelW+5);doc.addImage(canvas.toDataURL('image/png'),'PNG',px,y,doelW,h);rijMax=Math.max(rijMax,h);kol++;if(kol===kolommenPerRij){y+=rijMax+5;kol=0;}}
+        if(compact&&kol)y+=rijMax+5;
+        if(isRekenrooster)y+=10;else y+=7;
+      }} finally { body.classList.toggle('toont-oplossingen',had); body.classList.toggle('pdf-opname',hadPdfOpname); }
+      meldVoortgang(94,'PDF samenstellen…');
+      const naam=(titel||'rekenbundel').replace(/\s+/g,'-').toLowerCase()+(metAntw?'-oplossingssleutel':'')+'.pdf';
+      meldVoortgang(98,'Download opslaan…');doc.save(naam);await new Promise(resolve=>setTimeout(resolve,100));meldVoortgang(100,'Klaar');return;
+    }
+
+    for (let blokIndex=0; blokIndex<bundelData.length; blokIndex++) {
+      const blok=bundelData[blokIndex];
+      meldVoortgang(5+Math.round(88*blokIndex/Math.max(1,bundelData.length)),`Onderdeel ${blokIndex+1} van ${bundelData.length} verwerken…`);
       await _tekenBlok(blok);
     }
 
     const bestandsnaam = (titel || 'rekenbundel').replace(/\s+/g, '-').toLowerCase();
     const suffix = metAntw ? '-oplossingssleutel' : '';
+    meldVoortgang(98,'Download opslaan…');
     doc.save(`${bestandsnaam}${suffix}.pdf`);
+    await new Promise(resolve=>setTimeout(resolve,100));
+    meldVoortgang(100,'Klaar');
   }
 
-  function _tekenKoptekstSleutel(titel) {
+  function _tekenKoptekstSleutel(titel, toonSplitsOpm = false) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
     doc.setTextColor(80, 80, 80);
@@ -4023,14 +4442,11 @@ lijnKort(fx, formY);
     y += 7;
     lijn(ML, y, ML + CW, y, [0,150,50], 1.0);
     y += 7;
-    // Opmerking over tussenstappen
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(9);
-    doc.setTextColor(120, 120, 120);
-    const opmTekst = '* De tussenstappen bij splitsoefeningen kunnen afwijken van de gebruikte methode in de klas.';
-    const opmRegels = doc.splitTextToSize(opmTekst, CW);
-    doc.text(opmRegels, ML, y);
-    y += opmRegels.length * 5 + 3;
+    if (toonSplitsOpm) {
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(120,120,120);
+      const opmRegels = doc.splitTextToSize('* De tussenstappen bij splitsoefeningen kunnen afwijken van de gebruikte methode in de klas.', CW);
+      doc.text(opmRegels,ML,y); y += opmRegels.length*5+3;
+    }
   }
 
   /* ── Tafels blok tekenen ─────────────────────────────────── */
@@ -4146,20 +4562,76 @@ lijnKort(fx, formY);
 
   /* ── Tafels inzicht blok tekenen ────────────────────────── */
   /* ── Canvas-helper: emoji → PNG data-URL (gecached) ──────── */
+  // Veel emoji's (🚗 🌸 🐟 🦋 🍦 🍎 ...) hebben ingebouwde transparante padding
+  // rond hun glyph, waardoor ze visueel veel kleiner lijken dan bv. ⭐.
+  // Oplossing: render emoji groot op canvas, crop de transparante randen weg,
+  // en herrender op een vierkant canvas zodat élke emoji zijn box volledig vult.
   const _emojiCache = {};
   function _emojiPng(emoji, px = 48) {
     const key = emoji + px;
     if (_emojiCache[key]) return _emojiCache[key];
-    const canvas = document.createElement('canvas');
-    canvas.width  = px;
-    canvas.height = px;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, px, px);
-    ctx.font = `${Math.round(px * 0.75)}px serif`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(emoji, px / 2, px / 2);
-    const url = canvas.toDataURL('image/png');
+
+    // Stap 1: render emoji op groot canvas met ruime marge
+    const big = 256;
+    const c1 = document.createElement('canvas');
+    c1.width = big; c1.height = big;
+    const ctx1 = c1.getContext('2d');
+    ctx1.clearRect(0, 0, big, big);
+    ctx1.font = `${Math.round(big * 0.85)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",serif`;
+    ctx1.textAlign = 'center';
+    ctx1.textBaseline = 'middle';
+    ctx1.fillText(emoji, big / 2, big / 2);
+
+    // Stap 2: vind bounding box van niet-transparante pixels
+    let minX = big, minY = big, maxX = -1, maxY = -1;
+    try {
+      const data = ctx1.getImageData(0, 0, big, big).data;
+      for (let y = 0; y < big; y++) {
+        for (let x = 0; x < big; x++) {
+          if (data[(y * big + x) * 4 + 3] > 8) {  // alpha > 8
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+    } catch (e) {
+      maxX = -1;
+    }
+
+    // Fallback als emoji niet gerenderd kon worden of canvas tainted is
+    if (maxX < 0) {
+      const fb = document.createElement('canvas');
+      fb.width = px; fb.height = px;
+      const ctxFb = fb.getContext('2d');
+      ctxFb.font = `${Math.round(px * 0.85)}px serif`;
+      ctxFb.textAlign = 'center';
+      ctxFb.textBaseline = 'middle';
+      ctxFb.fillText(emoji, px / 2, px / 2);
+      const url = fb.toDataURL('image/png');
+      _emojiCache[key] = url;
+      return url;
+    }
+
+    // Stap 3: crop naar vierkante box rond glyph (met kleine marge van 4%)
+    const w = maxX - minX + 1;
+    const h = maxY - minY + 1;
+    const side = Math.max(w, h);
+    const margin = Math.round(side * 0.04);
+    const boxSide = side + margin * 2;
+    const boxX = minX + (w - side) / 2 - margin;
+    const boxY = minY + (h - side) / 2 - margin;
+
+    // Stap 4: schaal gecropte box naar gewenste px × px output
+    const c2 = document.createElement('canvas');
+    c2.width = px; c2.height = px;
+    const ctx2 = c2.getContext('2d');
+    ctx2.imageSmoothingEnabled = true;
+    ctx2.imageSmoothingQuality = 'high';
+    ctx2.drawImage(c1, boxX, boxY, boxSide, boxSide, 0, 0, px, px);
+
+    const url = c2.toDataURL('image/png');
     _emojiCache[key] = url;
     return url;
   }

@@ -78,6 +78,8 @@ const App = (() => {
     const isGemengd      = bewerking === 'gemengd';
     const isKomma        = bewerking === 'komma';
     const isSchatten     = bewerking === 'schatten';
+    const isBreuken      = bewerking === 'breuken';
+    const isPercentages  = bewerking === 'percentages';
 
     // Schakel tussen de sidebar-content blokken
     const tabHoofd        = document.getElementById('tab-hoofdrekenen');
@@ -89,7 +91,9 @@ const App = (() => {
     const tabVraagstukken = document.getElementById('tab-vraagstukken');
     const tabRekentaal    = document.getElementById('tab-rekentaal');
     const tabSchatten     = document.getElementById('tab-schatten');
-    if (tabHoofd)        tabHoofd.style.display        = (!isTafels && !isInzicht && !isCijferen && !isVraagstukken && !isRekentaal && !isGemengd && !isKomma && !isSchatten) ? 'block' : 'none';
+    const tabBreuken      = document.getElementById('tab-breuken');
+    const tabPercentages  = document.getElementById('tab-percentages');
+    if (tabHoofd)        tabHoofd.style.display        = (!isTafels && !isInzicht && !isCijferen && !isVraagstukken && !isRekentaal && !isGemengd && !isKomma && !isSchatten && !isBreuken && !isPercentages) ? 'block' : 'none';
     if (tabGemengd)      tabGemengd.style.display      = isGemengd       ? 'block' : 'none';
     if (tabKomma)        tabKomma.style.display        = isKomma         ? 'block' : 'none';
     if (tabTafels)       tabTafels.style.display       = isTafels        ? 'block' : 'none';
@@ -98,6 +102,11 @@ const App = (() => {
     if (tabVraagstukken) tabVraagstukken.style.display = isVraagstukken  ? 'block' : 'none';
     if (tabRekentaal)    tabRekentaal.style.display    = isRekentaal     ? 'block' : 'none';
     if (tabSchatten)     tabSchatten.style.display     = isSchatten      ? 'block' : 'none';
+    if (tabBreuken)      tabBreuken.style.display      = isBreuken       ? 'block' : 'none';
+    if (tabPercentages)  tabPercentages.style.display  = isPercentages   ? 'block' : 'none';
+
+    if (isBreuken) return;
+    if (isPercentages) return;
 
     if (isSchatten) { _updateSchattenUI(); _updateSchattenAfrondenUI(); return; }
 
@@ -422,14 +431,23 @@ const App = (() => {
         const checkbox = label.querySelector('input');
 
         if (type === 'Gemengd') {
-          container.querySelectorAll('.vink-chip').forEach(l => {
-            l.classList.remove('geselecteerd');
-            l.querySelector('input').checked = false;
-            l.querySelector('.vink-box').textContent = '';
-          });
-          label.classList.add('geselecteerd');
-          checkbox.checked = true;
-          label.querySelector('.vink-box').textContent = '✓';
+          const wasChecked = checkbox.checked;
+          if (wasChecked) {
+            // Gemengd uitvinken → gewoon deze chip uitzetten, andere chips blijven zoals ze waren
+            checkbox.checked = false;
+            label.classList.remove('geselecteerd');
+            label.querySelector('.vink-box').textContent = '';
+          } else {
+            // Gemengd aanvinken → alle andere chips uitvinken
+            container.querySelectorAll('.vink-chip').forEach(l => {
+              l.classList.remove('geselecteerd');
+              l.querySelector('input').checked = false;
+              l.querySelector('.vink-box').textContent = '';
+            });
+            label.classList.add('geselecteerd');
+            checkbox.checked = true;
+            label.querySelector('.vink-box').textContent = '✓';
+          }
         } else {
           const gemengdLabel = [...container.querySelectorAll('.vink-chip')]
             .find(l => l.querySelector('input').value === 'Gemengd');
@@ -718,6 +736,36 @@ const App = (() => {
   function voegOefeningToe(blokId) {
     const blok = bundelData.find(b => b.id === blokId);
     if (!blok) return;
+
+    if(blok.bewerking==='kommagetallen'){
+      const teken=blok.config.bewerking==='aftrekken'?'-':'+';
+      const sleutel=o=>o.rooster?o.sleutel:`${o.a}${teken}${o.b}`;
+      const bestaand=new Set(blok.oefeningen.map(sleutel));
+      const kandidaten=Kommagetallen.genereer({...blok.config,toonVoorbeeld:false,aantalOefeningen:12});
+      const nieuw=kandidaten.find(o=>!bestaand.has(sleutel(o)));
+      if(nieuw){blok.oefeningen.push(nieuw);Preview.render(bundelData);toonToast('➕ Oefening toegevoegd','#27AE60');}
+      else toonToast('⚠️ Geen nieuwe unieke oefening beschikbaar','#E74C3C');
+      return;
+    }
+    if(blok.bewerking==='breuken'){
+      const bestaand=new Set(blok.oefeningen.map(o=>o.sleutel));
+      let nieuw=null;
+      for(let poging=0;poging<20&&!nieuw;poging++){
+        const kandidaten=Breuken.genereer({...blok.config,aantalOefeningen:16});
+        nieuw=kandidaten.find(o=>!bestaand.has(o.sleutel))||null;
+      }
+      if(nieuw){blok.oefeningen.push(nieuw);Preview.render(bundelData);toonToast('➕ Oefening toegevoegd','#27AE60');}
+      else toonToast('⚠️ Geen nieuwe unieke oefening beschikbaar','#E74C3C');
+      return;
+    }
+    if(blok.bewerking==='percentages'){
+      const bestaand=new Set(blok.oefeningen.map(o=>o.sleutel));
+      const kandidaten=Percentages.genereer({...blok.config,aantalOefeningen:20});
+      const nieuw=kandidaten.find(o=>!bestaand.has(o.sleutel));
+      if(nieuw){blok.oefeningen.push(nieuw);Preview.render(bundelData);toonToast('➕ Oefening toegevoegd','#27AE60');}
+      else toonToast('⚠️ Geen nieuwe unieke oefening beschikbaar','#E74C3C');
+      return;
+    }
 
     // Rekentaal gaat via Generator.voegOefeningToe (zie generator.js)
     const gelukt = Generator.voegOefeningToe(blok);
@@ -1289,19 +1337,50 @@ function _getSplitsConfig() {
     toonToast('✅ Preview bijgewerkt');
   }
 
-  function downloadPDF() {
+  function _toonPdfVoortgang(titel) {
+    const overlay = document.getElementById('pdf-progress-overlay');
+    document.getElementById('pdf-progress-titel').textContent = titel;
+    document.getElementById('pdf-progress-vulling').style.width = '0%';
+    document.getElementById('pdf-progress-status').textContent = 'PDF voorbereiden…';
+    document.getElementById('pdf-progress-percentage').textContent = '0%';
+    overlay.classList.add('zichtbaar');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+  function _updatePdfVoortgang(procent, status) {
+    const waarde = Math.max(0, Math.min(100, Math.round(procent || 0)));
+    document.getElementById('pdf-progress-vulling').style.width = `${waarde}%`;
+    document.getElementById('pdf-progress-percentage').textContent = `${waarde}%`;
+    if (status) document.getElementById('pdf-progress-status').textContent = status;
+  }
+  function _verbergPdfVoortgang() {
+    const overlay = document.getElementById('pdf-progress-overlay');
+    overlay.classList.remove('zichtbaar');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+  async function _maakPdf(metAntwoorden) {
     if (bundelData.length === 0) return;
     const titel = document.getElementById('bundel-titel').value.trim() || 'Rekenbundel';
-    PdfEngine.genereer(bundelData, titel);
-    toonToast('📄 PDF gedownload!', '#27AE60');
+    const btnPdf = document.getElementById('btn-pdf');
+    const btnSleutel = document.getElementById('btn-sleutel');
+    btnPdf.disabled = true; btnSleutel.disabled = true;
+    _toonPdfVoortgang(metAntwoorden ? 'Oplossingssleutel maken' : 'PDF maken');
+    try {
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      await PdfEngine.genereer(bundelData, titel, metAntwoorden, _updatePdfVoortgang);
+      _updatePdfVoortgang(100, 'Klaar! De download wordt geopend.');
+      await new Promise(resolve => setTimeout(resolve, 450));
+      toonToast(metAntwoorden ? '🔑 Oplossingssleutel gedownload!' : '📄 PDF gedownload!', '#27AE60');
+    } catch (fout) {
+      console.error('PDF maken mislukt:', fout);
+      toonToast('❌ De PDF kon niet worden gemaakt. Probeer het opnieuw.', '#E74C3C');
+    } finally {
+      _verbergPdfVoortgang();
+      btnPdf.disabled = bundelData.length === 0;
+      btnSleutel.disabled = bundelData.length === 0;
+    }
   }
-
-  function downloadSleutel() {
-    if (bundelData.length === 0) return;
-    const titel = document.getElementById('bundel-titel').value.trim() || 'Rekenbundel';
-    PdfEngine.genereer(bundelData, titel, true);
-    toonToast('🔑 Oplossingssleutel gedownload!', '#27AE60');
-  }
+  async function downloadPDF() { return _maakPdf(false); }
+  async function downloadSleutel() { return _maakPdf(true); }
 
   /* ── Initialisatie ───────────────────────────────────────── */
   function init() {
@@ -2003,6 +2082,301 @@ function _getSplitsConfig() {
     toonToast(`✅ Gemengd blok toegevoegd! (${blok.oefeningen.length} oefeningen)`, '#FF8C00');
   }
 
+  function selecteerBreukRadio(naam, waarde, el) {
+    document.querySelectorAll(`[name="${naam}"]`).forEach(r => {
+      r.checked = r.value === waarde;
+      r.closest('.radio-chip')?.classList.toggle('geselecteerd', r.checked);
+    });
+    if (naam === 'breuk-soort') {
+      const inp = document.getElementById('inp-opdrachtzin-breuken');
+      const werkvorm = document.getElementById('kaart-breuk-werkvorm');
+      if (werkvorm) werkvorm.style.display = waarde === 'ongelijknamig' ? 'block' : 'none';
+      const gemengdeWerkvorm = document.getElementById('kaart-gemengde-werkvorm');
+      if (gemengdeWerkvorm) gemengdeWerkvorm.style.display = waarde === 'gemengde-getallen' ? 'block' : 'none';
+      const gemengdeNoemers = document.getElementById('kaart-gemengde-noemers');
+      if (gemengdeNoemers) gemengdeNoemers.style.display = waarde === 'gemengde-getallen' ? 'block' : 'none';
+      const vermenigvuldigen = document.getElementById('kaart-breuk-vermenigvuldigen');
+      if (vermenigvuldigen) vermenigvuldigen.style.display = waarde === 'vermenigvuldigen' ? 'block' : 'none';
+      const bewerkingskaart = document.getElementById('kaart-breuk-bewerking');
+      if (bewerkingskaart) bewerkingskaart.style.display = waarde === 'vermenigvuldigen' ? 'none' : 'block';
+      if (inp) inp.value = waarde === 'ongelijknamig'
+        ? 'Maak de breuken gelijknamig. Los daarna de bewerkingen op.'
+        : waarde === 'gemengde-getallen'
+          ? 'Maak de som. Schrijf de uitkomst als een gemengd getal.'
+          : waarde === 'vermenigvuldigen'
+            ? 'Los de vermenigvuldigingen op. Schrijf je antwoord in de eenvoudigste vorm.'
+          : 'Los de bewerkingen met gelijknamige breuken op.';
+    }
+    if(naam==='breuk-vermenigvuldig-variant'){
+      const zinnen={
+        'van-getal':'Bereken de breuk van het getal. Noteer je tussenstappen.',
+        'breuk-maal-getal':'Los de vermenigvuldigingen op.',
+        'getal-maal-breuk':'Vermenigvuldig de breuken. Schrijf je uitkomst in de eenvoudigste vorm of als gemengd getal.',
+        'gemengd-vermenigvuldigen':'Los de bewerkingen op. Schrijf je antwoord in de eenvoudigste vorm.',
+        'verbinden':'Denk goed na. Werk uit. Verbind de oefeningen met de juiste oplossing.',
+        'vraagstukken':'Lees aandachtig. Vul het schema en de bewerking in. Schrijf een antwoordzin.'
+      };
+      const inp=document.getElementById('inp-opdrachtzin-breuken');if(inp)inp.value=zinnen[waarde];
+    }
+    const soort=document.querySelector('[name="breuk-soort"]:checked')?.value;
+    if(soort==='gemengde-getallen'&&(naam==='breuk-bewerking'||naam==='gemengde-variant')){
+      const bewerking=document.querySelector('[name="breuk-bewerking"]:checked')?.value||'optellen';
+      const variant=document.querySelector('[name="gemengde-variant"]:checked')?.value||'inkleuren';
+      const inp=document.getElementById('inp-opdrachtzin-breuken');
+      if(inp&&bewerking==='aftrekken')inp.value=variant==='zonder'
+        ? 'Zoek het verschil. Je mag tussenstappen noteren.'
+        : variant==='afbeelding'
+          ? 'Kijk naar de afbeelding. Schrijf de aftrekking. Los op.'
+          : 'Kleur de stroken juist in. Zoek het verschil.';
+      else if(inp&&bewerking==='optellen')inp.value='Maak de som. Schrijf de uitkomst als een gemengd getal.';
+    }
+  }
+
+  function voegBreukenBlokToe() {
+    const soort = document.querySelector('[name="breuk-soort"]:checked')?.value || 'gelijknamig';
+    const bewerking = document.querySelector('[name="breuk-bewerking"]:checked')?.value || 'optellen';
+    const variant = soort === 'ongelijknamig'
+      ? (document.querySelector('[name="breuk-variant"]:checked')?.value || 'schema')
+      : soort === 'gemengde-getallen'
+        ? (document.querySelector('[name="gemengde-variant"]:checked')?.value || 'inkleuren')
+        : soort === 'vermenigvuldigen'
+          ? (document.querySelector('[name="breuk-vermenigvuldig-variant"]:checked')?.value || 'van-getal')
+        : 'kort';
+    const aantalOefeningen = parseInt(document.getElementById('inp-aantal-breuken')?.value || '6');
+    const gemengdeNoemers = document.querySelector('[name="gemengde-noemers"]:checked')?.value || 'gemengd';
+    const opdrachtzin = document.getElementById('inp-opdrachtzin-breuken')?.value.trim()
+      || (soort === 'ongelijknamig' ? 'Maak de breuken gelijknamig. Los daarna de bewerkingen op.' : 'Los de bewerkingen op.');
+    const oefeningen = Breuken.genereer({ soort, bewerking, variant, gemengdeNoemers, aantalOefeningen });
+    bundelData.push({ id: `blok-breuken-${Date.now()}`, bewerking: 'breuken', subtype: soort, niveau: 'breuken', opdrachtzin, hulpmiddelen: [], oefeningen, config: { soort, bewerking, variant, gemengdeNoemers, aantalOefeningen } });
+    Preview.render(bundelData);
+    toonToast(`Breukenblok toegevoegd! (${oefeningen.length} oefeningen)`, '#6f9f24');
+  }
+
+  function selecteerPercentageRadio(waarde,el){
+    document.querySelectorAll('[name="percentage-variant"]').forEach(r=>{
+      r.checked=r.value===waarde;r.closest('.radio-chip')?.classList.toggle('geselecteerd',r.checked);
+    });
+    const inp=document.getElementById('inp-opdrachtzin-percentages');
+    if(inp)inp.value=waarde==='lange-breukstreep'
+      ? 'Werk uit met behulp van de lange breukstreep.'
+      : 'Bereken het percentage van het getal. Noteer je tussenstappen.';
+  }
+
+  function voegPercentageBlokToe(){
+    const variant=document.querySelector('[name="percentage-variant"]:checked')?.value||'stappen';
+    const aantalOefeningen=parseInt(document.getElementById('inp-aantal-percentages')?.value||'4');
+    const opdrachtzin=document.getElementById('inp-opdrachtzin-percentages')?.value.trim()||'Bereken het percentage van het getal.';
+    const oefeningen=Percentages.genereer({variant,aantalOefeningen});
+    bundelData.push({id:`blok-percentages-${Date.now()}`,bewerking:'percentages',niveau:'percentages',opdrachtzin,hulpmiddelen:[],oefeningen,config:{variant,aantalOefeningen}});
+    Preview.render(bundelData);toonToast(`Percentageblok toegevoegd! (${oefeningen.length} oefeningen)`,'#2b93ad');
+  }
+
+  function selecteerKommaRadio(naam,waarde,el){
+    document.querySelectorAll(`[name="${naam}"]`).forEach(r=>{r.checked=r.value===waarde;r.closest('.radio-chip')?.classList.toggle('geselecteerd',r.checked);});
+    if(naam==='komma-niveau'){
+      if(waarde==='honderdste'&&['vermenigvuldigen','delen'].includes(document.querySelector('[name="komma-bewerking"]:checked')?.value)){
+        const tiende=document.querySelector('[name="komma-niveau"][value="tiende"]');
+        if(tiende)selecteerKommaRadio('komma-niveau','tiende',tiende.closest('.radio-chip'));
+        return;
+      }
+      const honderdste=waarde==='honderdste';
+      const kaartH=document.getElementById('kaart-komma-honderdste-vormen');
+      const kaartHM=document.getElementById('kaart-komma-honderdste-met-vormen');
+      const kaartHA=document.getElementById('kaart-komma-honderdste-aftrek-vormen');
+      const kaartHAM=document.getElementById('kaart-komma-honderdste-aftrek-met-vormen');
+      const kaartG=document.getElementById('kaart-komma-gemengd-vormen');
+      if(honderdste){
+        const aftrek=document.querySelector('[name="komma-bewerking"]:checked')?.value==='aftrekken';
+        const huidigBrug=document.querySelector('[name="komma-brug"]:checked')?.value||'zonder';
+        document.getElementById('kaart-komma-optelvormen').style.display='none';
+        document.getElementById('kaart-komma-aftrekvormen').style.display='none';
+        document.querySelector('.komma-strategie-keuze').style.display='none';
+        document.querySelector('.komma-aftrek-rooster-keuze').style.display='none';
+        if(kaartH)kaartH.style.display=aftrek?'none':'';
+        if(kaartHM)kaartHM.style.display='none';
+        if(kaartHA)kaartHA.style.display=aftrek?'':'none';
+        if(kaartHAM)kaartHAM.style.display='none';
+        if(kaartG)kaartG.style.display='none';
+        document.getElementById('komma-brug-titel').textContent=`${aftrek?'Aftrekken':'Optellen'} tot op een honderdste`;
+        const brugRadio=document.querySelector(`[name="komma-brug"][value="${huidigBrug}"]`);
+        if(brugRadio)selecteerKommaRadio('komma-brug',huidigBrug,brugRadio.closest('.radio-chip'));
+      }else{
+        if(kaartH)kaartH.style.display='none';
+        if(kaartHM)kaartHM.style.display='none';
+        if(kaartHA)kaartHA.style.display='none';
+        if(kaartHAM)kaartHAM.style.display='none';
+        if(kaartG)kaartG.style.display='none';
+        const huidig=document.querySelector('[name="komma-bewerking"]:checked')?.value||'optellen';
+        const radio=document.querySelector(`[name="komma-bewerking"][value="${huidig}"]`);
+        if(radio)selecteerKommaRadio('komma-bewerking',huidig,radio.closest('.radio-chip'));
+      }
+      return;
+    }
+    if(naam==='komma-bewerking'){
+      const aftrek=waarde==='aftrekken';
+      const bewerkingenGemengd=waarde==='gemengd';
+      const vermenigvuldigen=waarde==='vermenigvuldigen';
+      const delen=waarde==='delen';
+      const kaartVermenigvuldigen=document.getElementById('kaart-komma-vermenigvuldigvormen');
+      const kaartDelen=document.getElementById('kaart-komma-deelvormen');
+      const honderdsteRadio=document.querySelector('[name="komma-niveau"][value="honderdste"]');
+      if(honderdsteRadio)honderdsteRadio.disabled=vermenigvuldigen||delen;
+      if(vermenigvuldigen){
+        const niveauTiende=document.querySelector('[name="komma-niveau"][value="tiende"]');
+        document.querySelectorAll('[name="komma-niveau"]').forEach(r=>{r.checked=r===niveauTiende;r.closest('.radio-chip')?.classList.toggle('geselecteerd',r.checked);});
+        document.getElementById('kaart-komma-brug').style.display='none';
+        document.getElementById('kaart-komma-optelvormen').style.display='none';
+        document.getElementById('kaart-komma-aftrekvormen').style.display='none';
+        document.getElementById('kaart-komma-gemengd-vormen').style.display='none';
+        document.querySelector('.komma-strategie-keuze').style.display='none';
+        document.querySelector('.komma-aftrek-rooster-keuze').style.display='none';
+        if(kaartDelen)kaartDelen.style.display='none';
+        if(kaartVermenigvuldigen)kaartVermenigvuldigen.style.display='';
+        const radio=document.querySelector('[name="komma-variant"][value="vermenigvuldigen-haakjes"]');
+        if(radio)selecteerKommaRadio('komma-variant','vermenigvuldigen-haakjes',radio.closest('.radio-chip'));
+        return;
+      }
+      if(delen){
+        const niveauTiende=document.querySelector('[name="komma-niveau"][value="tiende"]');
+        document.querySelectorAll('[name="komma-niveau"]').forEach(r=>{r.checked=r===niveauTiende;r.closest('.radio-chip')?.classList.toggle('geselecteerd',r.checked);});
+        document.getElementById('kaart-komma-brug').style.display='none';
+        document.getElementById('kaart-komma-optelvormen').style.display='none';
+        document.getElementById('kaart-komma-aftrekvormen').style.display='none';
+        document.getElementById('kaart-komma-gemengd-vormen').style.display='none';
+        document.querySelector('.komma-strategie-keuze').style.display='none';
+        document.querySelector('.komma-aftrek-rooster-keuze').style.display='none';
+        if(kaartVermenigvuldigen)kaartVermenigvuldigen.style.display='none';
+        if(kaartDelen)kaartDelen.style.display='';
+        const radio=document.querySelector('[name="komma-variant"][value="delen-haakjes"]');
+        if(radio)selecteerKommaRadio('komma-variant','delen-haakjes',radio.closest('.radio-chip'));
+        return;
+      }
+      if(kaartVermenigvuldigen)kaartVermenigvuldigen.style.display='none';
+      if(kaartDelen)kaartDelen.style.display='none';
+      if(bewerkingenGemengd){
+        const huidigBrug=document.querySelector('[name="komma-brug"]:checked')?.value||'zonder';
+        const brugRadio=document.querySelector(`[name="komma-brug"][value="${huidigBrug}"]`);
+        if(brugRadio)selecteerKommaRadio('komma-brug',huidigBrug,brugRadio.closest('.radio-chip'));
+        return;
+      }
+      if(document.querySelector('[name="komma-niveau"]:checked')?.value==='honderdste'){
+        const huidigBrug=document.querySelector('[name="komma-brug"]:checked')?.value||'zonder';
+        const brugRadio=document.querySelector(`[name="komma-brug"][value="${huidigBrug}"]`);
+        if(brugRadio)selecteerKommaRadio('komma-brug',huidigBrug,brugRadio.closest('.radio-chip'));
+        return;
+      }
+      document.getElementById('kaart-komma-brug').style.display='';
+      document.getElementById('komma-brug-titel').textContent=aftrek?'Aftrekken tot op een tiende':'Optellen tot op een tiende';
+      document.getElementById('komma-brug-icon').textContent=aftrek?'➖':'➕';
+      const metChip=document.getElementById('komma-met-brug-chip');
+      metChip?.classList.remove('radio-chip-nog-niet');
+      metChip?.setAttribute('title','');
+      const metRadio=document.querySelector('[name="komma-brug"][value="met"]');
+      if(metRadio)metRadio.disabled=false;
+      document.getElementById('kaart-komma-optelvormen').style.display=aftrek?'none':'';
+      document.getElementById('kaart-komma-aftrekvormen').style.display=aftrek?'':'none';
+      const roosterKeuze=document.querySelector('.komma-aftrek-rooster-keuze');
+      if(roosterKeuze)roosterKeuze.style.display=aftrek?'':'none';
+      const brugMet=document.querySelector('[name="komma-brug"]:checked')?.value==='met';
+      document.querySelector('.komma-strategie-keuze').style.display=!aftrek&&brugMet?'':'none';
+      const nieuw=aftrek?'aftrek-schijfjes':'kort';
+      const radio=document.querySelector(`[name="komma-variant"][value="${nieuw}"]`);
+      if(radio)selecteerKommaRadio('komma-variant',nieuw,radio.closest('.radio-chip'));
+      return;
+    }
+    if(naam==='komma-brug'){
+      const met=waarde==='met';
+      const gemengd=waarde==='gemengd';
+      const bewerking=document.querySelector('[name="komma-bewerking"]:checked')?.value||'optellen';
+      const aftrek= bewerking==='aftrekken';
+      const bewerkingenGemengd=bewerking==='gemengd';
+      const toonGemengdeKaart=gemengd||bewerkingenGemengd;
+      const honderdste=document.querySelector('[name="komma-niveau"]:checked')?.value==='honderdste';
+      const kaartG=document.getElementById('kaart-komma-gemengd-vormen');
+      if(honderdste){
+        document.getElementById('kaart-komma-optelvormen').style.display='none';
+        document.getElementById('kaart-komma-aftrekvormen').style.display='none';
+        document.querySelector('.komma-strategie-keuze').style.display='none';
+        document.querySelector('.komma-aftrek-rooster-keuze').style.display='none';
+        document.getElementById('kaart-komma-honderdste-vormen').style.display=aftrek||met||toonGemengdeKaart?'none':'';
+        document.getElementById('kaart-komma-honderdste-met-vormen').style.display=!aftrek&&met&&!toonGemengdeKaart?'':'none';
+        document.getElementById('kaart-komma-honderdste-aftrek-vormen').style.display=aftrek&&!met&&!toonGemengdeKaart?'':'none';
+        document.getElementById('kaart-komma-honderdste-aftrek-met-vormen').style.display=aftrek&&met&&!toonGemengdeKaart?'':'none';
+        if(kaartG)kaartG.style.display=toonGemengdeKaart?'':'none';
+        document.getElementById('komma-brug-titel').textContent=`${bewerkingenGemengd?'Optellen en aftrekken':aftrek?'Aftrekken':'Optellen'} tot op een honderdste`;
+        const nieuw=toonGemengdeKaart?'komma-gemengd-kort':aftrek?(met?'aftrek-splitsen-honderdsten-brug':'aftrek-schijfjes-honderdsten'):met?'splitsen-honderdsten-brug':'honderdsten';
+        const radio=document.querySelector(`[name="komma-variant"][value="${nieuw}"]`);
+        if(radio)selecteerKommaRadio('komma-variant',nieuw,radio.closest('.radio-chip'));
+        return;
+      }
+      document.querySelector('.komma-strategie-keuze').style.display=met&&!aftrek?'':'none';
+      if(kaartG)kaartG.style.display=toonGemengdeKaart?'':'none';
+      document.getElementById('kaart-komma-optelvormen').style.display=!aftrek&&!toonGemengdeKaart?'':'none';
+      document.getElementById('kaart-komma-aftrekvormen').style.display=aftrek&&!toonGemengdeKaart?'':'none';
+      document.getElementById('komma-aftrek-zonder-vormen').style.display=aftrek&&!met&&!toonGemengdeKaart?'':'none';
+      document.getElementById('komma-aftrek-met-vormen').style.display=aftrek&&met&&!toonGemengdeKaart?'':'none';
+      if(toonGemengdeKaart){
+        const radio=document.querySelector('[name="komma-variant"][value="komma-gemengd-kort"]');
+        if(radio)selecteerKommaRadio('komma-variant','komma-gemengd-kort',radio.closest('.radio-chip'));
+      }else if(aftrek){
+        const nieuw=gemengd?'komma-gemengd-kort':met?'aftrek-brug-splitsen':'aftrek-schijfjes';
+        const radio=document.querySelector(`[name="komma-variant"][value="${nieuw}"]`);
+        if(radio)selecteerKommaRadio('komma-variant',nieuw,radio.closest('.radio-chip'));
+      }
+      const huidig=document.querySelector('[name="komma-variant"]:checked')?.value;
+      if(!met&&(huidig==='compenseren'||huidig==='transformeren')){
+        const radio=document.querySelector('[name="komma-variant"][value="kort"]');
+        if(radio)selecteerKommaRadio('komma-variant','kort',radio.closest('.radio-chip'));
+      }
+      return;
+    }
+    if(naam==='komma-variant'){
+      const deelRestKeuze=document.querySelector('.komma-deel-rest-keuze');
+      if(deelRestKeuze)deelRestKeuze.style.display=(waarde==='delen-nulregel'||waarde==='delen-factoren')?'none':'';
+      const voorbeeldKeuze=document.querySelector('.komma-voorbeeld-keuze');
+      if(voorbeeldKeuze)voorbeeldKeuze.style.display=waarde==='aftrek-brug-schijfjes'?'flex':'none';
+      const schemaH=document.querySelector('.komma-transform-h-schema-keuze');
+      if(schemaH)schemaH.style.display=waarde==='transformeren-honderdsten'?'flex':'none';
+      const aftrekSchemaH=document.querySelector('.komma-aftrek-transform-h-schema-keuze');
+      if(aftrekSchemaH)aftrekSchemaH.style.display=waarde==='aftrek-transformeren-honderdsten'?'flex':'none';
+      if(waarde==='compenseren'||waarde==='transformeren'){
+        const brug=document.querySelector('[name="komma-brug"][value="met"]');
+        if(brug)selecteerKommaRadio('komma-brug','met',brug.closest('.radio-chip'));
+      }
+      const zinnen={kort:'Los de optellingen op.',rooster:'Vul het rekenrooster in.',splitsen:'Vul de splitsing in. Schrijf de tussenstappen. Schrijf de som.',tienden:'Schrijf beide termen als tienden. Maak de som. Schrijf het kommagetal.',honderdsten:'Schrijf beide termen als honderdsten. Maak de som. Schrijf het kommagetal.','honderdsten-brug':'Schrijf beide termen als honderdsten. Maak de som. Schrijf het kommagetal.','tussenstappen-honderdsten-brug':'Los op. Je mag splitsen en tussenstappen noteren. Schrijf de som.','kort-honderdsten-brug':'Los de optellingen op. Kies zelf hoe je daarbij te werk gaat.','splitsen-honderdsten':'Vul de splitsing in. Schrijf de tussenstappen en de som.','kort-honderdsten':'Maak de som.','rooster-honderdsten':'Vul het rekenrooster in.','splitsen-honderdsten-brug':'Los op via splitsen.','compenseren-honderdsten':'Los op via compenseren.','transformeren-honderdsten':'Los op via transformeren.',compenseren:'Los op via compenseren.',transformeren:'Los op via transformeren.','aftrek-rooster':'Vul het rekenrooster in.','aftrek-schijfjes':'Streep door wat je weg doet. Los op.','aftrek-tienden':'Schrijf beide termen als tienden. Maak de aftrekking. Schrijf het kommagetal.','aftrek-aanvullen':'Los op door aan te vullen.','aftrek-kort':'Los de aftrekkingen op.','aftrek-brug-splitsen':'Teken de splitsing. Schrijf de tussenstappen. Los de aftrekking op.','aftrek-brug-schijfjes':'Bekijk het schema met schijfjes. Schrijf de tussenstappen. Los de aftrekking op.','aftrek-brug-tienden':'Schrijf beide termen als tienden. Los de aftrekking op. Schrijf het kommagetal.','aftrek-brug-aanvullen':'Los op door aan te vullen.','aftrek-brug-compenseren':'Los de aftrekkingen op door te compenseren.','aftrek-brug-transformeren':'Los de aftrekkingen op door te transformeren.','aftrek-brug-kort':'Los de aftrekkingen op.'};
+      Object.assign(zinnen,{'aftrek-schijfjes-honderdsten':'Schrap wat je er af haalt. Schrijf het verschil.','aftrek-splitsen-honderdsten':'Schrijf de splitsing en de tussenstappen. Schrijf het verschil.','aftrek-honderdsten':'Schrijf beide termen als honderdsten. Zoek het verschil. Schrijf het kommagetal.','aftrek-kort-honderdsten':'Los de aftrekkingen op.','aftrek-rooster-honderdsten':'Vul het rekenrooster in.'});
+      Object.assign(zinnen,{'aftrek-splitsen-honderdsten-brug':'Los op via splitsen.','aftrek-compenseren-honderdsten':'Los op via compenseren.','aftrek-transformeren-honderdsten':'Los op via transformeren.','aftrek-honderdsten-brug':'Schrijf beide termen als honderdsten. Zoek het verschil. Schrijf het kommagetal.'});
+      Object.assign(zinnen,{'aftrek-kort-honderdsten-brug':'Los de aftrekkingen op.','komma-gemengd-kort':'Los de oefeningen op. Let goed op waar je een brug nodig hebt.','getalpuzzel':'Los de getalpuzzels op.','komma-gemengd-rooster':'Vul het rekenrooster in.'});
+      Object.assign(zinnen,{'vermenigvuldigen-haakjes':'Los de vermenigvuldigingen op door te splitsen en te verdelen. Schrijf de tussenstappen. Werk uit en schrijf het product.','vermenigvuldigen-zelf':'Los de vermenigvuldigingen op door te splitsen en te verdelen. Schrijf de tussenstappen. Werk uit en schrijf het product.'});
+      Object.assign(zinnen,{'vermenigvuldigen-compenseren-haakjes':'Los de vermenigvuldigingen op door te compenseren. Schrijf de tussenstappen. Werk uit en schrijf het product.','vermenigvuldigen-compenseren-zelf':'Los de vermenigvuldigingen op door te compenseren. Schrijf de tussenstappen. Werk uit en schrijf het product.'});
+      Object.assign(zinnen,{'vermenigvuldigen-nulregel':'Los de vermenigvuldigingen op met de nulregel.','vermenigvuldigen-factoren':'Ontbind het gehele getal in factoren. Schakel en werk stap voor stap uit. Schrijf het product.'});
+      Object.assign(zinnen,{'delen-haakjes':'Los de delingen op door te splitsen en te verdelen. Schrijf de tussenstappen. Werk uit en schrijf het quotiënt.','delen-zelf':'Los de delingen op door te splitsen en te verdelen. Schrijf de tussenstappen. Werk uit en schrijf het quotiënt.'});
+      Object.assign(zinnen,{'delen-nulregel':'Los de delingen op met de nulregel.','delen-factoren':'Ontbind de deler in factoren. Werk stap voor stap uit. Schrijf het quotiënt.'});
+      const inp=document.getElementById('inp-opdrachtzin-komma');if(inp)inp.value=zinnen[waarde];
+      if(waarde==='rooster'||waarde==='aftrek-rooster'||waarde==='rooster-honderdsten'||waarde==='aftrek-rooster-honderdsten'||waarde==='komma-gemengd-rooster'){
+        const aantal=document.getElementById('inp-aantal-komma');if(aantal)aantal.value='1';
+      }
+    }
+  }
+  function voegKommaBlokToe(){
+    const bewerking=document.querySelector('[name="komma-bewerking"]:checked')?.value||'optellen';
+    const niveau=document.querySelector('[name="komma-niveau"]:checked')?.value||'tiende';
+    const brug=document.querySelector('[name="komma-brug"]:checked')?.value||'zonder';
+    const restsoort=document.querySelector('[name="komma-deel-rest"]:checked')?.value||'zonder';
+    let variant=document.querySelector('[name="komma-variant"]:checked')?.value||'kort';
+    const aantalOefeningen=parseInt(document.getElementById('inp-aantal-komma')?.value||'8');
+    const toonVoorbeeld=!!document.getElementById('inp-komma-voorbeeld')?.checked&&variant==='aftrek-brug-schijfjes';
+    const toonTransformSchemaH=!!document.getElementById('inp-komma-transform-schema-h')?.checked&&variant==='transformeren-honderdsten';
+    const toonAftrekTransformSchemaH=!!document.getElementById('inp-komma-aftrek-transform-schema-h')?.checked&&variant==='aftrek-transformeren-honderdsten';
+    const opdrachtzin=document.getElementById('inp-opdrachtzin-komma')?.value.trim()||'Los de optellingen op.';
+    const decimalen=niveau==='honderdste'?2:1;
+    if(variant==='komma-gemengd-kort')variant=bewerking==='gemengd'?'kort-bewerkingen-gemengd':decimalen===2?(bewerking==='aftrekken'?'aftrek-kort-honderdsten-gemengd':'kort-honderdsten-gemengd'):(bewerking==='aftrekken'?'aftrek-kort':'kort');
+    if(variant==='komma-gemengd-rooster')variant=bewerking==='gemengd'?'rooster-bewerkingen-gemengd':decimalen===2?(bewerking==='aftrekken'?'aftrek-rooster-honderdsten':'rooster-honderdsten'):(bewerking==='aftrekken'?'aftrek-rooster':'rooster');
+    const oefeningen=Kommagetallen.genereer({bewerking,brug,variant,aantalOefeningen,toonVoorbeeld,decimalen,restsoort});
+    bundelData.push({id:`blok-komma-${Date.now()}`,bewerking:'kommagetallen',niveau:niveau==='honderdste'?'honderdsten':'tienden',opdrachtzin,hulpmiddelen:[],oefeningen,config:{soort:'kommagetallen',bewerking,decimalen,niveau,brug,variant,restsoort,aantalOefeningen,toonVoorbeeld,toonTransformSchemaH,toonAftrekTransformSchemaH}});
+    Preview.render(bundelData);toonToast(`Kommablok toegevoegd! (${oefeningen.length} oefeningen)`,'#2e9d62');
+  }
+
   return {
     init, toonBewerking, selecteerRadio, selecteerBrugHoofd, selecteerBrugSub, selecteerStrategie, _updateHulpmiddelenUI, toggleHulpmiddel, toggleVoorbeeld,
     selecteerSplitsNiveau, toggleSplitsGetal, toggleGrootGetal, selecteerPuntBrug,
@@ -2023,6 +2397,7 @@ function _getSplitsConfig() {
     voegRekentaalBlokToe,
     selecteerSchattenType, selecteerSchattenNiveau, selecteerSchattenBewerking, selecteerSchattenAfronden,
     voegSchattenBlokToe,
+    selecteerBreukRadio, voegBreukenBlokToe, selecteerPercentageRadio, voegPercentageBlokToe, selecteerKommaRadio, voegKommaBlokToe,
     selecteerGemengdNiveau, selecteerGemengdBrugHoofd, selecteerGemengdBrugSub, selecteerGemengdVerhouding, selecteerGemengdRadio, toggleGemengdHulpmiddel, voegGemengdBlokToe,
     toonToast,
   };

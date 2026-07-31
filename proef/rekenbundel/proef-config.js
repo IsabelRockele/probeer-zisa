@@ -8,9 +8,9 @@
    3. Haalt kill-switch-instellingen op uit Firestore:
         instellingen/gratis_rekenbundel → { actief, start_datum, eind_datum, max_per_bezoeker }
    4. Haalt teller op voor deze UID:
-        proef-rekenbundel/{uid} → { teller: 0..3 }
+        proef-rekenbundel/{uid} → { teller: 0..2 }
    5. Beslist: blokkade tonen OF app doorlaten
-   6. Toont banner bovenaan met "Nog X van 3 gratis bundels"
+   6. Toont banner bovenaan met "Nog X van 2 gratis bundels"
    7. Hook op App.downloadPDF → verhoogt teller na succesvolle download
    8. Hook op App.downloadSleutel → blokkeert met PRO-promo popup
 
@@ -33,6 +33,7 @@
 
   // ── Webshop-link (voor "Bekijk aanbod" knoppen) ────────────────────────
   const WEBSHOP_URL = '../../#zg-prijzen';
+  const PROEF_MAX = 2;
 
   // ── State die we onderweg invullen ─────────────────────────────────────
   let _app, _auth, _db, _uid;
@@ -177,8 +178,8 @@
     // Dit is een persoonlijke boodschap (jij bent op teller 3, niet algemeen "proef voorbij")
     // Daarom behouden we hier wel een eigen blokkade-scherm
     _toonBlokkade(
-      'Je 3 gratis bundels zijn op',
-      'Je hebt je <strong>3 gratis proefbundels</strong> gebruikt. Leuk dat je de generator hebt uitgeprobeerd!<br><br>Wil je onbeperkt bundels maken met volledige oplossingssleutels erbij? Neem dan een abonnement op de Spelgenerator.',
+      'Je 2 gratis bundels zijn op',
+      'Je hebt je <strong>2 gratis proefbundels</strong> gebruikt. Leuk dat je de generator hebt uitgeprobeerd!<br><br>Wil je onbeperkt bundels maken, vraagstukken gebruiken en volledige oplossingssleutels downloaden? Neem dan een abonnement op de Spelgenerator.',
       'Bekijk het aanbod'
     );
   }
@@ -197,7 +198,7 @@
   // ══════════════════════════════════════════════════════════════════════
 
   function _toonBanner() {
-    const overMaking = Math.max(0, (_instellingen.max_per_bezoeker || 3) - _teller);
+    const overMaking = Math.max(0, PROEF_MAX - _teller);
     const banner = document.createElement('div');
     banner.id = 'proef-banner';
     banner.innerHTML = `
@@ -229,8 +230,8 @@
         ${overMaking === 0
           ? '<span class="laag">Laatste bundel gebruikt — dit is je preview-modus</span>'
           : overMaking === 1
-            ? '<span class="laag">Let op: nog <strong>1</strong> van 3 gratis bundels over</span>'
-            : `Je hebt nog <strong>${overMaking}</strong> van 3 gratis bundels over`
+            ? '<span class="laag">Let op: nog <strong>1</strong> van 2 gratis bundels over</span>'
+            : `Je hebt nog <strong>${overMaking}</strong> van 2 gratis bundels over`
         }
       </span>
       <a href="${WEBSHOP_URL}">Bekijk het aanbod →</a>`;
@@ -302,23 +303,17 @@
   }
 
   function _toonPopupNaDownload() {
-    const over = Math.max(0, (_instellingen.max_per_bezoeker || 3) - _teller);
+    const over = Math.max(0, PROEF_MAX - _teller);
     if (_teller === 1) {
       _toonPopup(
         '📄 Eerste bundel gedownload!',
-        'Mooi zo! Je hebt nog 2 gratis bundels over. Probeer gerust andere types oefeningen uit.',
-        null
+        'Mooi zo! Je hebt nog <strong>1 gratis bundel</strong> over. Probeer gerust een ander type oefening uit.',
+        'Bekijk het aanbod'
       );
     } else if (_teller === 2) {
       _toonPopup(
-        '📄 Tweede bundel gedownload',
-        'Nog <strong>1 gratis bundel</strong> over. Wil je onbeperkt bundels maken? Dan is het abonnement op de Spelgenerator iets voor jou.',
-        'Bekijk het aanbod'
-      );
-    } else if (_teller >= 3) {
-      _toonPopup(
         '🎉 Je laatste gratis bundel',
-        'Je hebt <strong>alle 3 je gratis bundels</strong> gedownload. Bedankt om de Rekenbundel Generator uit te proberen!<br><br>Wil je meer? Neem dan een abonnement op de Spelgenerator — met onbeperkte bundels en oplossingssleutels.',
+        'Je hebt <strong>beide gratis proefbundels</strong> gedownload. Bedankt om Bundel bewerkingen uit te proberen!<br><br>In PRO maak je onbeperkt bundels en krijg je ook vraagstukken en oplossingssleutels.',
         'Bekijk het aanbod'
       );
       // Na 2 seconden de blokkadepagina tonen zodat ze echt niks meer kunnen
@@ -404,7 +399,7 @@
         e.stopImmediatePropagation();
 
         // Check of teller al op max staat
-        const max = _instellingen.max_per_bezoeker || 3;
+        const max = PROEF_MAX;
         if (_teller >= max) {
           _toonTellerOp();
           return;
@@ -485,6 +480,9 @@
     // Zoek het tabblad voor vraagstukken
     const tab = document.querySelector('.tab-vraagstukken');
     if (!tab) return;
+    tab.style.display = 'none';
+    tab.setAttribute('aria-hidden', 'true');
+    return;
 
     // Voeg een ⭐ PRO badgje toe aan het einde van de tekst
     // (maar alleen als het er nog niet staat)
@@ -590,7 +588,7 @@
       console.log('[Proef] Teller voor deze bezoeker:', _teller);
 
       // 8. Als teller al op max staat → blokkeren
-      const max = _instellingen.max_per_bezoeker || 3;
+      const max = PROEF_MAX;
       if (_teller >= max) {
         _toonTellerOp();
         return;

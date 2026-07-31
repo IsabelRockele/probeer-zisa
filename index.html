@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spelgenerator PRO — De werkbladmachine van juf Zisa</title>
-  <meta name="description" content="Tientallen werkbladgeneratoren voor reken, taal, klokkijken, geld en meer. Door een Vlaamse leerkracht ontworpen, voor alle netten bruikbaar.">
+  <title>Spelgenerator PRO — De leerkrachtentoolbox van juf Zisa</title>
+  <meta name="description" content="Maak oefenbundels, werkbladen, spellen, puzzels en visuele klasmaterialen met de leerkrachtentoolbox van juf Zisa. Voor alle onderwijsnetten bruikbaar.">
   <link rel="icon" href="zisa.png" type="image/png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800&display=swap');
@@ -416,7 +416,7 @@
 }
 .zg-tools {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 10px;
 }
 .zg-tool {
@@ -430,6 +430,8 @@
   font-weight: 500;
   color: var(--zg-ink);
   transition: background 0.2s, transform 0.2s;
+  text-decoration: none;
+  cursor: pointer;
 }
 .zg-tool:hover {
   background: var(--zg-cat-soft, var(--zg-warm-2));
@@ -438,6 +440,13 @@
 .zg-tool-emoji {
   font-size: 1.2rem;
   flex-shrink: 0;
+}
+.zg-tool-example-arrow {
+  margin-left: auto;
+  color: var(--zg-coral);
+  font-weight: 800;
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 .zg-cat-note {
   margin-top: 16px;
@@ -1031,15 +1040,15 @@ section[id], #zg-prijzen {
             <span class="zg-pill-dot"></span>
             Door een leerkracht, voor leerkrachten
           </span>
-          <h1>Werkbladen op maat — <em>klaar in een paar klikken.</em></h1>
+          <h1>Van oefenblad tot klasbord — <em>klaar in een paar klikken.</em></h1>
           <p class="zg-hero-lead">
-            Spelgenerator PRO is jouw digitale werkbladmachine. Tientallen tools voor reken, taal,
-            klokkijken, geld en zoveel meer. Stel in, klik op "PDF" en je oefenblad rolt eruit —
-            precies zoals jouw klas het nodig heeft.
+            Spelgenerator PRO is jouw digitale leerkrachtentoolbox. Maak oefenbundels, werkbladen,
+            spelletjes, puzzels en visuele klasmaterialen — of gebruik handige tools rechtstreeks
+            op je digibord. Jij kiest de inhoud en instellingen die bij jouw klas passen.
           </p>
           <div class="zg-cta-row">
-            <a href="https://tools.jufzisa.be/pro/koop.html" target="_blank" rel="noopener" class="zg-btn zg-btn-primary">Word PRO voor €40/jaar ↗</a>
-            <a href="#zg-prijzen" class="zg-btn zg-btn-secondary">Bekijk alle opties</a>
+            <a href="https://tools.jufzisa.be/pro/koop.html" target="_blank" rel="noopener" class="zg-btn zg-btn-primary">12 maanden PRO voor €40 ↗</a>
+            <a href="#zg-probeer" class="zg-btn zg-btn-secondary">Probeer eerst gratis</a>
           </div>
           <div class="zg-hero-note">
             <span>⚡ Direct toegang na betaling</span>
@@ -1054,28 +1063,56 @@ section[id], #zg-prijzen {
     </div>
   </header>
 
+  <!-- ============ ZO WERKT HET ============ -->
+  <section class="zg-section">
+    <div class="zg-wrap">
+      <div class="zg-section-header" style="text-align:center;margin-left:auto;margin-right:auto">
+        <span class="zg-eyebrow">Eenvoudig, maar niet beperkt</span>
+        <h2>Jij bepaalt wat je nodig hebt.</h2>
+        <p class="zg-section-lead">Elke tool heeft eigen keuzes. Zo maak je geen standaardmateriaal, maar iets dat echt bij je les en je leerlingen past.</p>
+      </div>
+      <div class="zg-grid-3">
+        <div class="zg-feature">
+          <div class="zg-feature-icon">1</div>
+          <h3>Kies een tool</h3>
+          <p>Start met een oefenbundel, spel, puzzel, leesopdracht, visueel hulpmiddel of klasorganisatietool.</p>
+        </div>
+        <div class="zg-feature">
+          <div class="zg-feature-icon">2</div>
+          <h3>Maak hem van jou</h3>
+          <p>Kies bijvoorbeeld getallen, bewerkingen, woorden, oefenvormen, moeilijkheid, aantal opdrachten, hulpmiddelen of vormgeving.</p>
+        </div>
+        <div class="zg-feature">
+          <div class="zg-feature-icon">3</div>
+          <h3>Gebruik meteen</h3>
+          <p>Download een printklare PDF of gebruik de tool rechtstreeks op je computer, tablet of digibord.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ VOORDELEN ============ -->
   <section class="zg-section zg-cream" id="zg-waarom">
     <div class="zg-wrap">
       <div class="zg-section-header">
         <span class="zg-eyebrow">Waarom Spelgenerator PRO?</span>
-        <h2>Tijd voor je klas, niet voor je werkbladen.</h2>
+        <h2>Tijd voor je klas, niet voor zoek- en maakwerk.</h2>
         <p class="zg-section-lead">
-          Geen knip- en plakwerk meer in Word, geen uren zoeken naar oefeningen op het juiste niveau.<br>
-          Stel in wat je nodig hebt, klik op print, en geef de tijdwinst terug aan wat écht telt.
+          Geen uren zoeken, knippen en plakken of telkens opnieuw beginnen.<br>
+          Kies wat je nodig hebt en laat Zisa het materiaal voor je opbouwen.
         </p>
       </div>
 
       <div class="zg-grid-3">
         <div class="zg-feature">
           <div class="zg-feature-icon">⏱️</div>
-          <h3>Uren tijdwinst per week</h3>
-          <p>Een werkblad dat normaal 30 minuten kost, staat hier in 30 seconden klaar — telkens met andere oefeningen.</p>
+          <h3>Snel een nieuwe versie</h3>
+          <p>Pas één of meer keuzes aan en maak meteen nieuw materiaal voor een andere lesgroep of een volgend oefenmoment.</p>
         </div>
         <div class="zg-feature">
           <div class="zg-feature-icon">🎯</div>
-          <h3>Differentiatie in één klik</h3>
-          <p>Twee niveaus parallel? Drie? Geen probleem. Pas het niveau aan en draai een nieuwe variant uit voor elke leerling.</p>
+          <h3>Passend voor jouw klas</h3>
+          <p>Pas getallen, woorden, oefenvormen, moeilijkheid, hoeveelheid en ondersteuning aan. De mogelijkheden verschillen per tool.</p>
         </div>
         <div class="zg-feature">
           <div class="zg-feature-icon">🌱</div>
@@ -1096,10 +1133,10 @@ section[id], #zg-prijzen {
     <div class="zg-wrap">
       <div class="zg-section-header">
         <span class="zg-eyebrow">Wat zit erin?</span>
-        <h2>Tientallen tools, netjes per categorie.</h2>
+        <h2>Meer dan werkbladen, netjes per categorie.</h2>
         <p class="zg-section-lead">
-          Klap een categorie open om te zien welke tools erin zitten.<br>
-          Telkens met instellingen waarmee jij bepaalt wat er op het blad komt.
+          Klap een categorie open en klik op een tool voor uitleg en een visueel voorbeeld.<br>
+          Van printklare bundels en spellen tot tools voor je digibord en klasorganisatie.
         </p>
       </div>
 
@@ -1109,7 +1146,7 @@ section[id], #zg-prijzen {
           <summary>
             <span class="zg-cat-icon">🧮</span>
             <span class="zg-cat-name">Reken-oefeningen</span>
-            <span class="zg-cat-count">16 tools</span>
+            <span class="zg-cat-count">17 tools</span>
             <span class="zg-cat-arrow">+</span>
           </summary>
           <div class="zg-cat-body">
@@ -1122,9 +1159,10 @@ section[id], #zg-prijzen {
               <div class="zg-tool"><span class="zg-tool-emoji">🔻</span>Rekendriehoek</div>
               <div class="zg-tool"><span class="zg-tool-emoji">⭕</span>Rekencirkel</div>
               <div class="zg-tool"><span class="zg-tool-emoji">📘</span>Bundel bewerkingen</div>
-              <div class="zg-tool"><span class="zg-tool-emoji">🔢</span>Werkblad getalinzicht</div>
+              <div class="zg-tool"><span class="zg-tool-emoji">🔢</span>Bundel getalinzicht</div>
               <div class="zg-tool"><span class="zg-tool-emoji">✏️</span>Werkblad cijferen</div>
               <div class="zg-tool"><span class="zg-tool-emoji">💰</span>Bundel geld</div>
+              <div class="zg-tool"><span class="zg-tool-emoji">📐</span>Bundel meetkunde</div>
               <div class="zg-tool"><span class="zg-tool-emoji">💕</span>Verliefde harten</div>
               <div class="zg-tool"><span class="zg-tool-emoji">⚡</span>Tempotoetsen</div>
               <div class="zg-tool"><span class="zg-tool-emoji">🏃</span>Loopspel</div>
@@ -1231,17 +1269,18 @@ section[id], #zg-prijzen {
           <summary>
             <span class="zg-cat-icon">📋</span>
             <span class="zg-cat-name">Klasmanagement</span>
-            <span class="zg-cat-count">2 tools</span>
+            <span class="zg-cat-count">3 tools</span>
             <span class="zg-cat-arrow">+</span>
           </summary>
           <div class="zg-cat-body">
             <div class="zg-tools">
               <div class="zg-tool"><span class="zg-tool-emoji">📚</span>Opvolging huistaken</div>
               <div class="zg-tool"><span class="zg-tool-emoji">✅</span>Takenbord</div>
+              <div class="zg-tool"><span class="zg-tool-emoji">🗓️</span>Planbord</div>
             </div>
             <div class="zg-cat-note">
               <span>🔒</span>
-              <span>Hier werk je met voornamen van leerlingen — je geeft de eerste keer expliciet akkoord met de privacyverklaring voor je deze tools kan gebruiken.</span>
+              <span>Bij Huistaken en Takenbord werk je met voornamen van leerlingen — je geeft de eerste keer expliciet akkoord met de privacyverklaring voor je die tools kan gebruiken.</span>
             </div>
           </div>
         </details>
@@ -1269,16 +1308,16 @@ section[id], #zg-prijzen {
 
         <div class="zg-try-grid">
 
-          <!-- Tempotoetsen — tijdelijk -->
-          <a href="proef-tempotoetsen/" class="zg-try-tile zg-try-tile-hot">
+          <!-- Bundel bewerkingen — aangekondigde proef -->
+          <a href="proef/rekenbundel/" class="zg-try-tile zg-try-tile-hot">
             <div class="zg-try-badge">
               <span class="zg-try-badge-dot"></span>
-              Tijdelijk gratis — t/m 20 juni 2026
+              Gratis proef · 17 augustus–20 september 2026
             </div>
-            <div class="zg-try-emoji">⚡</div>
-            <h3>Tempotoetsen</h3>
-            <p>Elke dag een frisse tempotoets — flitsen op het bord, invullen op tablet of op papier. <strong>Tot 2 weekbladen en 2 huistaakbladen gratis</strong>, flitsen onbeperkt.</p>
-            <span class="zg-try-arrow">Probeer nu ↗</span>
+            <div class="zg-try-emoji">📐</div>
+            <h3>Bundel bewerkingen</h3>
+            <p>Stel zelf twee complete oefenbundels samen met de nieuwste generator. Kies onder meer getalbereik, bewerkingen, oefenvormen en ondersteuning en download een klasklare PDF. <strong>Vraagstukken en oplossingssleutels blijven voor PRO.</strong></p>
+            <span class="zg-try-arrow">Bekijk de proef en aftelklok ↗</span>
           </a>
 
           <!-- Huistaken — permanent -->
@@ -1309,8 +1348,8 @@ section[id], #zg-prijzen {
         <span class="zg-eyebrow">Kies wat bij jou past</span>
         <h2>Eerlijke prijzen. Geen verborgen kosten.</h2>
         <p class="zg-section-lead">
-          Eén keer kiezen, alles erbij.<br>
-          Voor één maand, het hele schooljaar, of voor je hele schoolteam.
+          Eén keer betalen, alles erbij.<br>
+          Kies voor één maand, twaalf volledige maanden of toegang voor je hele schoolteam.
         </p>
       </div>
 
@@ -1326,7 +1365,7 @@ section[id], #zg-prijzen {
           </div>
           <ul class="zg-price-list">
             <li>Toegang tot alle generatoren</li>
-            <li>Onbeperkt werkbladen maken</li>
+            <li>Alle tools onbeperkt gebruiken</li>
             <li>Nooit automatische verlenging</li>
             <li>Nieuwe tools meteen beschikbaar</li>
           </ul>
@@ -1336,17 +1375,17 @@ section[id], #zg-prijzen {
         <div class="zg-price zg-featured">
           <span class="zg-price-badge">Voordeligst</span>
           <img src="jaar.png" alt="" class="zg-price-illu">
-          <h3>Schooljaar</h3>
-          <p class="zg-price-sub">De populairste keuze. Bespaar tegenover de maandformule en zit goed voor het hele jaar.</p>
+          <h3>12 maanden</h3>
+          <p class="zg-price-sub">De voordeligste keuze. Je toegang loopt twaalf volledige maanden vanaf de dag van aankoop.</p>
           <div class="zg-price-amount">
             <span class="zg-euro">€</span>40
-            <span class="zg-price-period">/ jaar</span>
+            <span class="zg-price-period">/ 12 maanden</span>
           </div>
           <ul class="zg-price-list">
             <li>Alles uit het maandpakket</li>
-            <li>Méér dan 40% goedkoper dan maand</li>
+            <li>Ongeveer €3,33 per maand</li>
             <li>Nooit automatische verlenging</li>
-            <li>Voorrang op nieuwe generatoren</li>
+            <li>Nieuwe tools meteen inbegrepen</li>
           </ul>
           <a href="https://tools.jufzisa.be/pro/koop.html" target="_blank" rel="noopener" class="zg-price-cta">Word PRO voor €40 ↗</a>
         </div>
@@ -1357,7 +1396,7 @@ section[id], #zg-prijzen {
           <p class="zg-price-sub">Eén bestelling, je hele lerarenteam mee. Ideaal voor schoolbreed gebruik.</p>
           <div class="zg-price-amount">
             <span class="zg-euro">€</span>40
-            <span class="zg-price-period">/ leerkracht / jaar</span>
+            <span class="zg-price-period">/ leerkracht / 12 maanden</span>
           </div>
           <ul class="zg-price-list">
             <li>Aparte toegang per leerkracht</li>
@@ -1385,14 +1424,21 @@ section[id], #zg-prijzen {
         <details class="zg-faq-item">
           <summary>Hoe werkt het precies — wat krijg ik na betaling?</summary>
           <div class="zg-faq-body">
-            Na betaling krijg je een persoonlijk account waarmee je inlogt op de PRO-omgeving. Daar vind je alle generatoren in één overzicht. Je stelt in wat je nodig hebt (niveau, type oefening, aantal), klikt op "Genereer PDF" en je werkblad rolt eruit. Geen software te installeren, alles werkt in je browser.
+            Na betaling krijg je een persoonlijk account waarmee je inlogt op de PRO-omgeving. Daar vind je alle tools overzichtelijk per categorie. Elke tool heeft eigen instellingen: bij de ene kies je getallen, bewerkingen en hulpmiddelen, bij een andere vul je woorden in, ontwerp je een spel of organiseer je je klas. Veel tools maken een printklare PDF; andere gebruik je rechtstreeks op je computer, tablet of digibord. Je hoeft niets te installeren.
           </div>
         </details>
 
         <details class="zg-faq-item">
           <summary>Op welke leeftijd / graad is het afgestemd?</summary>
           <div class="zg-faq-body">
-            De generatoren bestrijken het volledige Vlaamse basisonderwijs (graad 1 t.e.m. graad 3). Per generator kies je het niveau, zodat je voor zowel een eersteklasser als een zesdeklasser passende oefeningen krijgt. Spelgenerator PRO is ontworpen voor leerkrachten uit <strong>alle netten</strong> en houdt rekening met de nieuwe minimumdoelen. Omdat leerplannen tussen netten verschillen, geef ik je vooral veel instelmogelijkheden — zo stem jij elke oefening af op het leerplan dat jij volgt.
+            De tools bestrijken verschillende leerinhouden van het Vlaamse basisonderwijs, van de eerste tot en met de derde graad. Je kiest niet altijd een leerjaar: afhankelijk van de tool stel je bijvoorbeeld een getalbereik, bewerking, moeilijkheid, AVI-niveau, eigen woordenlijst of oefenvorm in. Zo stem je het materiaal af op wat jouw leerlingen op dat moment nodig hebben. Spelgenerator PRO is bruikbaar in <strong>alle onderwijsnetten</strong> en houdt rekening met de nieuwe minimumdoelen.
+          </div>
+        </details>
+
+        <details class="zg-faq-item">
+          <summary>Kan ik mijn favoriete tools bewaren?</summary>
+          <div class="zg-faq-body">
+            Ja. In de PRO-omgeving klik je op het sterretje bij de tools die je vaak gebruikt. Je persoonlijke favorieten verschijnen bovenaan je overzicht en worden aan je account gekoppeld. Daardoor zie je ze na het inloggen ook terug op een andere laptop of tablet.
           </div>
         </details>
 
@@ -1427,7 +1473,7 @@ section[id], #zg-prijzen {
         <details class="zg-faq-item">
           <summary>Wat als ik wil stoppen — moet ik opzeggen?</summary>
           <div class="zg-faq-body">
-            <strong>Nee, je hoeft nooit op te zeggen.</strong> Bij Spelgenerator PRO worden abonnementen <em>nooit</em> automatisch verlengd — niet bij het maandabonnement, niet bij het jaarabonnement. Je betaalt één keer voor de gekozen periode en op het einde stopt het gewoon. Wil je verder? Dan vernieuw je zelf, op het moment dat het jou uitkomt. Geen bankafschrijvingen waar je over struikelt — jij houdt het volledig in de hand.
+            <strong>Nee, je hoeft nooit op te zeggen.</strong> Bij Spelgenerator PRO worden abonnementen <em>nooit</em> automatisch verlengd — niet bij het maandabonnement en niet bij de formule van twaalf maanden. Je betaalt één keer voor de gekozen periode en op het einde stopt de toegang gewoon. Wil je verder? Dan vernieuw je zelf, op het moment dat het jou uitkomt.
           </div>
         </details>
 
@@ -1453,10 +1499,10 @@ section[id], #zg-prijzen {
 
   <!-- ============ EINDBLOK ============ -->
   <section class="zg-final">
-    <h2>Klaar om uren tijd terug te winnen?</h2>
-    <p>Word lid van Spelgenerator PRO en geef je voorbereidingstijd terug aan wat écht telt — jouw klas.</p>
+    <h2>Maak precies wat jouw klas nodig heeft.</h2>
+    <p>Geen stapel vaste werkbladen, maar een complete toolbox waarmee je zelf kiest wat je maakt en hoe je het gebruikt.</p>
     <div class="zg-cta-row">
-      <a href="https://tools.jufzisa.be/pro/koop.html" target="_blank" rel="noopener" class="zg-btn zg-btn-primary">Word PRO voor €40/jaar ↗</a>
+      <a href="https://tools.jufzisa.be/pro/koop.html" target="_blank" rel="noopener" class="zg-btn zg-btn-primary">12 maanden PRO voor €40 ↗</a>
       <a href="https://tools.jufzisa.be/pro/maand.html" target="_blank" rel="noopener" class="zg-btn zg-btn-secondary">Of probeer een maand ↗</a>
     </div>
   </section>
@@ -1489,6 +1535,39 @@ section[id], #zg-prijzen {
 
 
 <!-- Bezoekteller -->
+<script>
+  (() => {
+    const voorbeeldLinks = {
+      'Rekenvierkant':'rekenvierkant','Rekenweg':'rekenweg','Rekenpiramide':'rekenpiramide','Reken en kleur':'reken-en-kleur',
+      'Rekenrooster':'rekenrooster','Rekendriehoek':'rekendriehoek','Rekencirkel':'rekencirkel','Bundel bewerkingen':'bundel-bewerkingen',
+      'Bundel getalinzicht':'bundel-getalinzicht','Werkblad cijferen':'werkblad-cijferen','Bundel geld':'bundel-geld','Bundel meetkunde':'bundel-meetkunde',
+      'Verliefde harten':'verliefde-harten','Tempotoetsen':'tempotoetsen','Loopspel':'loopspel','Rekenspellen':'rekenspellen','MAB en schema':'mab-en-schema',
+      'Leeskaartjes per AVI':'leeskaartjes-per-avi','Lezen':'lezen','Handschrift':'handschrift','Woordzoeker':'woordzoeker',
+      'Kruiswoordpuzzel':'kruiswoordpuzzel','Geheime boodschap':'geheime-boodschap','Lettercode':'lettercode','Lettertetris':'lettertetris','Galgje':'galgje',
+      'Sudoku':'sudoku','Zoek de verschillen':'zoek-de-verschillen','Doolhof':'doolhof','Slangendoolhof':'slangendoolhof','Hexagonaal raster':'hexagonaal-raster','Schaduw':'schaduw',
+      'Punttekening':'punttekening','Pixelart':'pixelart','Bouwplaten':'bouwplaten','Coderen':'coderen','Blokkenbouwsels':'blokkenbouwsels','Plattegrond':'plattegrond',
+      'Bingo':'bingo','Vier op een rij':'vier-op-een-rij','Rad':'rad','QR-generator':'qr-generator',
+      'Bundel kloklezen':'bundel-kloklezen','Bundel kalenders':'bundel-kalenders','Timer':'timer',
+      'Opvolging huistaken':'opvolging-huistaken','Takenbord':'takenbord','Planbord':'planbord'
+    };
+    document.querySelectorAll('.zg-tool').forEach(tool => {
+      const emoji = tool.querySelector('.zg-tool-emoji')?.textContent || '';
+      const naam = tool.textContent.replace(emoji, '').trim();
+      const slug = voorbeeldLinks[naam];
+      if (!slug) return;
+      const link = document.createElement('a');
+      link.className = tool.className;
+      link.href = `voorbeelden/?tool=${slug}`;
+      link.setAttribute('aria-label', `${naam}: bekijk uitleg en voorbeeld`);
+      while (tool.firstChild) link.appendChild(tool.firstChild);
+      const pijl = document.createElement('span');
+      pijl.className = 'zg-tool-example-arrow';
+      pijl.textContent = 'Bekijk ›';
+      link.appendChild(pijl);
+      tool.replaceWith(link);
+    });
+  })();
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="teller.js" data-pagina="hoofdpagina"></script>

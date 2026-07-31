@@ -191,6 +191,14 @@ const Generator = (() => {
 
   /* ── Voeg één extra oefening toe aan een bestaand blok ───── */
   function voegOefeningToe(blok) {
+    if (blok.bewerking === 'breuken') {
+      const nieuw = Breuken.genereer({ ...(blok.config || {}), aantalOefeningen: 12 });
+      const bestaand = new Set(blok.oefeningen.map(o => o.sleutel));
+      const oef = nieuw.find(o => !bestaand.has(o.sleutel));
+      if (!oef) return false;
+      blok.oefeningen.push(oef);
+      return true;
+    }
     // Schatten: gebruik Schatten module
     if (blok.bewerking === 'schatten') {
       const cfg = blok.config || {};

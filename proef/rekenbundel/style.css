@@ -2928,3 +2928,831 @@ body.toont-oplossingen .deel-boog {
 }
 .btn-sleutel:hover { background: #1e8449; }
 .btn-sleutel:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Breuken */
+.sidebar-tab.tab-breuken { background-color:#dcedc8; color:#1A3A5C; border-color:#83b735 !important; }
+.sidebar-tab.tab-breuken:hover { background-color:#c5e1a5; }
+.sidebar-tab.tab-breuken.active { background-color:#6f9f24 !important; color:#fff; border-bottom-color:#416814 !important; font-weight:800; }
+.sidebar-tab.tab-percentages { background-color:#c9e9f1; color:#1A3A5C; border-color:#56a8ba !important; }
+.sidebar-tab.tab-percentages:hover { background-color:#aee0eb; }
+.sidebar-tab.tab-percentages.active { background-color:#2b93ad !important; color:#fff; border-bottom-color:#17657a !important; font-weight:800; }
+.breuken-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.breuken-grid.mg-grid { grid-template-columns:1fr; }
+.breuken-grid.mg-grid-kijk { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.breuken-grid.mg-grid-zonder { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.breuk-oef-kort,.breuk-oef-schema { position:relative; min-height:86px; padding:18px 34px 16px 14px; flex-direction:column; }
+.breuk-oef-keten { min-height:118px; justify-content:center; }
+.breuk-oef-schema { min-height:230px; align-items:stretch; }
+.breuk-som,.breuk-gelijknamig { display:flex; align-items:center; justify-content:center; gap:8px; font-size:21px; }
+.breuk { display:inline-flex; flex-direction:column; align-items:center; line-height:1.05; min-width:27px; vertical-align:middle; }
+.breuk-teller { width:100%; text-align:center; border-bottom:1.5px solid currentColor; padding:0 3px 2px; min-height:19px; box-sizing:border-box; }
+.breuk-noemer { padding-top:2px; text-align:center; }
+.breuk-invul { position:relative; gap:7px; min-width:34px; }
+.breuk-invul::after { content:""; position:absolute; left:0; right:0; top:50%; border-top:2px solid #263238; transform:translateY(-1px); z-index:2; }
+.breuk-invul .breuk-teller,.breuk-invul .breuk-noemer { border:1.5px solid #adb5bd; border-radius:5px; width:28px; min-width:28px; height:34px; min-height:34px; padding:4px 2px; line-height:24px; box-sizing:border-box; background:#fff; z-index:1; }
+.breuk-invul .breuk-teller { margin-bottom:0; }
+.breuk-som-lang { gap:5px; font-size:18px; flex-wrap:nowrap; }
+.breuken-grid.breuk-vermenigvuldig-uitgewerkt{grid-template-columns:1fr}
+.breuken-grid.breuk-vermenigvuldig-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.breuk-vermenigvuldig-kort{position:relative;min-height:118px;padding:22px 42px;justify-content:center}
+.breuk-vermenigvuldig-som{display:flex;align-items:center;gap:10px;font-size:24px}
+.breuk-vermenigvuldig-antwoord{display:inline-block;min-width:132px;height:30px;border-bottom:1.5px solid #aeb9c4;text-align:center;color:#0783c2;font-weight:700}
+.breuk-van-getal{position:relative;min-height:330px;padding:20px 40px;display:grid;grid-template-rows:auto auto 1fr auto;gap:20px;font-size:22px}
+.breuk-van-uitleg,.breuk-van-formule,.breuk-van-slot{display:flex;align-items:center;justify-content:center;gap:8px}
+.breuk-van-uitleg em{color:#6abf45;font-style:normal}
+.breuk-product-breuk{display:inline-flex;align-items:center;gap:5px;border-bottom:1px solid #333;padding:0 6px 4px}
+.breuk-schrap-product{display:inline-grid;grid-template-rows:auto auto;min-width:116px;text-align:center;color:#0783c2;font-weight:600}
+.breuk-schrap-boven{display:flex;align-items:flex-end;justify-content:center;gap:9px;border-bottom:2px solid #333;padding:0 5px 3px;position:relative}
+.breuk-schrap-onder{padding-top:3px;position:relative}
+.breuk-schrap-product i{font-style:normal;color:#333;font-weight:400}
+.breuk-schrap-product .doorgestreept{position:relative;font-weight:500}
+.breuk-schrap-product .doorgestreept::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:2px;background:#0783c2;transform:rotate(48deg);transform-origin:center}
+.breuk-schrap-product sup{font-size:14px;line-height:1;position:relative;top:-10px;margin-left:-7px;color:#0783c2}
+.breuk-schrap-onder sup{top:-7px;margin-left:2px}
+.breuk-product-leeg{color:#222;font-weight:500}
+.breuk-product-leeg .breuk-schrap-boven{min-width:112px}
+.breuk-werklijnen{display:flex;flex-direction:column;justify-content:center;gap:24px;padding:0 15%}
+.breuk-werklijnen span{height:30px;border-bottom:1px solid #ccd3da;color:#0783c2;font-weight:600}
+.breuk-werklijnen span::after{content:attr(data-antwoord);visibility:hidden}
+.toon-oplossingen .breuk-werklijnen span::after{visibility:visible}
+.breuk-verbind-puzzel{position:relative;min-height:560px;padding:24px 68px;display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);column-gap:40px}
+.breuk-verbind-kolom,.breuk-verbind-doelen{display:flex;flex-direction:column;justify-content:space-around;gap:18px}
+.breuk-verbind-doelen{align-items:center}
+.breuk-verbind-item{position:relative;min-height:72px;border:2px solid #46b8df;border-radius:16px;display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:21px}
+.breuk-verbind-kolom .breuk-verbind-item:nth-child(2){border-color:#f05a63}.breuk-verbind-kolom .breuk-verbind-item:nth-child(3){border-color:#e49a2b}.breuk-verbind-kolom .breuk-verbind-item:nth-child(4){border-color:#a96ab2}
+.breuk-verbind-doelen span{width:74px;height:58px;border:2px solid #f2ae22;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:21px;background:#fff}
+.breuk-verbind-item .breuk-vermenigvuldig-antwoord{min-width:72px}
+.breuk-vermenigvuldig-uitwerking{display:inline-flex;align-items:center;gap:7px;color:#0783c2;font-weight:600;white-space:nowrap}
+.breuk-vermenigvuldig-uitwerking .breuk{color:#0783c2}
+.breuken-grid.breuk-vermenigvuldig-gemengd{gap:0}
+.breuk-vermenigvuldig-gemengd .breuk-vermenigvuldig-kort{border:none;border-radius:0;min-height:132px;padding:20px 34px;box-shadow:none}
+.breuk-vermenigvuldig-gemengd .breuk-vermenigvuldig-kort:nth-child(even){border-left:2px solid #7aa5b4}
+.breuk-vermenigvuldig-gemengd .breuk-vermenigvuldig-antwoord{flex:1;min-width:90px}
+.breuk-vraagstuk{min-height:430px;padding:18px 22px;border:1.5px solid #b7c0c7;border-radius:14px;background:#fff;display:flex;flex-direction:column}
+.breuk-vraagstuk-tekst{border:1.5px solid #aeb7bd;border-radius:13px;padding:14px 18px;font-size:18px;line-height:1.45}
+.breuk-vraagstuk-tekst p{margin:0 0 4px}.breuk-vraagstuk-tekst .vraag{margin-top:7px;font-weight:650}
+.breuk-vraagstuk-tekst .breuk{font-size:.9em;vertical-align:middle}
+.breuk-vraagstuk-werk{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:16px}
+.breuk-vraagstuk-werk h4,.breuk-vraagstuk-antwoordzin b{margin:0 0 7px;color:#6d9eaa;font-size:18px}
+.breuk-vraagstuk-raster{height:118px;position:relative;border:1px solid #bdd0d8;background-color:#fff;background-image:linear-gradient(#d7e3e8 1px,transparent 1px),linear-gradient(90deg,#d7e3e8 1px,transparent 1px);background-size:28px 28px;padding:10px;color:#0783c2}
+.breuk-vraagstuk-raster>span,.breuk-vraagstuk-raster>b,.breuk-vraagstuk-raster>em{position:absolute;font-style:normal}
+.breuk-vraagstuk-raster>span{top:8px;left:45%;font-size:20px}.breuk-vraagstuk-raster>b{bottom:9px;left:12%;font-size:18px}.breuk-vraagstuk-raster>em{bottom:9px;left:53%;font-size:18px}
+.breuk-vraagstuk-bewerking{display:flex;flex-direction:column;gap:6px;font-size:16px}
+.breuk-vraagstuk-bewerking>span{position:static}
+.breuk-vraagstuk-bewerking span::after,.breuk-vraagstuk-antwoordzin span::after{content:attr(data-antwoord);visibility:hidden;color:#0783c2;font-weight:650}
+.toon-oplossingen .breuk-vraagstuk-bewerking span::after,.toon-oplossingen .breuk-vraagstuk-antwoordzin span::after{visibility:visible}
+.breuk-vraagstuk-antwoordzin{display:flex;align-items:flex-end;gap:8px;margin-top:18px;border-bottom:1px solid #aeb7bd;min-height:38px;width:100%;font-size:17px}
+.breuk-vraagstuk-antwoordzin span{flex:1}
+.percentage-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px}
+.percentage-oef{position:relative;background:#fff;border:2px solid #aeb4b9;border-radius:17px;color:#242225;box-sizing:border-box}
+.percentage-stappen{display:block!important;width:100%;min-width:0;height:410px;padding:18px 20px 16px;overflow:hidden}
+.percentage-stappen h3{position:absolute;left:20px;top:18px;margin:0;font-size:22px;line-height:1.15;white-space:nowrap}
+.percentage-omzet{position:absolute;right:16px;top:73px;width:170px;height:82px;border:2px solid #6d9eaa;border-radius:19px;display:flex;align-items:center;justify-content:center;gap:7px;color:#6d9eaa;font-size:21px;box-sizing:border-box}
+.percentage-omzet .breuk{font-size:20px;min-width:48px}
+.percentage-omzet .breuk-invul .breuk-teller,.percentage-omzet .breuk-invul .breuk-noemer{min-width:42px;min-height:27px}
+.percentage-pijl{position:absolute;left:130px;top:72px;width:74px;height:45px;border-left:3px solid #6d9eaa;border-bottom:3px solid #6d9eaa;box-sizing:border-box}
+.percentage-pijl::after{content:"";position:absolute;right:-1px;bottom:-7px;border-left:13px solid #6d9eaa;border-top:7px solid transparent;border-bottom:7px solid transparent}
+.percentage-stapregels{margin:164px 0 20px 42px;display:flex;flex-direction:column;gap:17px}
+.percentage-stapregels>div{display:grid;grid-template-columns:max-content minmax(95px,1fr);align-items:end;column-gap:8px;font-size:18px}
+.percentage-stapregels>div>b{font-weight:500;white-space:nowrap}
+.percentage-stapregels span{display:block;min-height:29px;border-bottom:1px solid #adb6bc;padding:0 4px 2px;color:transparent;white-space:nowrap}
+.percentage-stapregels span::after{content:attr(data-antwoord);visibility:hidden;color:#0783c2;font-weight:650}
+.toon-oplossingen .percentage-stapregels span::after{visibility:visible}
+.percentage-slot{position:absolute;left:24px;right:24px;bottom:17px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:21px}
+.percentage-invul{display:inline-flex;min-width:76px;height:45px;border:1.5px solid #88adba;align-items:center;justify-content:center;background:#fff}
+.percentage-invul::after{content:attr(data-antwoord);visibility:hidden;color:#0783c2;font-weight:700}
+.toon-oplossingen .percentage-invul::after{visibility:visible}
+.percentage-puntbreuk,.percentage-lange-breukstreep{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:21px;line-height:1.15}
+.percentage-puntbreuk{min-width:54px}
+.percentage-lange-breukstreep{min-width:150px}
+.percentage-puntbreuk>span:first-child,.percentage-lange-breukstreep>span:first-child{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border-bottom:2px solid #222;padding:0 8px 4px;box-sizing:border-box}
+.percentage-puntbreuk>span:last-child,.percentage-lange-breukstreep>span:last-child{padding-top:4px}
+.percentage-punt{display:inline-block;min-width:28px;text-align:center;font-style:normal;color:#242225}
+.percentage-punt::after{content:attr(data-antwoord);display:none;color:#0783c2;font-weight:650}
+.toon-oplossingen .percentage-punt{font-size:0}
+.toon-oplossingen .percentage-punt::after{display:inline;font-size:21px}
+.percentage-lang{grid-column:1/-1;min-height:112px;padding:18px 16px 22px;display:flex;align-items:center;justify-content:flex-start;gap:7px;font-size:22px;border:0;border-radius:0;white-space:nowrap}
+.percentage-lang-zin,.percentage-lang-maal,.percentage-lang-gelijk{font-weight:400;white-space:nowrap}
+.percentage-lange-breukstreep{width:168px;min-width:168px;margin:0 1px}
+.percentage-product-oplossing{display:none;color:#0783c2;font-weight:500}
+body.toont-oplossingen .percentage-product-leeg{display:none}
+body.toont-oplossingen .percentage-product-oplossing{display:inline-flex}
+.percentage-product-oplossing i{font-style:normal}
+.percentage-schrap-waarde{position:relative;display:inline-flex;align-items:center;justify-content:center;margin-left:2px}
+.percentage-schrap-waarde::after{content:"";position:absolute;left:-5px;right:-5px;top:50%;height:2px;background:#0783c2;transform:rotate(36deg);transform-origin:center}
+.percentage-schrap-waarde sup{position:absolute;right:-10px;top:-11px;font-size:12px;line-height:1;color:#0783c2;font-weight:700}
+.percentage-schrap{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.percentage-schrap sup{display:none;position:absolute;right:-9px;top:-10px;color:#0783c2;font-size:12px;font-weight:700}
+.toon-oplossingen .percentage-schrap .percentage-punt::before{content:"";position:absolute;width:30px;height:2px;background:#0783c2;transform:rotate(35deg);left:0;top:50%}
+.toon-oplossingen .percentage-schrap sup{display:block}
+.percentage-antwoordlijn{display:inline-block;min-width:68px;min-height:27px;border-bottom:1px solid #adb6bc;color:transparent;text-align:center}
+.percentage-antwoordlijn::after{content:attr(data-antwoord);visibility:hidden;color:#0783c2;font-weight:700}
+.toon-oplossingen .percentage-antwoordlijn::after{visibility:visible}
+@media(max-width:800px){.percentage-grid{grid-template-columns:1fr!important}}
+.breuk-schema { display:flex; justify-content:center; margin:16px 0 0; padding:8px; border:1.5px solid #aab5c0; border-radius:9px; min-height:152px; }
+.breuk-conversie { position:relative; width:210px; height:144px; font-size:18px; }
+.breuk-conv-bron,.breuk-conv-doel { position:absolute; top:48px; z-index:2; }
+.breuk-conv-bron { left:18px; }.breuk-conv-doel { right:18px; }
+.breuk-conv-gelijk { position:absolute; left:99px; top:69px; }
+.breuk-conversie svg { position:absolute; left:20px; top:20px; width:170px; height:108px; overflow:visible; }
+.breuk-conversie path { fill:none; stroke:#222; stroke-width:2; }
+.breuk-conversie polygon { fill:#222; stroke:none; }
+.breuk-factor { position:absolute; left:76px; color:#333; font-size:16px; line-height:20px; z-index:3; }
+.breuk-factor.boven { top:3px; }.breuk-factor.onder { top:130px; }
+.breuk-factor i { display:inline-block; width:36px; min-height:20px; border-bottom:1.5px solid #777; font-style:normal; text-align:center; }
+body.toont-oplossingen .breuk-antwoord { background:#e5f6e8; border-color:#27ae60; color:#006100; }
+body.toont-oplossingen .breuk-factor i { color:#006100; border-bottom-color:#27ae60; font-weight:700; }
+.mg-oef { position:relative; min-height:190px; padding:16px 34px 16px 14px; flex-direction:column; gap:16px; align-items:stretch; }
+.mg-oef.mg-uitgewerkt { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr); gap:18px; min-height:330px; align-items:stretch; }
+.mg-werk { position:relative; display:flex; flex-direction:column; gap:12px; min-width:0; padding:2px 4px 8px; }
+.mg-vraag { display:flex; align-items:center; gap:8px; font-size:21px; min-height:44px; }
+.mg-schema-start,.mg-schema-rij { display:grid; grid-template-columns:58px minmax(105px,1fr) 22px minmax(105px,1fr) 58px; align-items:center; gap:6px; min-height:48px; }
+.mg-gelijknamig .mg-schema-start,.mg-gelijknamig .mg-schema-rij { grid-template-columns:58px auto 22px auto 58px; justify-content:center; column-gap:8px; }
+.mg-gelijknamig .mg-werk { max-width:520px; width:100%; margin:0 auto; }
+.mg-gelijknamig.mg-uitgewerkt { min-height:285px; }
+.mg-schema-start>.mg-stroken,.mg-schema-rij>.mg-stroken { max-width:none; justify-content:flex-start; }
+.mg-schema-omzet { width:58px; height:126px; margin:-10px 0 -4px; }
+.mg-schema-omzet.mg-omzet-links { align-self:flex-start; }
+.mg-schema-omzet.mg-omzet-rechts { align-self:flex-end; }
+.mg-schema-omzet .mg-omzet { margin:0; }
+.mg-schema-pijl { color:#222; font-size:34px; line-height:24px; text-align:center; margin:-8px 0 -5px; }
+.mg-schema-eind { grid-template-columns:64px minmax(130px,1fr); }
+.mg-schema-totaal { grid-template-columns:64px minmax(130px,1fr); }
+.mg-aftrek-werk{gap:8px}
+.mg-aftrek-rij{display:grid;grid-template-columns:minmax(180px,1fr) minmax(150px,.72fr);align-items:center;gap:14px;min-height:64px}
+.mg-aftrek-rij>.mg-stroken{max-width:none;justify-content:flex-start}
+.mg-aftrek-notatie{display:flex;align-items:center;gap:8px;font-size:20px;white-space:nowrap}
+.mg-aftrek-eerste .mg-schema-pijl{width:60%;margin:-3px 40% -3px 0}
+.mg-aftrek-kijk{display:flex;min-height:310px;justify-content:center;align-items:center;padding:18px 28px 24px;gap:15px}
+.mg-aftrek-plaat{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;max-width:320px}
+.mg-aftrek-vorm{position:relative;display:inline-flex}
+.mg-aftrek-vorm>.mg-stroken{max-width:none}
+.mg-rood-overlay{position:absolute;inset:0;z-index:5;width:100%;height:100%;overflow:visible;pointer-events:none}
+.mg-rood-overlay line{stroke:#ef5350;stroke-width:1.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
+body.pdf-opname .mg-rood-overlay line{stroke-width:2.2}
+.mg-aftrek-zwarte-pijl{font-size:35px;line-height:30px;color:#222;text-align:center}
+.mg-aftrek-kijk-regels{display:flex;flex-direction:column;align-items:center;gap:15px;font-size:20px}
+.mg-aftrek-kijk-regels>div{display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+body.pdf-opname .mg-aftrek-kijk{min-height:410px;padding:24px 34px 38px;gap:22px}
+body.pdf-opname .mg-aftrek-plaat{max-width:390px;gap:11px}
+body.pdf-opname .mg-aftrek-kijk-regels{font-size:26px;gap:22px}
+body.pdf-opname .mg-aftrek-zwarte-pijl{font-size:46px;line-height:40px}
+.komma-header{background:linear-gradient(135deg,#27885a,#3bb978)!important}
+.komma-strategie-keuze{border:2px solid #70b995;background:#f1fbf5}
+.komma-strategie-keuze .kaart-titel{color:#176b45}
+.komma-getallen-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.komma-getallen-grid.komma-splitsen,.komma-getallen-grid.komma-tienden{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getallen-grid.komma-vermenigvuldigen-haakjes,.komma-getallen-grid.komma-vermenigvuldigen-zelf{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getallen-grid.komma-vermenigvuldigen-compenseren-haakjes,.komma-getallen-grid.komma-vermenigvuldigen-compenseren-zelf{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getallen-grid.komma-delen-haakjes,.komma-getallen-grid.komma-delen-zelf{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getallen-grid.komma-vermenigvuldigen-nulregel{grid-template-columns:repeat(3,minmax(0,1fr))}
+.komma-getallen-grid.komma-vermenigvuldigen-factoren{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getallen-grid.komma-delen-nulregel{grid-template-columns:repeat(3,minmax(0,1fr))}
+.komma-getallen-grid.komma-delen-factoren{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-maal-keuzetitel{margin:12px 0 7px;color:#176b45;font-size:13px;font-weight:800}
+.komma-vermenigvuldig-blok .opdrachtzin-wrapper{align-items:flex-start}
+.komma-vermenigvuldig-blok .opdrachtzin-tekst{display:block;min-width:0;max-width:900px;white-space:normal;line-height:1.35;overflow-wrap:break-word}
+.komma-oef.komma-vermenigvuldigen{min-height:205px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:22px;padding:24px 34px 22px 20px}
+.komma-maal-eerste{display:flex;align-items:center;flex-wrap:nowrap;gap:4px;font-size:18px;white-space:nowrap}
+.komma-maal-klein{display:inline-block;min-width:34px;min-height:27px;border-bottom:1px solid #aeb8c0;color:#0672b8;text-align:center}
+.komma-maal-comp-vak{display:inline-block;min-width:92px;min-height:27px;border-bottom:1px solid #aeb8c0;color:#0672b8;text-align:center}
+.komma-deel-vak{display:inline-block;min-width:92px;min-height:27px;border-bottom:1px solid #aeb8c0;color:#0672b8;text-align:center}
+.komma-maal-regel{display:inline-block;flex:1;min-width:170px;min-height:27px;border-bottom:1px solid #aeb8c0;color:#0672b8}
+.komma-maal-stap{display:grid;width:calc(100% - 55px);grid-template-columns:30px minmax(0,1fr);align-items:end;margin-left:55px;font-size:19px;box-sizing:border-box}
+.komma-maal-stap>span{display:block;min-height:27px;border-bottom:1px solid #aeb8c0;color:#0672b8;padding-left:8px}
+.komma-maal-product>span{font-weight:700}
+body.pdf-opname .komma-oef.komma-vermenigvuldigen{min-height:280px;gap:31px;padding:32px 45px 30px 27px}
+body.pdf-opname .komma-vermenigvuldig-blok .opdrachtzin-wrapper{min-height:92px;margin-bottom:18px}
+body.pdf-opname .komma-vermenigvuldig-blok .opdrachtzin-tekst{max-width:820px;font-size:21px;line-height:1.45}
+body.pdf-opname .komma-maal-eerste{font-size:22px;gap:4px}
+body.pdf-opname .komma-maal-klein{min-width:38px;min-height:34px}
+body.pdf-opname .komma-vermenigvuldigen-compenseren .komma-maal-eerste{font-size:24px}
+body.pdf-opname .komma-maal-comp-vak{min-width:86px;min-height:38px}
+body.pdf-opname .komma-delen .komma-maal-eerste{font-size:20px}
+body.pdf-opname .komma-deel-vak{min-width:82px;min-height:34px}
+.komma-nulregel{min-height:78px;padding:16px 34px 16px 18px;display:flex;align-items:center;gap:7px;font-size:19px;white-space:nowrap}
+.komma-nulregel .komma-antwoord{flex:1;min-width:55px}
+.komma-getallen-grid.komma-delen-nulregel .komma-nulregel{padding:14px 28px 14px 14px;font-size:17px}
+body.pdf-opname .komma-nulregel{min-height:92px;padding:20px 38px 20px 22px;font-size:23px}
+body.pdf-opname .komma-getallen-grid.komma-delen-nulregel .komma-nulregel{padding:18px 32px 18px 18px;font-size:20px}
+.komma-oef.komma-factoren{min-height:285px;padding:22px 34px 22px 20px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:25px;font-size:18px}
+.komma-factoren>div{display:grid;grid-template-columns:125px 26px minmax(0,1fr);align-items:end}
+.komma-factoren>div:not(:first-child){grid-template-columns:125px 26px minmax(0,1fr)}
+.komma-factoren>div:not(:first-child)>b{grid-column:2}
+.komma-factoren>div>span:last-child{min-height:27px;border-bottom:1px solid #aeb8c0;color:#0672b8;padding-left:6px}
+.komma-factoren-product>span{font-weight:800}
+body.pdf-opname .komma-factoren{min-height:370px;gap:34px;padding:30px 42px 30px 28px;font-size:23px}
+body.pdf-opname .komma-factoren>div{grid-template-columns:165px 34px minmax(0,1fr)}
+body.pdf-opname .komma-factoren>div:not(:first-child){grid-template-columns:165px 34px minmax(0,1fr)}
+body.pdf-opname .komma-factoren>div>span:last-child{min-height:36px}
+.komma-deel-factoren{min-height:225px}
+.komma-deel-factoren>div:not(:first-child){grid-template-columns:55px 26px minmax(0,1fr)}
+body.pdf-opname .komma-deel-factoren{min-height:305px}
+body.pdf-opname .komma-deel-factoren>div:not(:first-child){grid-template-columns:72px 34px minmax(0,1fr)}
+body.pdf-opname .komma-maal-regel{min-height:37px}
+body.pdf-opname .komma-maal-stap{width:calc(100% - 72px);grid-template-columns:40px minmax(0,1fr);margin-left:72px;font-size:26px}
+body.pdf-opname .komma-maal-stap>span{min-height:37px}
+.komma-getallen-grid.komma-compenseren,.komma-getallen-grid.komma-transformeren{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-oef{position:relative;min-height:92px;padding:22px 34px 20px 20px;font-size:22px;display:flex;align-items:center;gap:10px}
+.komma-kort{justify-content:flex-start}
+.komma-antwoord{display:inline-block;min-width:78px;min-height:28px;border-bottom:1.5px solid #8795a3;color:#0672b8;font-weight:700;text-align:center}
+body.pdf-opname .komma-kort{
+  min-height:64px;
+  padding:10px 18px;
+  font-size:19px;
+  gap:8px;
+  flex-wrap:nowrap;
+}
+body.pdf-opname .komma-kort>span:first-child{white-space:nowrap}
+body.pdf-opname .komma-kort .komma-antwoord{min-width:90px}
+.komma-tienden{min-height:118px;white-space:nowrap;font-size:19px}
+.komma-lijn{display:inline-block;width:58px;height:24px;border-bottom:1.5px solid #9aa5ae}
+.komma-splits{min-height:190px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
+.komma-hoofdsom{display:flex;align-items:flex-start;justify-content:flex-start;gap:8px;font-size:22px;white-space:nowrap}
+.komma-term-splits{position:relative;display:inline-flex;justify-content:center;min-width:42px}
+.komma-splitsbeen{position:absolute;display:flex;gap:10px;padding-top:34px;top:30px;left:50%;transform:translateX(-50%)}
+.komma-splitsbeen::before,.komma-splitsbeen::after{content:"";position:absolute;top:4px;width:38px;height:22px;border-top:1.5px solid #8db3c7}
+.komma-splitsbeen::before{left:15px;transform:rotate(-27deg)}.komma-splitsbeen::after{left:50px;transform:rotate(27deg)}
+.komma-vak{width:42px;height:38px;border:1.5px solid #9fbfce;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#0672b8;font-weight:700}
+.komma-tussenlijnen{display:flex;flex-direction:column;align-items:flex-start;gap:27px;padding-top:102px;margin-left:116px}
+.komma-tussenlijnen>span{display:block;width:78%;min-height:25px;border-bottom:1px solid #aeb8c0;color:#0672b8;font-size:17px;padding-left:8px;box-sizing:border-box}
+body.pdf-opname .komma-oef{min-height:145px;font-size:29px;padding:28px 38px}
+body.pdf-opname .komma-antwoord{min-width:110px;min-height:39px;font-size:28px}
+body.pdf-opname .komma-tienden{min-height:165px;font-size:25px}
+body.pdf-opname .komma-lijn{width:78px;height:32px}
+body.pdf-opname .komma-splits{min-height:245px}
+body.pdf-opname .komma-hoofdsom{font-size:29px}
+body.pdf-opname .komma-vak{width:55px;height:50px;font-size:24px}
+body.pdf-opname .komma-splitsbeen{top:42px;gap:14px;padding-top:42px}
+body.pdf-opname .komma-tussenlijnen{padding-top:142px;margin-left:155px;gap:34px}
+body.pdf-opname .komma-tussenlijnen>span{width:76%;min-height:34px;font-size:23px;padding-left:12px}
+.komma-strategie{min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;font-size:19px}
+.komma-strategie-som,.komma-strategie-stap{display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap}
+.komma-strategie-lijn{display:inline-block;min-width:55px;min-height:24px;border-bottom:1.4px solid #9ba8b3;color:#0672b8;text-align:center}
+.komma-comp-correctie{padding:6px 14px;border:1.5px solid #b4c9d8;border-radius:7px;color:#0672b8}
+.komma-rond-term{position:relative;padding:1px 5px;border:1.5px solid #707b83;border-radius:50%;text-decoration:none}
+.komma-compenseren .komma-rond-term::before{content:"";position:absolute;left:50%;top:100%;width:64px;border-top:1.5px solid #444;transform:rotate(145deg);transform-origin:left center}
+.komma-compenseren .komma-rond-term::after{content:"";position:absolute;left:10px;top:45px;border-right:6px solid #444;border-top:4px solid transparent;border-bottom:4px solid transparent;transform:rotate(-35deg)}
+.komma-trans-correcties{width:190px;display:flex;justify-content:space-between;color:#0672b8;margin-top:4px}
+.komma-trans-correcties>span{display:flex;align-items:center;gap:3px}
+.komma-trans-pijlen{width:180px;display:flex;justify-content:space-between;font-size:27px;line-height:22px;margin:-8px 0}
+body.pdf-opname .komma-strategie{min-height:315px;gap:19px;font-size:25px;padding:28px 38px}
+body.pdf-opname .komma-strategie-lijn{min-width:75px;min-height:32px;font-size:24px}
+body.pdf-opname .komma-comp-correctie{padding:8px 20px}
+body.pdf-opname .komma-trans-correcties{width:250px}
+body.pdf-opname .komma-trans-pijlen{width:235px;font-size:36px}
+.komma-getallen-grid.komma-aftrek-schijfjes,.komma-getallen-grid.komma-aftrek-tienden,.komma-getallen-grid.komma-aftrek-aanvullen{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-plaats-schema{width:100%;border:1.5px solid #aab3ba}
+.komma-plaats-kop,.komma-plaats-rij{display:grid;grid-template-columns:1fr 1fr}
+.komma-plaats-kop b{padding:5px;text-align:center;background:#ffe082;border-right:1px solid #777}
+.komma-plaats-kop b:last-child{background:#ffecb3;border-right:0}
+.komma-plaats-rij>span{min-height:56px;padding:7px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:4px;background:#f1f1f1;border-right:1px solid #777}
+.komma-plaats-rij>span:last-child{border-right:0}
+.komma-schijf{position:relative;width:24px;height:24px;border:1px solid #d5a500;border-radius:50%;background:#ffd400;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-style:normal;font-weight:700}
+.komma-schijf.weg::after{content:"";display:none;position:absolute;left:-3px;right:-3px;top:11px;border-top:2px solid #e34234;transform:rotate(-35deg)}
+body.toont-oplossingen .komma-schijf.weg::after{display:block}
+.komma-aftrek-schijfjes{min-height:175px;flex-direction:column;align-items:stretch;padding:16px 30px 16px 16px}
+.komma-aftrek-som{font-size:20px}
+.komma-aanvullen{min-height:125px;display:grid;grid-template-columns:190px minmax(210px,1fr);align-items:center;justify-content:center;gap:16px;padding:18px 32px 18px 18px}
+.komma-aanvul-balk{display:grid;grid-template-columns:4fr 1fr;width:190px;border:1px solid #b7c0c8;box-sizing:border-box}
+.komma-aanvul-balk>div{padding:7px 12px;background:#cce5ef;text-align:center}.komma-aanvul-balk>div:first-child{grid-column:1/3}.komma-aanvul-balk>div:nth-child(2){grid-column:1;grid-row:2;background:#cce8b4}.komma-aanvul-balk .komma-aanvul-vraag{grid-column:2;grid-row:2;background:#ffe49b;font-weight:800;text-align:center;padding-left:5px;padding-right:5px}
+.komma-aanvul-regels{display:flex;flex-direction:column;align-items:flex-start;gap:14px;font-size:18px;white-space:nowrap}.komma-aanvul-regels>span{display:flex;align-items:center;gap:5px}.komma-aanvul-regels .komma-antwoord,.komma-aanvul-regels .komma-lijn{width:82px;min-width:82px}
+.komma-compenseren .komma-strategie-som{margin-top:8px}.komma-comp-werk{width:100%;display:grid;grid-template-columns:135px 1fr;align-items:start;gap:18px;margin-top:26px}.komma-compenseren .komma-comp-correctie{min-width:115px;height:30px;padding:4px 8px;display:flex;align-items:center;justify-content:center}.komma-schrijfregels{width:100%;display:flex;flex-direction:column;gap:27px;padding-top:0}.komma-schrijfregels i{display:block;min-height:24px;border-bottom:1px solid #aeb8c0;font-style:normal;color:#0672b8;text-align:left}
+body.pdf-opname .komma-comp-werk{grid-template-columns:180px 1fr;gap:24px;margin-top:38px}body.pdf-opname .komma-schrijfregels{gap:38px}body.pdf-opname .komma-compenseren .komma-rond-term::before{width:86px}body.pdf-opname .komma-compenseren .komma-rond-term::after{left:8px;top:56px}
+.komma-trans-balk{display:grid;grid-template-columns:1fr 1fr;width:82%;margin-bottom:4px}.komma-trans-balk span{position:relative;padding:9px;text-align:center}.komma-trans-balk .blauw{background:#ccecf5}.komma-trans-balk .geel{background:#ffedb9}.komma-trans-balk i{position:absolute;left:18%;right:18%;bottom:4px;border-bottom:1px solid #aeb8c0}
+.komma-transform .komma-trans-pijlen{width:180px;margin:-4px 0;display:flex;justify-content:space-between}.komma-transform .komma-trans-pijlen span{display:flex;flex-direction:column;align-items:center;gap:0}.komma-transform .komma-trans-pijlen b{font-size:28px;line-height:25px}.komma-transform .komma-trans-pijlen i{width:55px;min-height:20px;border-bottom:1px solid #9ba8b3;font-size:14px;font-style:normal;color:#0672b8}
+body.pdf-opname .komma-aftrek-schijfjes{min-height:235px}.pdf-opname .komma-schijf{width:30px;height:30px;font-size:12px}.pdf-opname .komma-plaats-rij>span{min-height:78px}.pdf-opname .komma-aanvullen{min-height:175px;grid-template-columns:245px minmax(275px,1fr);gap:24px;padding:26px 42px 26px 25px}.pdf-opname .komma-aanvul-balk{width:245px}.pdf-opname .komma-aanvul-balk>div{padding:10px 16px;font-size:24px}.pdf-opname .komma-aanvul-regels{gap:20px;font-size:24px}.pdf-opname .komma-aanvul-regels .komma-antwoord,.pdf-opname .komma-aanvul-regels .komma-lijn{width:108px;min-width:108px}
+@media(max-width:900px){.komma-getallen-grid,.komma-getallen-grid.komma-splitsen,.komma-getallen-grid.komma-tienden{grid-template-columns:1fr}}
+body.pdf-opname .mg-aftrek-rij{grid-template-columns:minmax(230px,1fr) minmax(190px,.72fr);min-height:92px;gap:20px}
+body.pdf-opname .mg-aftrek-notatie{font-size:25px;gap:11px}
+body.pdf-opname .mg-aftrek-eerste{min-height:520px}
+.mg-schrijf { border:2px solid #b8bec4; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:24px; min-height:310px; }
+.mg-schrijf>em { font-size:20px; color:#444; text-align:left; }
+.mg-schrijf-som { display:flex; align-items:center; justify-content:center; gap:10px; font-size:18px; flex-wrap:nowrap; }
+.mg-schrijf-term { position:relative; display:inline-flex; align-items:center; }
+.mg-term-pijl{position:absolute;left:50%;top:calc(100% + 5px);width:48px;height:76px;transform:translateX(-16px);z-index:4;border-left:4px solid #0696d7;border-bottom:4px solid #0696d7;border-radius:0 0 0 2px;box-sizing:border-box}
+.mg-term-pijl::after{content:"";position:absolute;right:-4px;bottom:-9px;border-left:13px solid #0696d7;border-top:7px solid transparent;border-bottom:7px solid transparent}
+.mg-term-pijl.mg-term-pijl-links{transform:translateX(-32px);border-left:0;border-right:4px solid #0696d7;border-radius:0 0 2px 0}
+.mg-term-pijl.mg-term-pijl-links::after{right:auto;left:-4px;border-left:0;border-right:13px solid #0696d7}
+.mg-schrijf-conversie { position:relative; height:122px; margin:18px 0 -8px 4px; }
+.mg-conv-mini { position:absolute; left:calc(50% + 48px); top:0; width:150px; height:98px; transform:translateX(-50%); display:flex; align-items:center; gap:12px; font-size:18px; }
+.mg-schrijf-conversie.mg-conv-links .mg-conv-mini { left:105px; }
+.mg-conv-mini svg { position:absolute; left:0; top:0; width:102px; height:98px; overflow:visible; }
+.mg-conv-mini svg path { fill:none; stroke:#222; stroke-width:2; }
+.mg-conv-mini svg polygon { fill:#222; }
+.mg-conv-mini>span,.mg-conv-mini>b { position:relative; z-index:2; }
+.mg-factor { position:absolute!important; left:36px; font-size:16px; white-space:nowrap; }
+.mg-factor-boven { top:-13px; }.mg-factor-onder { bottom:-14px; }
+.mg-factor i { display:inline-block; width:36px; border-bottom:1.5px solid #777; min-height:18px; }
+.mg-schrijf-uitkomst { margin-top:auto; }
+.mg-zonder { min-height:105px; justify-content:center; }
+.mg-zonder .mg-som{width:100%;justify-content:flex-start;padding-left:18px;font-size:22px}
+.mg-zonder .mg-lange-lijn{flex:1;max-width:260px;margin-left:4px}
+body.pdf-opname .mg-zonder{min-height:145px;padding:24px 30px}
+body.pdf-opname .mg-zonder .mg-som{font-size:28px;gap:13px}
+body.pdf-opname .mg-zonder .mg-lange-lijn{max-width:none;min-width:190px;height:34px}
+.mg-kijk { min-height:300px; padding:18px 34px 18px 18px; display:flex; flex-direction:column; gap:20px; justify-content:flex-start; }
+.mg-kijk-beelden { min-height:115px; display:flex; align-items:center; justify-content:center; gap:10px; }
+.mg-kijk-beelden>span { display:flex; justify-content:center; min-width:125px; }
+.mg-kijk-beelden .mg-stroken { max-width:210px; }
+.mg-kijk-som { display:flex; align-items:center; justify-content:center; gap:7px; min-height:82px; font-size:18px; white-space:nowrap; }
+.mg-kijk-omzet { position:relative; height:112px; width:210px; margin-top:-18px; }
+.mg-kijk-omzet.mg-kijk-links { align-self:flex-start; margin-left:22px; }
+.mg-kijk-omzet.mg-kijk-rechts { align-self:flex-end; margin-right:18px; }
+.mg-kijk-l-pijl { position:absolute; left:8px; top:0; width:29px; height:56px; border-left:4px solid #0696d7; border-bottom:4px solid #0696d7; }
+.mg-kijk-l-pijl::after { content:""; position:absolute; right:-9px; bottom:-9px; border-left:13px solid #0696d7; border-top:7px solid transparent; border-bottom:7px solid transparent; }
+.mg-kijk-omzetregel { position:absolute; left:48px; top:42px; display:flex; align-items:center; gap:12px; font-size:18px; }
+.mg-som,.mg-beelden { display:flex; align-items:center; justify-content:center; gap:9px; font-size:19px; }
+.mg-getal { display:inline-flex; align-items:center; gap:3px; }
+.mg-heel { display:inline-flex; width:25px; height:31px; border:1.5px solid #adb5bd; border-radius:5px; align-items:center; justify-content:center; }
+.mg-stroken { display:flex; gap:5px; flex-wrap:wrap; justify-content:center; max-width:230px; }
+.mg-strook { display:inline-flex; width:88px; height:34px; border:1.5px solid #666; box-sizing:border-box; }
+.mg-strook-heel { background:#fff; }
+.mg-taarten { align-items:center; }
+.mg-taart { display:inline-block; width:62px; height:62px; border:2px solid #444; border-radius:50%; box-sizing:border-box; }
+body.toont-oplossingen .mg-taart:not(.mg-voorgekleurd) path[data-deel-gevuld="true"] { fill:#79a9cf!important; }
+.mg-schrijf-term,.mg-schrijf,.mg-schrijf-som { overflow:visible; }
+.mg-puntbreuk .breuk-teller,.mg-puntbreuk .breuk-noemer { min-width:30px; font-size:20px; }
+.mg-geheel-lijn { display:inline-block; width:30px; height:24px; border-bottom:1.5px solid #888; }
+.mg-puntgetal { gap:5px; }
+.mg-strook i { flex:1; border-right:1px solid #888; }
+.mg-strook i:last-child { border-right:0; }
+.mg-voorgekleurd i[data-gevuld="true"],.mg-voorgekleurd .mg-strook-heel[data-gevuld="true"],body.toont-oplossingen .mg-stroken:not(.mg-voorgekleurd) i[data-gevuld="true"],body.toont-oplossingen .mg-stroken:not(.mg-voorgekleurd) .mg-strook-heel[data-gevuld="true"] { background:#79a9cf; }
+.mg-resultaat { padding-top:8px; border-top:1px solid #d8dee5; }
+.mg-lange-lijn { display:inline-block; min-width:150px; min-height:25px; border-bottom:1.5px solid #888; color:#006100; }
+.mg-omzet { position:relative; width:58px; height:126px; margin:0 auto; }
+.mg-omzet-doel { position:absolute; left:18px; bottom:0; }
+.mg-blauwe-pijl { position:absolute; left:28px; top:0; width:0; height:37px; border-left:4px solid #0696d7; }
+.mg-blauwe-pijl::after { content:""; position:absolute; left:-9px; bottom:-9px; border-top:12px solid #0696d7; border-left:7px solid transparent; border-right:7px solid transparent; }
+body.toont-oplossingen .mg-heel { background:#e5f6e8; border-color:#27ae60; color:#006100; font-weight:700; }
+@media (max-width:700px){.breuken-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.mg-oef.mg-uitgewerkt{grid-template-columns:1fr}.mg-schrijf{min-height:230px}.breuken-grid.mg-grid-kijk{grid-template-columns:1fr}}
+.pdf-progress-overlay{position:fixed;right:24px;bottom:24px;z-index:100000;display:none;background:transparent}
+.pdf-progress-overlay.zichtbaar{display:block}
+.pdf-progress-kaart{width:min(430px,calc(100vw - 40px));padding:24px 26px 22px;border-radius:16px;background:#fff;box-shadow:0 18px 55px rgba(0,0,0,.28);color:#17385d;text-align:center}
+.pdf-progress-titel{margin-bottom:16px;font-size:20px;font-weight:800}
+.pdf-progress-balk{height:18px;overflow:hidden;border:1px solid #b9c9da;border-radius:999px;background:#e9f0f7;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
+.pdf-progress-vulling{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3186d5,#20b879);transition:width .22s ease}
+.pdf-progress-status{min-height:21px;margin-top:12px;font-size:15px;color:#52677d}
+.pdf-progress-percentage{margin-top:3px;font-size:17px;font-weight:800;color:#176db5}
+body.pdf-opname .breuk-invul{min-width:46px;gap:9px}
+body.pdf-opname .breuk-invul .breuk-teller,body.pdf-opname .breuk-invul .breuk-noemer{width:40px;min-width:40px;height:44px;min-height:44px;font-size:23px;line-height:32px}
+body.pdf-opname .mg-heel{width:36px;height:42px;font-size:22px}
+body.pdf-opname .mg-puntbreuk .breuk-teller,body.pdf-opname .mg-puntbreuk .breuk-noemer{min-width:38px;min-height:27px;font-size:23px}
+body.pdf-opname .mg-geheel-lijn{width:42px;height:30px}
+body.pdf-opname .mg-factor{font-size:19px}
+body.pdf-opname .mg-factor{left:14px}
+body.pdf-opname .mg-factor i{width:42px;min-height:23px}
+body.pdf-opname .mg-conv-mini{width:175px;gap:16px}
+body.pdf-opname .mg-schrijf-conversie{height:142px;margin-top:26px;margin-bottom:2px}
+body.pdf-opname .mg-schrijf{min-height:350px;padding-bottom:30px}
+body.pdf-opname .mg-schrijf-uitkomst{padding-bottom:8px}
+body.pdf-opname .mg-kijk{min-height:365px;padding:22px 30px 38px 20px;gap:24px}
+body.pdf-opname .mg-kijk-beelden{min-height:135px}
+body.pdf-opname .mg-kijk-som{font-size:22px;min-height:92px;gap:9px}
+body.pdf-opname .mg-kijk-omzet{height:142px;margin-top:-12px;margin-bottom:6px}
+body.pdf-opname .mg-kijk-omzetregel{top:48px;font-size:21px}
+body.pdf-opname .mg-taart{width:68px;height:68px}
+body.pdf-opname .mg-strook{width:102px;height:40px}
+body.pdf-opname .mg-oef{font-size:24px}
+body.pdf-opname .mg-vraag{font-size:28px;min-height:58px}
+body.pdf-opname .mg-oef .breuk{min-width:38px;font-size:24px}
+body.pdf-opname .mg-oef .breuk-teller{min-height:25px;padding-bottom:3px}
+body.pdf-opname .mg-oef .breuk-noemer{padding-top:3px}
+body.pdf-opname .mg-schrijf>em{font-size:27px}
+body.pdf-opname .mg-schrijf-som{font-size:25px;gap:14px}
+body.pdf-opname .mg-schema-start,body.pdf-opname .mg-schema-rij{font-size:24px;min-height:64px}
+body.pdf-opname .mg-taart{width:88px;height:88px}
+body.pdf-opname .mg-strook{width:124px;height:48px}
+body.pdf-opname .mg-kijk-beelden{min-height:175px;gap:16px}
+body.pdf-opname .mg-kijk-beelden>span{min-width:155px}
+body.pdf-opname .mg-kijk-beelden .mg-stroken{max-width:275px}
+body.pdf-opname .mg-kijk-som{font-size:26px;min-height:108px}
+body.pdf-opname .breuk-invul{min-width:54px}
+body.pdf-opname .breuk-invul .breuk-teller,body.pdf-opname .breuk-invul .breuk-noemer{width:48px;min-width:48px;height:50px;min-height:50px;font-size:27px;line-height:36px}
+body.pdf-opname .mg-heel{width:43px;height:49px;font-size:25px}
+body.pdf-opname .mg-puntbreuk .breuk-teller,body.pdf-opname .mg-puntbreuk .breuk-noemer{min-width:45px;min-height:31px;font-size:27px}
+body.pdf-opname .mg-geheel-lijn{width:50px;height:35px}
+body.pdf-opname .mg-kijk{min-height:455px;padding-bottom:48px}
+body.pdf-opname .mg-schrijf{min-height:430px}
+body.pdf-opname .mg-schrijf-conversie{height:190px;margin-top:34px;margin-bottom:10px}
+body.pdf-opname .mg-conv-mini{left:calc(50% + 62px);top:4px;width:220px;height:142px;gap:22px;font-size:25px}
+body.pdf-opname .mg-schrijf-conversie.mg-conv-links .mg-conv-mini{left:142px}
+body.pdf-opname .mg-conv-mini svg{left:2px;top:0;width:142px;height:136px}
+body.pdf-opname .mg-conv-mini svg path{stroke-width:2.5}
+body.pdf-opname .mg-factor{left:27px;font-size:22px}
+body.pdf-opname .mg-factor-boven{top:-24px}
+body.pdf-opname .mg-factor-onder{bottom:-30px}
+body.pdf-opname .mg-factor i{width:52px;min-height:27px}
+.komma-trans-balk .onder{min-height:24px;padding:5px 9px;color:#0672b8;border-bottom:0}.komma-trans-balk .onder::after{content:"";position:absolute;left:22%;right:22%;bottom:5px;border-bottom:1px solid #aeb8c0}.komma-trans-onder{width:210px;display:flex;justify-content:space-between;margin:-12px 0 -17px}.komma-trans-term{position:relative;width:72px;height:58px;display:block}.komma-trans-term>b{position:absolute;left:50%;top:0;font-size:31px;font-weight:400;line-height:31px}.komma-trans-term>i{position:absolute;right:28px;top:25px;width:58px;min-height:20px;border-bottom:1px solid #aeb8c0;color:#0672b8;font-size:14px;font-style:normal;text-align:right}.komma-trans-nieuw{display:grid;grid-template-columns:60px 18px 60px 18px 72px;align-items:center;justify-content:center;gap:5px}.komma-trans-nieuw>span{min-height:24px;border-bottom:1px solid #aeb8c0;color:#0672b8;text-align:center}
+body.pdf-opname .komma-trans-balk{width:86%}body.pdf-opname .komma-trans-balk span{padding:12px}body.pdf-opname .komma-trans-balk .onder{min-height:32px}body.pdf-opname .komma-trans-onder{width:275px;margin-top:-14px}body.pdf-opname .komma-trans-term{width:92px;height:75px}body.pdf-opname .komma-trans-term>b{font-size:40px;line-height:40px}body.pdf-opname .komma-trans-term>i{top:34px;right:36px;width:76px;font-size:19px}.pdf-opname .komma-trans-nieuw{grid-template-columns:78px 24px 78px 24px 94px;font-size:23px}
+.komma-compenseren .komma-rond-term::before{left:-72px;top:76px;width:90px;transform:rotate(-35deg);transform-origin:left center}
+.komma-compenseren .komma-rond-term::after{left:-78px;top:72px;border:0;border-right:8px solid #444;border-top:5px solid transparent;border-bottom:5px solid transparent;transform:rotate(-35deg)}
+.komma-compenseren .komma-comp-werk{grid-template-columns:180px 1fr;margin-top:35px}.komma-compenseren .komma-comp-correctie{width:160px;min-width:160px;height:40px;box-sizing:border-box}.komma-compenseren .komma-comp-correctie .breuk-antwoord{width:100%;min-height:27px}
+body.pdf-opname .komma-compenseren .komma-comp-werk{grid-template-columns:230px 1fr;margin-top:62px}body.pdf-opname .komma-compenseren .komma-comp-correctie{width:205px;min-width:205px;height:52px}body.pdf-opname .komma-compenseren .komma-rond-term::before{left:-94px;top:96px;width:115px}body.pdf-opname .komma-compenseren .komma-rond-term::after{left:-101px;top:91px}
+.komma-transform .komma-strategie-som,.komma-transform .komma-trans-nieuw,.komma-transform .komma-trans-onder{width:250px;display:grid;grid-template-columns:60px 18px 60px 18px 72px;align-items:center;justify-content:center;gap:5px;box-sizing:border-box}
+.komma-transform .komma-strategie-som{text-align:center}.komma-transform .komma-strategie-som .komma-antwoord{min-width:0;width:72px}
+.komma-transform .komma-trans-onder{height:64px;margin:-10px 0 -15px}.komma-transform .komma-trans-onder .komma-trans-term:first-child{grid-column:1}.komma-transform .komma-trans-onder .komma-trans-term:last-child{grid-column:3}.komma-transform .komma-trans-term{width:60px}.komma-transform .komma-trans-term>b{left:50%;transform:translateX(-50%)}
+.komma-transform .komma-trans-term>i{top:14px;width:54px}.komma-transform .komma-trans-term:first-child>i{right:38px;text-align:right}.komma-transform .komma-trans-term:last-child>i{left:38px;right:auto;text-align:left}
+body.pdf-opname .komma-transform .komma-strategie-som,body.pdf-opname .komma-transform .komma-trans-nieuw,body.pdf-opname .komma-transform .komma-trans-onder{width:330px;grid-template-columns:78px 24px 78px 24px 94px;gap:7px}body.pdf-opname .komma-transform .komma-strategie-som .komma-antwoord{width:94px}body.pdf-opname .komma-transform .komma-trans-onder{height:82px}body.pdf-opname .komma-transform .komma-trans-term>i{top:19px;width:72px}body.pdf-opname .komma-transform .komma-trans-term:first-child>i{right:50px}body.pdf-opname .komma-transform .komma-trans-term:last-child>i{left:50px;right:auto}
+.radio-chip.radio-chip-nog-niet{opacity:.55;cursor:not-allowed}.radio-chip.radio-chip-nog-niet::after{content:"later";margin-left:5px;font-size:10px;font-weight:700;color:#a46b00}
+.komma-voorbeeld-vink{margin-top:8px;padding:8px 10px}.komma-getallen-grid.komma-aftrek-brug-splitsen,.komma-getallen-grid.komma-aftrek-brug-schijfjes{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-aftrek-brug-splits{min-height:225px;display:grid;grid-template-columns:145px 1fr;grid-template-rows:58px 125px;align-items:start;gap:6px 22px;padding:20px 34px 18px 20px}.komma-brug-hoofd{display:flex;align-items:center;gap:10px;font-size:21px;white-space:nowrap}.komma-brug-antwoord{display:inline-flex;width:70px;height:39px;border:1.5px solid #9fbfce;border-radius:3px;align-items:center;justify-content:center;color:#0672b8;font-weight:700}
+.komma-split-boom{position:relative;grid-column:1;grid-row:2;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-top:42px}.komma-split-boom>i::before,.komma-split-boom>i::after{content:"";position:absolute;top:12px;width:48px;border-top:1.5px solid #8db3c7}.komma-split-boom>i::before{left:24px;transform:rotate(-38deg)}.komma-split-boom>i::after{right:24px;transform:rotate(38deg)}.komma-split-vak{height:48px;border:1.5px solid #9fbfce;display:flex;align-items:center;justify-content:center;color:#0672b8;font-weight:700}
+.komma-brug-stappen{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;gap:29px;padding-top:62px}.komma-brug-lijn{display:block;min-height:27px;border-bottom:1px solid #adb8c1;color:#0672b8;font-size:18px}
+.komma-aftrek-brug-schema{min-height:370px;display:flex;flex-direction:column;align-items:stretch;padding:18px 30px 20px 18px}.komma-wissel-schema{border:1.5px solid #777;background:#ddd}.komma-wissel-kop{display:grid;grid-template-columns:1fr 12px 1fr}.komma-wissel-kop b{padding:5px;text-align:center;background:#ffd400}.komma-wissel-kop b:nth-child(2){background:#aaa;padding:5px 0}.komma-wissel-kop b:last-child{background:#ffe49b}.komma-wissel-boven,.komma-wissel-onder{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:7px}.komma-wissel-boven>span,.komma-wissel-onder>span{min-height:48px;padding:5px;background:#fff;display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px}.komma-wissel-onder>span{border:2px solid #c2c6ca;border-radius:10px}.komma-aftrek-brug-schema .komma-brug-hoofd{margin-top:13px}.komma-aftrek-brug-schema .komma-brug-stappen{padding-top:12px;margin-left:145px}
+.komma-voorbeeld{background:#fff1df!important;border:2px solid #f39a35!important}.komma-voorbeeld-antwoord{color:#087ab7!important;font-weight:700}.komma-voorbeeld .komma-schijf.weg::after{display:block}
+body.pdf-opname .komma-aftrek-brug-splits{min-height:300px;grid-template-columns:190px 1fr;grid-template-rows:75px 165px;padding:28px 42px 24px 26px}.pdf-opname .komma-aftrek-brug-schema{min-height:500px;padding:25px 42px 30px 25px}.pdf-opname .komma-brug-hoofd{font-size:28px}.pdf-opname .komma-brug-antwoord{width:92px;height:52px}.pdf-opname .komma-split-vak{height:62px;font-size:24px}.pdf-opname .komma-brug-lijn{min-height:37px;font-size:24px}.pdf-opname .komma-brug-stappen{gap:39px;padding-top:82px}.pdf-opname .komma-aftrek-brug-schema .komma-brug-stappen{padding-top:16px;margin-left:190px}.pdf-opname .komma-wissel-boven>span,.pdf-opname .komma-wissel-onder>span{min-height:70px;padding:8px;gap:5px}
+.komma-split-boom>i{position:absolute;inset:0;pointer-events:none}
+.komma-voorbeeld-keuze{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 10px;border:1px solid #e3b06f;border-radius:7px;background:#fff7ea;font-size:13px;font-weight:600;cursor:pointer}.komma-voorbeeld-keuze input{width:17px;height:17px;accent-color:#ef8e24}
+.komma-aftrek-brug-splits{grid-template-columns:190px minmax(0,1fr)}
+.komma-brug-somdelen{display:grid;grid-template-columns:38px 16px 50px 16px 58px;width:178px;margin-left:30px;gap:0;text-align:center}.komma-brug-somdelen>*{justify-self:center}.komma-brug-somdelen .komma-brug-antwoord{width:56px;height:36px}
+.komma-split-boom{width:98px;grid-template-columns:45px 45px;gap:8px;padding-top:30px}.komma-split-boom.split-eerste{margin-left:0}.komma-split-boom.split-tweede{margin-left:60px}.komma-split-vak{width:45px;height:40px;box-sizing:border-box}.komma-split-boom>i::before,.komma-split-boom>i::after{top:8px;width:34px}.komma-split-boom>i::before{left:23px;transform:rotate(-35deg)}.komma-split-boom>i::after{right:23px;transform:rotate(35deg)}
+.komma-voorbeeld::before{content:"Voorbeeld";position:absolute;left:9px;top:7px;padding:2px 7px;border-radius:999px;background:#ef8e24;color:#fff;font-size:11px;font-weight:800;z-index:3}.komma-voorbeeld{padding-top:30px!important}
+.komma-voorbeeld-label{display:none}
+body.pdf-opname .komma-aftrek-brug-splits{grid-template-columns:250px minmax(0,1fr)}body.pdf-opname .komma-brug-somdelen{grid-template-columns:50px 21px 66px 21px 76px;width:234px;margin-left:40px}.pdf-opname .komma-brug-somdelen .komma-brug-antwoord{width:74px;height:48px}.pdf-opname .komma-split-boom{width:130px;grid-template-columns:60px 60px;gap:10px;padding-top:40px}.pdf-opname .komma-split-boom.split-tweede{margin-left:80px}.pdf-opname .komma-split-vak{width:60px;height:53px}.pdf-opname .komma-split-boom>i::before,.pdf-opname .komma-split-boom>i::after{top:11px;width:45px}.pdf-opname .komma-split-boom>i::before{left:30px}.pdf-opname .komma-split-boom>i::after{right:30px}
+.komma-split-boom{top:-36px}.komma-split-boom>i::before,.komma-split-boom>i::after{left:50%;right:auto;top:3px;width:38px;transform-origin:left center}.komma-split-boom>i::before{transform:rotate(145deg)}.komma-split-boom>i::after{transform:rotate(35deg)}
+body.pdf-opname .komma-split-boom{top:-45px}body.pdf-opname .komma-split-boom>i::before,body.pdf-opname .komma-split-boom>i::after{left:50%;right:auto;top:4px;width:50px}body.pdf-opname .komma-split-boom>i::before{transform:rotate(145deg)}body.pdf-opname .komma-split-boom>i::after{transform:rotate(35deg)}
+.komma-getallen-grid.komma-aftrek-brug-tienden{grid-template-columns:1fr}.komma-getallen-grid.komma-aftrek-brug-kort{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-brug-tienden{min-height:105px;padding-left:28px;font-size:20px}.komma-brug-kort{min-height:105px;display:flex;align-items:center;padding:20px 35px 20px 25px;font-size:21px}.komma-brug-lange-lijn{display:inline-block;flex:1;min-width:140px;min-height:28px;margin-left:7px;border-bottom:1.5px solid #9aa5ae;color:#0672b8;font-weight:700}
+body.pdf-opname .komma-brug-tienden{min-height:145px;padding-left:38px;font-size:26px}body.pdf-opname .komma-brug-kort{min-height:145px;padding:28px 45px 28px 34px;font-size:28px}body.pdf-opname .komma-brug-lange-lijn{min-width:190px;min-height:36px}
+/* Rekenroosters kommagetallen */
+.komma-getallen-grid.komma-rooster,
+.komma-getallen-grid.komma-aftrek-rooster{grid-template-columns:minmax(0,1fr)}
+.komma-rooster-oef{padding:18px 22px;overflow-x:auto}
+.komma-rekenrooster{width:100%;max-width:820px;margin:0 auto;border-collapse:collapse;table-layout:fixed;font-size:19px;color:#24384f}
+.komma-rekenrooster th,.komma-rekenrooster td{border:1px solid #aec6d4;text-align:center;height:58px;padding:5px}
+.komma-rekenrooster thead th{background:#bfe8f5;font-weight:700}
+.komma-rekenrooster tbody th{background:#dff2f8;font-weight:700}
+.komma-rekenrooster .rooster-hoek{position:relative;background:#fff}
+.komma-rekenrooster .rooster-hoek::after{content:"";position:absolute;inset:5px;background:linear-gradient(135deg,transparent 49%,#79cde7 50%,#79cde7 51%,transparent 52%)}
+.komma-rekenrooster .rooster-hoek span{position:relative;z-index:1;font-size:25px}
+.komma-rekenrooster td .breuk-antwoord{display:block;width:78%;min-width:42px;height:30px;margin:0 auto;border:0;border-bottom:1.5px solid #aebbc5;border-radius:0}
+body.toont-oplossingen .komma-rekenrooster td .breuk-antwoord{border-bottom-color:#159447}
+@media print{
+  .komma-rooster-oef{padding:10px 14px;overflow:visible;break-inside:avoid}
+  .komma-rekenrooster{max-width:none;font-size:15px}
+  .komma-rekenrooster th,.komma-rekenrooster td{height:43px;padding:3px}
+}
+
+/* Schrijf als tienden: steeds twee per rij en goed leesbaar in de PDF. */
+.komma-getallen-grid.komma-tienden,
+.komma-getallen-grid.komma-aftrek-tienden,
+.komma-getallen-grid.komma-aftrek-brug-tienden{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.komma-tienden,
+.komma-brug-tienden{
+  min-height:132px;
+  padding:22px 24px;
+  font-size:21px;
+  line-height:1.65;
+}
+.komma-tienden .komma-lijn,
+.komma-brug-tienden .komma-lijn{
+  width:66px;
+  height:29px;
+}
+body.pdf-opname .komma-getallen-grid.komma-tienden,
+body.pdf-opname .komma-getallen-grid.komma-aftrek-tienden,
+body.pdf-opname .komma-getallen-grid.komma-aftrek-brug-tienden{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+body.pdf-opname .komma-tienden,
+body.pdf-opname .komma-brug-tienden{
+  min-height:190px;
+  padding:34px 28px;
+  font-size:31px;
+  line-height:1.75;
+}
+body.pdf-opname .komma-tienden .komma-lijn,
+body.pdf-opname .komma-brug-tienden .komma-lijn{
+  width:96px;
+  height:40px;
+  border-bottom-width:2px;
+}
+
+/* Gebogen richtingspijl in de hoek van het rekenrooster. */
+.komma-rekenrooster .rooster-hoek::before{
+  content:"";
+  position:absolute;
+  right:8px;
+  top:8px;
+  width:30%;
+  height:62%;
+  border-top:2px solid #69c9e7;
+  border-left:2px solid #69c9e7;
+  border-radius:95% 0 0 0;
+}
+.komma-rekenrooster .rooster-hoek::after{
+  content:"";
+  position:absolute;
+  left:auto;
+  bottom:auto;
+  right:6px;
+  top:4px;
+  width:9px;
+  height:9px;
+  background:none;
+  border-top:2px solid #69c9e7;
+  border-right:2px solid #69c9e7;
+  transform:rotate(24deg);
+}
+.komma-rekenrooster .rooster-hoek span{
+  position:absolute;
+  left:35%;
+  bottom:12px;
+  z-index:1;
+  font-size:25px;
+  line-height:1;
+}
+body.pdf-opname .komma-rooster-oef{
+  padding:24px 30px;
+  overflow:visible;
+}
+body.pdf-opname .komma-rekenrooster{
+  max-width:none;
+  font-size:29px;
+}
+body.pdf-opname .komma-rekenrooster th,
+body.pdf-opname .komma-rekenrooster td{
+  height:88px;
+  padding:8px;
+}
+body.pdf-opname .komma-rekenrooster td .breuk-antwoord{
+  width:82%;
+  min-width:68px;
+  height:48px;
+  font-size:27px;
+  border-bottom-width:2px;
+}
+body.pdf-opname .komma-rekenrooster .rooster-hoek span{
+  bottom:19px;
+  font-size:35px;
+}
+body.pdf-opname .komma-rekenrooster .rooster-hoek::before{
+  right:12px;
+  top:12px;
+  border-width:3px 0 0 3px;
+}
+body.pdf-opname .komma-rekenrooster .rooster-hoek::after{
+  left:auto;
+  bottom:auto;
+  right:9px;
+  top:7px;
+  width:13px;
+  height:13px;
+  border-width:3px 3px 0 0;
+}
+
+/* Aftrekken met brug via aanvullen. */
+.komma-getallen-grid.komma-aftrek-brug-aanvullen{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.komma-brug-aanvullen{
+  min-height:205px;
+}
+.komma-brug-aanvullen .komma-aanvul-regels{
+  gap:10px;
+  line-height:1.35;
+}
+.komma-brug-aanvullen .komma-aanvul-regels>b{
+  font-weight:500;
+}
+body.pdf-opname .komma-brug-aanvullen{
+  min-height:275px;
+}
+body.pdf-opname .komma-brug-aanvullen .komma-aanvul-regels{
+  gap:14px;
+  font-size:25px;
+}
+
+/* Aftrekken met brug via compenseren. */
+.komma-getallen-grid.komma-aftrek-brug-compenseren{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.komma-aftrek-compenseren{
+  min-height:235px;
+}
+.komma-aftrek-compenseren .komma-schrijfregels{
+  gap:16px;
+}
+body.pdf-opname .komma-aftrek-compenseren{
+  min-height:320px;
+}
+
+/* Aftrekken met brug via transformeren. */
+.komma-getallen-grid.komma-aftrek-brug-transformeren{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.komma-aftrek-transform{
+  min-height:300px;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:12px;
+  padding:18px 24px 20px;
+}
+.komma-aftrek-trans-schema{
+  width:100%;
+  display:grid;
+  grid-template-columns:92px minmax(120px,1fr) 105px;
+  grid-template-rows:42px 42px;
+  font-size:20px;
+  font-weight:600;
+}
+.komma-aftrek-trans-schema>span{display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.komma-aftrek-trans-schema .correctie{min-height:30px;padding:5px 8px;border:0;border-bottom:1px solid #aeb8c0;color:#087ab7}
+.komma-aftrek-trans-schema .term-a{grid-column:2/4;grid-row:1;background:#c9eaf3}
+.komma-aftrek-trans-schema .term-b{grid-column:2;grid-row:2;background:#c9eaf3}
+.komma-aftrek-trans-schema .vraag{grid-column:3;grid-row:2;background:#e7ecef;font-size:22px}
+.komma-aftrek-trans-schema .correctie:first-child{grid-column:1;grid-row:1}
+.komma-aftrek-trans-schema .correctie:nth-child(3){grid-column:1;grid-row:2}
+.komma-aftrek-transform.transform-plus .komma-aftrek-trans-schema .correctie{background:#fff0bc}
+.komma-aftrek-transform.transform-min .komma-aftrek-trans-schema .correctie{background:#c9eaf3}
+.komma-aftrek-transform.transform-min .komma-aftrek-trans-schema .correctie{border-right:2px dashed #52c5e5}
+.komma-h-aftrek-trans-schema .correctie{background:#fff0bc}
+.komma-h-aftrek-transform:not(.met-schema){min-height:250px}
+.komma-getallen-grid.komma-aftrek-splitsen-honderdsten-brug,
+.komma-getallen-grid.komma-aftrek-compenseren-honderdsten,
+.komma-getallen-grid.komma-aftrek-transformeren-honderdsten{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getallen-grid.komma-aftrek-honderdsten-brug{grid-template-columns:minmax(0,1fr)}
+body.pdf-opname .komma-h-aftrek-transform:not(.met-schema){min-height:320px}
+.komma-getallen-grid.komma-getalpuzzel{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getalpuzzel{min-height:330px;padding:18px;overflow:visible}
+.komma-puzzel-ring{position:relative;width:270px;height:240px;border:3px solid #72a5b3;border-radius:50%;margin:auto}
+.puzzel-getal{position:absolute;display:flex;align-items:center;justify-content:center;width:76px;min-width:76px;height:48px;border:2px solid #00aee9;border-radius:12px;background:#fff;font-size:20px;font-weight:700;box-sizing:border-box}
+.puzzel-getal.boven{left:96px;top:-25px}.puzzel-getal.rechts{right:-40px;top:94px}.puzzel-getal.onder{left:96px;bottom:-25px}.puzzel-getal.links{left:-40px;top:94px}
+.puzzel-bewerking{position:absolute;padding:2px 5px;background:#fff;font-size:17px;white-space:nowrap}
+.puzzel-bewerking.b0{right:-18px;top:34px}.puzzel-bewerking.b1{right:-22px;bottom:34px}.puzzel-bewerking.b2{left:-18px;bottom:34px}.puzzel-bewerking.b3{left:-18px;top:34px}
+body.pdf-opname .komma-getalpuzzel{min-height:350px;padding:28px 18px}
+body.pdf-opname .komma-puzzel-ring{width:300px;height:260px}
+.komma-aftrek-trans-som,.komma-aftrek-trans-nieuw{
+  width:315px;
+  display:grid;
+  grid-template-columns:70px 22px 70px 22px 85px;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  font-size:20px;
+  text-align:center;
+}
+.komma-aftrek-trans-som .komma-antwoord,.komma-aftrek-trans-nieuw .breuk-antwoord{min-height:28px;border-bottom:1px solid #aeb8c0;color:#087ab7}
+.komma-aftrek-trans-pijlen{
+  width:315px;
+  display:grid;
+  grid-template-columns:70px 22px 70px 22px 85px;
+  gap:6px;
+  margin:-8px 0 -7px;
+  justify-content:center;
+}
+.komma-aftrek-trans-pijlen>span{position:relative;height:69px}
+.komma-aftrek-trans-pijlen>span:first-child{grid-column:1}
+.komma-aftrek-trans-pijlen>span:last-child{grid-column:3}
+.komma-aftrek-trans-pijlen b{position:absolute;left:50%;top:8px;transform:translateX(-50%) scaleY(1.25);transform-origin:top center;font-size:38px;font-weight:400;line-height:1}
+.komma-aftrek-trans-pijlen i{position:absolute;top:25px;width:55px;min-height:21px;border-bottom:1px solid #aeb8c0;color:#087ab7;font-style:normal;font-size:15px}
+.komma-aftrek-trans-pijlen>span:first-child i{right:48px;text-align:right}
+.komma-aftrek-trans-pijlen>span:last-child i{left:48px;text-align:left}
+body.pdf-opname .komma-aftrek-transform{min-height:405px;padding:25px 32px 28px;gap:16px}
+body.pdf-opname .komma-aftrek-trans-schema{grid-template-columns:122px minmax(160px,1fr) 140px;grid-template-rows:57px 57px;font-size:27px}
+body.pdf-opname .komma-aftrek-trans-som,body.pdf-opname .komma-aftrek-trans-nieuw{width:420px;grid-template-columns:94px 29px 94px 29px 114px;font-size:27px}
+body.pdf-opname .komma-aftrek-trans-pijlen{width:420px;grid-template-columns:94px 29px 94px 29px 114px;gap:7px;height:78px;margin-left:0}
+body.pdf-opname .komma-aftrek-trans-pijlen b{font-size:49px;top:12px}
+body.pdf-opname .komma-aftrek-trans-pijlen i{top:35px;width:74px;font-size:20px}
+body.pdf-opname .komma-aftrek-trans-pijlen>span:first-child i{right:64px}
+body.pdf-opname .komma-aftrek-trans-pijlen>span:last-child i{left:64px}
+
+/* Optellen zonder brug tot op een honderdste. */
+.komma-getallen-grid.komma-honderdsten,
+.komma-getallen-grid.komma-splitsen-honderdsten{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.komma-getallen-grid.komma-honderdsten,
+.komma-getallen-grid.komma-honderdsten-brug{grid-template-columns:minmax(0,1fr)}
+.komma-honderdsten{
+  min-height:138px;
+  padding:22px 14px;
+  font-size:17px;
+  line-height:1.7;
+  white-space:nowrap;
+}
+.komma-honderdsten .komma-lijn{width:52px;height:29px}
+.komma-honderdsten .komma-antwoord{width:52px;min-width:52px}
+.komma-splits-honderdsten{
+  min-height:270px;
+  display:grid;
+  grid-template-columns:225px minmax(190px,1fr);
+  align-items:start;
+  gap:18px;
+  padding:22px 28px 20px 20px;
+}
+.komma-h-hoofdsom{display:flex;align-items:flex-start;gap:7px;font-size:20px;white-space:nowrap}
+.komma-h-term{position:relative;display:inline-flex;justify-content:center;min-width:58px}
+.komma-h-splitsbeen{
+  position:absolute;
+  left:50%;
+  top:31px;
+  width:180px;
+  transform:translateX(-50%);
+  display:grid;
+  grid-template-columns:repeat(3,54px);
+  gap:9px;
+  padding-top:38px;
+}
+.komma-h-splitsbeen svg{position:absolute;left:0;top:0;width:180px;height:38px;overflow:visible}
+.komma-h-splitsbeen svg line{stroke:#8db3c7;stroke-width:1.5}
+.komma-h-splitsbeen .komma-vak{width:54px;height:46px;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.komma-h-stappen{display:flex;flex-direction:column;gap:22px;padding-top:47px}
+.komma-h-stappen>span{display:block;min-height:27px;border-bottom:1px solid #aeb8c0;color:#087ab7;font-size:18px}
+body.pdf-opname .komma-honderdsten{min-height:190px;padding:32px 24px;font-size:27px}
+body.pdf-opname .komma-honderdsten .komma-lijn{width:82px;height:39px}
+body.pdf-opname .komma-honderdsten .komma-antwoord{width:82px;min-width:82px}
+body.pdf-opname .komma-splits-honderdsten{min-height:365px;grid-template-columns:267px minmax(255px,1fr);gap:12px;padding:30px 38px 28px 27px}
+body.pdf-opname .komma-h-hoofdsom{font-size:27px}
+body.pdf-opname .komma-h-splitsbeen{top:42px;width:240px;grid-template-columns:repeat(3,72px);gap:12px;padding-top:51px}
+body.pdf-opname .komma-h-splitsbeen svg{width:240px;height:51px}
+body.pdf-opname .komma-h-splitsbeen .komma-vak{width:72px;height:62px;font-size:23px}
+body.pdf-opname .komma-h-stappen{gap:30px;padding-top:63px}
+body.pdf-opname .komma-h-stappen>span{min-height:37px;font-size:24px}
+
+.komma-getallen-grid.komma-kort-honderdsten{grid-template-columns:repeat(3,minmax(0,1fr))}
+.komma-getallen-grid.komma-kort-honderdsten-brug,
+.komma-getallen-grid.komma-tussenstappen-honderdsten-brug{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-kort-honderdsten{min-height:105px;padding:18px 26px;font-size:20px;gap:9px}
+.komma-kort-honderdsten .komma-brug-lange-lijn{min-width:95px}
+.komma-getallen-grid.komma-rooster-honderdsten{grid-template-columns:minmax(0,1fr)}
+body.pdf-opname .komma-kort-honderdsten{
+  min-height:100px;
+  padding:16px 18px;
+  font-size:23px;
+  flex-direction:row;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:12px;
+}
+body.pdf-opname .komma-kort-honderdsten>span:first-child{white-space:nowrap;flex:0 0 auto}
+body.pdf-opname .komma-kort-honderdsten .komma-brug-lange-lijn{width:auto;min-width:90px;max-width:125px;flex:1 1 105px}
+.komma-h-werk{min-height:245px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:24px 30px;gap:25px}
+.komma-h-werk-som{display:flex;align-items:center;gap:14px;font-size:21px;white-space:nowrap}
+.komma-h-werk-som .komma-antwoord{min-width:82px;height:36px;border:1px solid #9fc0d0}
+.komma-h-werk-regels{display:flex;flex-direction:column;gap:22px;padding-left:38%}
+.komma-h-werk-regels>span{display:block;min-height:28px;border-bottom:1px solid #aeb8c0;color:#087ab7;text-align:left}
+body.pdf-opname .komma-h-werk{min-height:310px;padding:32px 40px;gap:32px}
+body.pdf-opname .komma-h-werk-som{font-size:28px;gap:18px}
+body.pdf-opname .komma-h-werk-som .komma-antwoord{min-width:110px;height:48px}
+body.pdf-opname .komma-h-werk-regels{gap:29px}
+body.pdf-opname .komma-h-werk-regels>span{min-height:38px;font-size:23px}
+
+/* Optellen met brug tot op een honderdste. */
+.komma-getallen-grid.komma-splitsen-honderdsten-brug,
+.komma-getallen-grid.komma-compenseren-honderdsten,
+.komma-getallen-grid.komma-transformeren-honderdsten{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-h-comp{min-height:235px}
+.komma-transform-h-schema-keuze{align-items:center;gap:8px;margin-top:9px;padding:9px 10px;border:1px solid #8fc9da;border-radius:7px;background:#eefaff;font-size:13px;font-weight:600}
+.komma-transform-h-schema-keuze input{width:17px;height:17px;accent-color:#168fbd}
+.komma-aftrek-transform-h-schema-keuze{align-items:center;gap:8px;margin-top:9px;padding:9px 10px;border:1px solid #8fc9da;border-radius:7px;background:#eefaff;font-size:13px;font-weight:600;cursor:pointer}
+.komma-aftrek-transform-h-schema-keuze input{display:block;width:17px;height:17px;accent-color:#168fbd;flex:0 0 auto}
+.komma-h-transform{min-height:240px;flex-direction:column;justify-content:flex-start;gap:8px;padding:18px 26px 20px}
+.komma-h-transform.met-schema{min-height:325px}
+.komma-h-trans-schema{width:88%;display:grid;grid-template-columns:2fr 1fr;grid-template-rows:43px 43px;margin-bottom:8px;font-size:19px}
+.komma-h-trans-schema>span{display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.komma-trans-balk>span:nth-child(n+3),
+.komma-h-trans-schema>span:nth-child(n+3){border-top:2px solid #fff}
+.komma-h-trans-schema .blauw{background:#c9eaf3}
+.komma-h-trans-schema .geel{background:#fff0bc}
+.komma-h-trans-schema .breuk-antwoord{min-height:29px;padding-top:7px;border-bottom:1px solid #aeb8c0;color:#087ab7}
+.komma-h-trans-som,.komma-h-trans-nieuw{width:320px;display:grid;grid-template-columns:72px 22px 72px 22px 88px;gap:5px;align-items:center;justify-content:center;text-align:center;font-size:20px}
+.komma-h-trans-som .komma-antwoord,.komma-h-trans-nieuw .breuk-antwoord{min-height:28px;border-bottom:1px solid #aeb8c0;color:#087ab7}
+.komma-h-trans-pijlen{width:320px;display:grid;grid-template-columns:72px 22px 72px 22px 88px;gap:5px;justify-content:center;margin:-7px 0 -5px}
+.komma-h-trans-pijlen>span{position:relative;height:67px}
+.komma-h-trans-pijlen>span:first-child{grid-column:1}.komma-h-trans-pijlen>span:last-child{grid-column:3}
+.komma-h-trans-pijlen b{position:absolute;left:50%;top:8px;transform:translateX(-50%) scaleY(1.2);font-size:37px;font-weight:400;line-height:1}
+.komma-h-trans-pijlen i{position:absolute;top:24px;width:58px;min-height:21px;border-bottom:1px solid #aeb8c0;color:#087ab7;font-style:normal;font-size:15px}
+.komma-h-trans-pijlen>span:first-child i{right:48px;text-align:right}.komma-h-trans-pijlen>span:last-child i{left:48px;text-align:left}
+body.pdf-opname .komma-h-comp{min-height:320px}
+body.pdf-opname .komma-h-transform{min-height:325px;padding:25px 35px 28px}
+body.pdf-opname .komma-h-transform.met-schema{min-height:440px}
+body.pdf-opname .komma-h-trans-schema{grid-template-rows:58px 58px;font-size:26px}
+body.pdf-opname .komma-h-trans-som,body.pdf-opname .komma-h-trans-nieuw{width:430px;grid-template-columns:96px 30px 96px 30px 118px;gap:7px;font-size:27px}
+body.pdf-opname .komma-h-trans-pijlen{width:430px;grid-template-columns:96px 30px 96px 30px 118px;gap:7px}
+body.pdf-opname .komma-h-trans-pijlen>span{height:88px}
+body.pdf-opname .komma-h-trans-pijlen b{font-size:49px;top:10px}
+body.pdf-opname .komma-h-trans-pijlen i{top:34px;width:78px;font-size:20px}
+body.pdf-opname .komma-h-trans-pijlen>span:first-child i{right:66px}body.pdf-opname .komma-h-trans-pijlen>span:last-child i{left:66px}
+
+/* Aftrekken zonder brug tot op een honderdste. */
+.komma-getallen-grid.komma-aftrek-schijfjes-honderdsten{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-getallen-grid.komma-aftrek-honderdsten,
+.komma-getallen-grid.komma-aftrek-rooster-honderdsten{grid-template-columns:minmax(0,1fr)}
+.komma-getallen-grid.komma-aftrek-splitsen-honderdsten{grid-template-columns:repeat(2,minmax(0,1fr))}
+.komma-h-schijfjes{min-height:205px;flex-direction:column;align-items:stretch;padding:18px 24px;gap:18px}
+.komma-h-plaats{border:1px solid #777}
+.komma-h-plaats-kop,.komma-h-plaats-rij{display:grid;grid-template-columns:1fr 14px 1fr 1fr}
+.komma-h-plaats-kop>b{padding:7px 4px;text-align:center;background:#ffe498;border-right:1px solid #777}.komma-h-plaats-kop>b:first-child{background:#ffd400}.komma-h-plaats-kop>b:last-child{border-right:0}
+.komma-h-plaats-rij>span{min-height:62px;padding:6px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:3px;background:#eee;border-right:1px solid #777}.komma-h-plaats-rij>span:last-child{border-right:0}
+.komma-h-plaats-kop>b:nth-child(2),.komma-h-plaats-rij>span:nth-child(2){background:#aaa;padding-left:0;padding-right:0;border-right:1px solid #666}
+.komma-h-plaats-rij .komma-schijf{width:21px;height:21px;font-size:8px}
+.komma-h-schijf-som{text-align:center;font-size:20px}
+body.pdf-opname .komma-h-schijfjes{min-height:275px;padding:24px 32px;gap:24px}
+body.pdf-opname .komma-h-plaats-rij>span{min-height:84px;padding:8px;gap:4px}
+body.pdf-opname .komma-h-plaats-rij .komma-schijf{width:28px;height:28px;font-size:10px}
+body.pdf-opname .komma-h-schijf-som{font-size:27px}

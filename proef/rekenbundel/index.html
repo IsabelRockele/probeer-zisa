@@ -422,8 +422,8 @@
     <div class="hero-content">
       <img src="../../zisa.png" alt="Juf Zisa logo" class="hero-logo">
       <div>
-        <h1>📐 Rekenbundel Generator</h1>
-        <p>Proefmaand komt eraan — hier alvast alle info</p>
+        <h1>📐 Bundel bewerkingen</h1>
+        <p>Ontdek hoe je in enkele minuten een oefenbundel op maat maakt</p>
       </div>
     </div>
   </div>
@@ -440,20 +440,20 @@
     <div class="info-card green">
       <h2><span class="icon">✨</span> Wat kan je doen in de proefmaand?</h2>
       <ul>
-        <li class="ja"><strong>3 gratis rekenbundels maken</strong> voor je eigen klas</li>
-        <li class="ja">Kiezen uit meerdere <strong>oefentypes</strong> (optellen, aftrekken, tafels, vraagstukken, splitsingen, eerlijk verdelen...)</li>
+        <li class="ja"><strong>2 gratis oefenbundels maken</strong> voor je eigen klas</li>
+        <li class="ja">Kiezen uit meerdere <strong>oefentypes</strong>, zoals optellen, aftrekken, tafels, splitsingen en inzichtsoefeningen</li>
         <li class="ja">Differentiëren op <strong>niveau</strong> per oefening</li>
         <li class="ja">Alles downloadbaar als <strong>kant-en-klare PDF</strong></li>
-        <li class="ja">Automatische <strong>verbetersleutel</strong> bij elke bundel</li>
+        <li class="komt"><strong>Vraagstukken en oplossingssleutels</strong> zijn uitsluitend beschikbaar in PRO</li>
       </ul>
     </div>
 
     <div class="info-card orange">
-      <h2><span class="icon">📌</span> Welke inhoud zit erin in mei?</h2>
+      <h2><span class="icon">📌</span> Wat krijg je te zien?</h2>
       <ul>
-        <li class="ja"><strong>Leerjaar 1 tot 4</strong> — volledig uitgebreid aanbod</li>
-        <li class="ja">Hoofdrekenen, splitsingen, tafels, eerlijk verdelen, getallen, vraagstukken...</li>
-        <li class="komt">Leerjaar 5 en 6 en de tabs voor breuken en kommagetallen <strong>komen half augustus</strong></li>
+        <li class="ja">De <strong>recentste versie</strong> van Bundel bewerkingen uit de Spelgenerator</li>
+        <li class="ja">Hoofdrekenen, splitsingen, tafels, eerlijk verdelen, breuken, kommagetallen en meer</li>
+        <li class="ja">Een live voorbeeldweergave voordat je de PDF downloadt</li>
       </ul>
     </div>
 
@@ -461,24 +461,24 @@
       <h2><span class="icon">🗓️</span> Wat is het plan?</h2>
       <div class="timeline">
         <div class="timeline-item">
-          <div class="timeline-date">20 april – 20 mei 2026</div>
-          <div class="timeline-text">Eerste proefmaand — bezoekers kunnen 3 gratis bundels maken voor leerjaar 1 tot 4.</div>
+          <div class="timeline-date">Nu</div>
+          <div class="timeline-text">De proef wordt aangekondigd, zodat je de startdatum alvast kan noteren.</div>
         </div>
         <div class="timeline-item future">
-          <div class="timeline-date">Half augustus 2026</div>
-          <div class="timeline-text">Uitbreiding klaar: tabs voor breuken en kommagetallen, en inhoud tot 6de leerjaar.</div>
+          <div class="timeline-date">17 augustus 2026</div>
+          <div class="timeline-text">De proef opent. Elke bezoeker kan twee bundels maken en downloaden.</div>
         </div>
         <div class="timeline-item future">
-          <div class="timeline-date">Augustus – september 2026</div>
-          <div class="timeline-text">Tweede proefmaand — iedereen kan de volledige tool uitproberen voor het nieuwe schooljaar begint.</div>
+          <div class="timeline-date">20 september 2026</div>
+          <div class="timeline-text">De proef sluit. In PRO blijft Bundel bewerkingen onbeperkt beschikbaar, inclusief vraagstukken en oplossingssleutels.</div>
         </div>
       </div>
     </div>
 
     <div class="promo-card">
       <div class="promo-card-text">
-        <h3>Wil je nu al aan de slag?</h3>
-        <p>De volledige Rekenbundel zit nu al in de Spelgenerator.</p>
+        <h3>Wil je onbeperkt aan de slag?</h3>
+        <p>De volledige Bundel bewerkingen zit in de Spelgenerator, inclusief vraagstukken en oplossingssleutels.</p>
       </div>
       <a href="../../">Bekijk alle tools en prijzen →</a>
     </div>
@@ -513,6 +513,8 @@
     const db = firebase.firestore();
 
     const card = document.getElementById('countdown-card');
+    const aangekondigdeStart = new Date('2026-08-17T00:00:00');
+    const aangekondigdeEinde = new Date('2026-09-20T00:00:00');
 
     // ── Helpers ─────────────────────────────────────────────────────────
     function parseerDatum(str) {
@@ -567,7 +569,7 @@
             <div class="aftel-label">seconden</div>
           </div>
         </div>
-        <div class="subtitle">Eén maand lang — 3 gratis bundels per bezoeker</div>
+        <div class="subtitle">Van 17 augustus tot 20 september — 2 gratis bundels per bezoeker</div>
         <div class="badge">Nog even geduld!</div>
       `;
 
@@ -605,7 +607,7 @@
       card.innerHTML = `
         <div class="status-actief">Proef is nu live</div>
         <h2>🎉 De proefmaand is geopend!</h2>
-        <div class="subtitle">Maak nu je 3 gratis oefenbundels.</div>
+        <div class="subtitle">Maak nu je 2 gratis oefenbundels.</div>
         <a href="app.html" class="start-knop">Start de proef →</a>
         <div class="extra-info">Nog geldig tot en met ${eindTxt} 2026</div>
       `;
@@ -616,7 +618,7 @@
       card.innerHTML = `
         <h2>📅 Proefmaand is afgelopen</h2>
         <div class="subtitle">Bedankt om de Rekenbundel Generator te proberen!</div>
-        <div class="big-date" style="font-size:1.4rem;margin-top:14px;">Volgende proef in augustus 2026</div>
+        <div class="big-date" style="font-size:1.4rem;margin-top:14px;">Deze proef liep tot 20 september 2026</div>
         <div class="subtitle" style="margin-top:8px;">Wil je nu al aan de slag? Ontdek het volledige abonnement hieronder.</div>
       `;
     }
@@ -624,10 +626,10 @@
     // ── Toestand 4: Fout (Firebase onbereikbaar) ────────────────────────
     function toonFout() {
       card.innerHTML = `
-        <h2>⏳ Start op 1 mei 2026</h2>
+        <h2>⏳ Start op 17 augustus 2026</h2>
         <div class="subtitle">De gratis proefmaand van de Rekenbundel Generator</div>
-        <div class="big-date">1 mei 2026</div>
-        <div class="subtitle">Eén maand lang — 3 gratis bundels per bezoeker</div>
+        <div class="big-date">17 augustus 2026</div>
+        <div class="subtitle">Tot en met 20 september — 2 gratis bundels per bezoeker</div>
         <div class="badge">Kom zeker terug!</div>
       `;
     }
@@ -641,7 +643,20 @@
         const eindDatum  = parseerDatum(d.eind_datum);
         const actief     = d.actief === true;
 
-        if (!startDatum || !eindDatum) { toonFout(); return; }
+        // Zolang Firestore nog de vorige proefperiode bevat, tonen we alvast
+        // correct de aangekondigde proef van augustus–september.
+        if (isVandaagVoor(aangekondigdeStart) &&
+            (!startDatum || !eindDatum || isVandaagNa(eindDatum))) {
+          toonAftelklok(aangekondigdeStart);
+          return;
+        }
+
+        if (!startDatum || !eindDatum) {
+          if (isVandaagVoor(aangekondigdeStart)) toonAftelklok(aangekondigdeStart);
+          else if (!isVandaagNa(aangekondigdeEinde)) toonStartKnop(aangekondigdeEinde);
+          else toonAfgelopen();
+          return;
+        }
 
         if (isVandaagVoor(startDatum)) {
           // Nog niet begonnen → aftelklok (ook al is actief=true)
@@ -656,7 +671,9 @@
       })
       .catch(err => {
         console.error('Kon instellingen niet laden:', err);
-        toonFout();
+        if (isVandaagVoor(aangekondigdeStart)) toonAftelklok(aangekondigdeStart);
+        else if (!isVandaagNa(aangekondigdeEinde)) toonStartKnop(aangekondigdeEinde);
+        else toonAfgelopen();
       });
   })();
   </script>
