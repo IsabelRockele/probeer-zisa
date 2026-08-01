@@ -1021,6 +1021,13 @@ section[id], #zg-prijzen {
   display: none !important;
 }
 
+/* Zisa Spelen â€” nieuwe PRO-highlight */
+.zg-play-highlight{background:linear-gradient(135deg,#fffaf0 0%,#eef9ff 100%)}
+.zg-play-card{display:grid;grid-template-columns:minmax(0,.9fr) minmax(420px,1.1fr);gap:46px;align-items:center;padding:34px;border:1px solid #dce8ee;border-radius:32px;background:rgba(255,255,255,.92);box-shadow:0 22px 55px rgba(30,72,94,.12)}
+.zg-play-copy h2{margin:10px 0 14px}.zg-play-lead{color:var(--zg-muted);font-size:1.08rem;line-height:1.65}.zg-play-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;background:#e9f8f0;color:#08764a;font-weight:800;font-size:.83rem}
+.zg-play-points{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}.zg-play-point{display:flex;gap:10px;align-items:flex-start;padding:13px;border:1px solid #e4edf2;border-radius:15px;background:#fff;color:#4f6879;line-height:1.4;font-size:.9rem}.zg-play-point span{font-size:1.25rem}.zg-play-point strong{display:block;color:var(--zg-ink);margin-bottom:2px}
+.zg-play-note{margin:0 0 20px;padding:12px 14px;border-radius:14px;background:#fff5da;color:#725315;font-size:.88rem;line-height:1.45}.zg-play-visual{overflow:hidden;border-radius:24px;background:#eaf6fb;box-shadow:0 14px 34px rgba(24,69,94,.16)}.zg-play-visual img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+@media(max-width:950px){.zg-play-card{grid-template-columns:1fr;gap:26px;padding:26px}.zg-play-visual{order:-1}}@media(max-width:600px){.zg-play-card{padding:18px;border-radius:22px}.zg-play-points{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1033,6 +1040,7 @@ section[id], #zg-prijzen {
       <span class="zg-stickynav-brand">🦓 Spelgenerator <em>PRO</em></span>
       <div class="zg-stickynav-links">
         <a href="#zg-waarom">Waarom?</a>
+        <a href="#zg-spelen">Zisa Spelen</a>
         <a href="#zg-tools">Wat zit erin?</a>
         <a href="#zg-probeer">Probeer zelf gratis uit</a>
         <a href="#zg-prijzen">Prijzen</a>
@@ -1135,6 +1143,28 @@ section[id], #zg-prijzen {
           <h3>Nooit automatische verlenging</h3>
           <p>Bewust gekozen: je betaalt één keer en het stopt. Geen verrassingen op je rekening, geen "vergeten op te zeggen".</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ZISA SPELEN ============ -->
+  <section class="zg-section zg-play-highlight" id="zg-spelen">
+    <div class="zg-wrap">
+      <div class="zg-play-card">
+        <div class="zg-play-copy">
+          <span class="zg-play-badge">🎮 NIEUW IN PRO · ZISA SPELEN</span>
+          <h2>Rekenspelletjes die leerlingen zélf kunnen openen.</h2>
+          <p class="zg-play-lead">Geef je klas één vaste leerling-QR. Kinderen scannen zonder account en kiezen zelfstandig een rekenspel op hun niveau — als ze klaar zijn met hun werk, tijdens een oefenmoment of thuis als extra inoefening.</p>
+          <div class="zg-play-points">
+            <div class="zg-play-point"><span>📱</span><div><strong>Zelfstandig op tablet</strong>Geen leerlinglogin nodig: scannen, leerjaar kiezen en spelen.</div></div>
+            <div class="zg-play-point"><span>🏠</span><div><strong>Ook thuis bruikbaar</strong>Dezelfde veilige leerlinglink werkt zolang het PRO-abonnement actief is.</div></div>
+            <div class="zg-play-point"><span>🖥️</span><div><strong>Samen op het smartboard</strong>Gebruik een spel als korte lesstarter of afsluiter en laat kinderen om de beurt aan het bord komen.</div></div>
+            <div class="zg-play-point"><span>🔒</span><div><strong>Onder controle van de leerkracht</strong>Jij kiest welke leerjaren zichtbaar zijn en kunt de QR vervangen bij misbruik.</div></div>
+          </div>
+          <p class="zg-play-note"><strong>Nu beschikbaar:</strong> spellen voor het 1e, 2e en 3e leerjaar — groep 3, 4 en 5 in Nederland. Onder meer splitsen, hoofdrekenen, tafels en rekenen met geld.</p>
+          <a href="https://tools.jufzisa.be/pro/koop.html" target="_blank" rel="noopener" class="zg-btn zg-btn-primary">Ontdek Zisa Spelen in PRO ↗</a>
+        </div>
+        <figure class="zg-play-visual"><img src="voorbeelden/assets/zisa-spelen-sfeer.webp" alt="Leerlingen oefenen met Zisa Spelen op tablets en samen aan het smartboard"></figure>
       </div>
     </div>
   </section>
