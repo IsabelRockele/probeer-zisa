@@ -612,14 +612,15 @@
 .zg-discover-icon {
   display: grid;
   place-items: center;
-  flex: 0 0 72px;
-  width: 72px;
-  height: 72px;
+  flex: 0 0 112px;
+  width: 112px;
+  height: 112px;
   border-radius: 20px;
   background: white;
   box-shadow: var(--zg-shadow);
-  font-size: 2.25rem;
+  overflow: hidden;
 }
+.zg-discover-icon img { width: 100%; height: 100%; object-fit: contain; }
 .zg-discover-copy h3 { margin: 0 0 8px; font-size: 1.45rem; color: var(--zg-ink); }
 .zg-discover-copy p { margin: 0; color: var(--zg-ink-soft); line-height: 1.6; }
 .zg-discover-points { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 14px; }
@@ -1402,7 +1403,7 @@ section[id], #zg-prijzen {
 
         <div class="zg-discover-card">
           <div class="zg-discover-main">
-            <div class="zg-discover-icon" aria-hidden="true">✨</div>
+            <div class="zg-discover-icon"><img src="zisa.png" alt="Zisa toont de verschillende mogelijkheden van de Spelgenerator"></div>
             <div class="zg-discover-copy">
               <h3>Maak eerst iets waar je trots op bent</h3>
               <p>Stel oefeningen samen, pas opdrachten aan en bekijk het resultaat. Je kunt rustig blijven verkennen; alleen downloaden heeft duidelijke gratis grenzen.</p>
