@@ -597,8 +597,59 @@
 .zg-page a.zg-try-tile:hover .zg-try-arrow {
   transform: translateX(4px);
 }
+.zg-discover-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px;
+  padding: 34px 38px;
+  border: 2px solid #f0c85d;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #fff8df 0%, #edf8f3 100%);
+  box-shadow: var(--zg-shadow);
+}
+.zg-discover-main { display: flex; align-items: flex-start; gap: 20px; }
+.zg-discover-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: var(--zg-shadow);
+  font-size: 2.25rem;
+}
+.zg-discover-copy h3 { margin: 0 0 8px; font-size: 1.45rem; color: var(--zg-ink); }
+.zg-discover-copy p { margin: 0; color: var(--zg-ink-soft); line-height: 1.6; }
+.zg-discover-points { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 14px; }
+.zg-discover-points span { color: #315b4a; font-size: .84rem; font-weight: 700; }
+.zg-page a.zg-discover-button,
+.zg-page a.zg-discover-button:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 250px;
+  padding: 16px 22px;
+  border-radius: 14px;
+  background: #173f73;
+  color: white !important;
+  text-decoration: none !important;
+  font-weight: 900;
+  box-shadow: 0 9px 20px rgba(23,63,115,.2);
+  transition: transform .2s, background .2s, box-shadow .2s;
+}
+.zg-page a.zg-discover-button:hover {
+  transform: translateY(-3px);
+  background: #0e315d;
+  box-shadow: 0 13px 26px rgba(23,63,115,.27);
+}
 @media (max-width: 600px) {
   .zg-try { padding: 45px 28px; }
+  .zg-discover-card { grid-template-columns: 1fr; padding: 25px 20px; gap: 22px; }
+  .zg-discover-main { display: block; }
+  .zg-discover-icon { margin-bottom: 16px; }
+  .zg-page a.zg-discover-button { width: 100%; min-width: 0; }
 }
 
 /* ============= Prijzen ============= */
@@ -1342,43 +1393,27 @@ section[id], #zg-prijzen {
       <div class="zg-try">
         <div class="zg-section-header" style="text-align:center;margin:0 auto 40px;max-width:680px">
           <span class="zg-eyebrow">Liever eerst even zelf voelen?</span>
-          <h2>Probeer een paar tools gratis uit.</h2>
+          <h2>Ontdek de volledige Spelgenerator gratis.</h2>
           <p class="zg-section-lead">
-            Geen registratie, geen e-mailadres, niets te downloaden.<br>
-            Gewoon klikken en zelf voelen hoe het werkt.
+            Bekijk alle beschikbare tools en leer dezelfde werkwijze kennen als in PRO.<br>
+            Voor een PDF zonder watermerk maak je pas op het moment van downloaden een gratis account.
           </p>
         </div>
 
-        <div class="zg-try-grid">
-
-          <!-- Bundel bewerkingen — aangekondigde proef -->
-          <a href="proef/rekenbundel/" class="zg-try-tile zg-try-tile-hot">
-            <div class="zg-try-badge">
-              <span class="zg-try-badge-dot"></span>
-              Gratis proef · 17 augustus–20 september 2026
+        <div class="zg-discover-card">
+          <div class="zg-discover-main">
+            <div class="zg-discover-icon" aria-hidden="true">✨</div>
+            <div class="zg-discover-copy">
+              <h3>Maak eerst iets waar je trots op bent</h3>
+              <p>Stel oefeningen samen, pas opdrachten aan en bekijk het resultaat. Je kunt rustig blijven verkennen; alleen downloaden heeft duidelijke gratis grenzen.</p>
+              <div class="zg-discover-points">
+                <span>✓ Alle tools bekijken</span>
+                <span>✓ 15 gratis downloads in totaal</span>
+                <span>✓ Maximaal 3 downloads per tool</span>
+              </div>
             </div>
-            <div class="zg-try-emoji">📐</div>
-            <h3>Bundel bewerkingen</h3>
-            <p>Stel zelf twee complete oefenbundels samen met de nieuwste generator. Kies onder meer getalbereik, bewerkingen, oefenvormen en ondersteuning en download een klasklare PDF. <strong>Vraagstukken en oplossingssleutels blijven voor PRO.</strong></p>
-            <span class="zg-try-arrow">Bekijk de proef en aftelklok ↗</span>
-          </a>
-
-          <!-- Huistaken — permanent -->
-          <a href="demo/huistaken/" class="zg-try-tile">
-            <div class="zg-try-emoji">📚</div>
-            <h3>Huistaken opvolgen</h3>
-            <p>Speel met een demo-klas en zie hoe je in één oogopslag weet wie wat af heeft.</p>
-            <span class="zg-try-arrow">Open demo ↗</span>
-          </a>
-
-          <!-- Takenbord — permanent -->
-          <a href="demo/takenbord/" class="zg-try-tile">
-            <div class="zg-try-emoji">✅</div>
-            <h3>Takenbord</h3>
-            <p>Bekijk hoe een takenbord werkt — zowel het klasoverzicht als de persoonlijke kaart per kind.</p>
-            <span class="zg-try-arrow">Open demo ↗</span>
-          </a>
-
+          </div>
+          <a href="https://tools.jufzisa.be/ontdek/app.html" class="zg-discover-button">Open alle tools en ontdek →</a>
         </div>
       </div>
     </div>
