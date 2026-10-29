@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Een getekende vis komt tot leven in een kleurrijke wereld">
+  <rect x="12" y="12" width="576" height="576" rx="65" fill="#e7f6ec"/>
+  <circle cx="342" cy="302" r="185" fill="#bce8ed"/>
+  <path d="M184 356 Q260 310 338 359 T518 339 V421 Q350 533 184 407Z" fill="#84cbd2"/>
+  <g transform="rotate(-12 196 294)">
+    <rect x="75" y="132" width="223" height="298" rx="15" fill="#fff" stroke="#638b78" stroke-width="9"/>
+    <path d="M109 173H259M109 198H211" stroke="#dbe6df" stroke-width="10" stroke-linecap="round"/>
+    <ellipse cx="173" cy="303" rx="48" ry="35" fill="none" stroke="#366375" stroke-width="7"/>
+    <path d="M218 300L253 270V333Z" fill="none" stroke="#366375" stroke-width="7" stroke-linejoin="round"/>
+    <circle cx="155" cy="295" r="5" fill="#366375"/>
+  </g>
+  <path d="M290 241Q340 195 375 220M355 191L377 220L348 230" fill="none" stroke="#f1aa35" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M445 321L506 272V370Z" fill="#ee8b46" stroke="#ad5a31" stroke-width="7" stroke-linejoin="round"/>
+  <ellipse cx="396" cy="321" rx="69" ry="51" fill="#ffc765" stroke="#ad5a31" stroke-width="7"/>
+  <circle cx="371" cy="307" r="8" fill="#354944"/>
+  <path d="M363 332Q375 346 389 332" fill="none" stroke="#ad5a31" stroke-width="5" stroke-linecap="round"/>
+  <g fill="#fff"><circle cx="460" cy="222" r="14"/><circle cx="490" cy="184" r="9"/><circle cx="330" cy="401" r="9"/></g>
+  <g transform="rotate(32 240 442)"><rect x="225" y="381" width="30" height="118" rx="4" fill="#ec7379"/><path d="M225 499L240 533L255 499" fill="#efd3a6"/><path d="M234 520L240 533L246 520" fill="#364c46"/></g>
+  <path d="M122 91L129 111L151 118L129 125L122 147L115 125L94 118L115 111Z" fill="#f4bd52"/>
+</svg>

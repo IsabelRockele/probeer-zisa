@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Kleurrijke boomwhackers, pianotoetsen en muzieknoten">
+  <rect x="12" y="12" width="576" height="576" rx="65" fill="#e7f6ec"/>
+  <circle cx="300" cy="284" r="204" fill="#dcd5f5"/>
+  <circle cx="470" cy="135" r="48" fill="#fff0bd"/>
+  <g fill="#6650a8" stroke="#6650a8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M142 184V109L203 94V165M142 123L203 108" fill="none"/>
+    <ellipse cx="128" cy="186" rx="18" ry="12" transform="rotate(-20 128 186)"/>
+    <ellipse cx="189" cy="168" rx="18" ry="12" transform="rotate(-20 189 168)"/>
+    <path d="M450 224V156Q479 164 480 189" fill="none"/>
+    <ellipse cx="436" cy="227" rx="18" ry="12" transform="rotate(-20 436 227)"/>
+  </g>
+  <g transform="rotate(-9 300 310)" stroke-width="5">
+    <rect x="111" y="225" width="47" height="193" rx="18" fill="#f06a74" stroke="#ce4c60"/>
+    <rect x="169" y="244" width="47" height="174" rx="18" fill="#f7a24d" stroke="#d77f36"/>
+    <rect x="227" y="264" width="47" height="154" rx="18" fill="#ffda62" stroke="#dfb53c"/>
+    <rect x="285" y="284" width="47" height="134" rx="18" fill="#9ace63" stroke="#75a447"/>
+    <rect x="343" y="305" width="47" height="113" rx="18" fill="#54bfbd" stroke="#369b9b"/>
+    <rect x="401" y="325" width="47" height="93" rx="18" fill="#8e7cce" stroke="#6d5aae"/>
+    <path d="M125 249V387M183 267V387M241 287V387M299 307V387M357 328V387M415 348V387" stroke="#fff" opacity=".45" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(6 304 448)">
+    <rect x="94" y="405" width="420" height="122" rx="20" fill="#443c64"/>
+    <rect x="107" y="418" width="394" height="95" rx="9" fill="#fffdf5"/>
+    <path d="M163 419V512M219 419V512M275 419V512M331 419V512M387 419V512M443 419V512" stroke="#d0cbd9" stroke-width="4"/>
+    <g fill="#443c64"><rect x="148" y="416" width="29" height="57" rx="4"/><rect x="204" y="416" width="29" height="57" rx="4"/><rect x="316" y="416" width="29" height="57" rx="4"/><rect x="372" y="416" width="29" height="57" rx="4"/><rect x="428" y="416" width="29" height="57" rx="4"/></g>
+  </g>
+  <path d="M302 111L310 135L334 143L310 151L302 175L294 151L270 143L294 135Z" fill="#f3bc44"/>
+  <g fill="#fff"><circle cx="91" cy="324" r="9"/><circle cx="510" cy="316" r="12"/><circle cx="374" cy="199" r="8"/></g>
+</svg>

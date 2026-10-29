@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+  <defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7456e8"/><stop offset="1" stop-color="#392a92"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-opacity=".22"/></filter></defs>
+  <rect width="600" height="400" rx="28" fill="#eeeaff"/><circle cx="68" cy="65" r="36" fill="#ffd84a" opacity=".8"/><circle cx="535" cy="330" r="56" fill="#70e1b3" opacity=".55"/>
+  <g filter="url(#s)"><rect x="118" y="48" width="364" height="305" rx="40" fill="url(#b)" stroke="#282044" stroke-width="12"/><rect x="154" y="88" width="292" height="210" rx="24" fill="#3a4155" stroke="#9ca5bf" stroke-width="7"/></g>
+  <text x="300" y="80" text-anchor="middle" font-family="Arial" font-size="22" font-weight="900" fill="#fff">SPLIT-O-MATIC</text>
+  <path d="M300 147v45M300 192l-83 69M300 192l83 69" fill="none" stroke="#c9d1e4" stroke-width="12" stroke-linecap="round"/>
+  <g font-family="Arial" font-size="42" font-weight="900" text-anchor="middle"><rect x="255" y="112" width="90" height="66" rx="17" fill="#fff5a6" stroke="#ffb126" stroke-width="7"/><text x="300" y="159" fill="#4637aa">10</text><rect x="166" y="240" width="90" height="66" rx="17" fill="#fff" stroke="#5ed2a4" stroke-width="7"/><text x="211" y="287" fill="#293149">6</text><rect x="344" y="240" width="90" height="66" rx="17" fill="#fff5a6" stroke="#ffdf3e" stroke-width="7"/><text x="389" y="287" fill="#4637aa">?</text></g>
+  <g fill="#ffcf56"><path d="M84 183l13 27 29 4-21 21 5 29-26-14-26 14 5-29-21-21 29-4z"/><path d="M516 100l8 17 19 3-14 13 4 19-17-9-17 9 3-19-13-13 19-3z"/></g>
+</svg>
